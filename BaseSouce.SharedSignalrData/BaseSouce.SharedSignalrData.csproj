@@ -5,9 +5,4 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <ItemGroup>
-    <Folder Include="Client\" />
-    <Folder Include="Server\" />
-  </ItemGroup>
-
 </Project>

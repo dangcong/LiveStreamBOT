@@ -14,6 +14,7 @@
     <PackageReference Include="FFmpegArgs.Executes" Version="1.5.0" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.2" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="TqkLibrary.Queues" Version="1.0.0-build2022121301" />
     <PackageReference Include="TypedSignalR.Client" Version="3.3.0">
       <PrivateAssets>all</PrivateAssets>

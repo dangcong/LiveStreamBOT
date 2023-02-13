@@ -1,0 +1,177 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using TqkLibrary.Queues.TaskQueues;
+using FFmpegArgs.Executes;
+using System.Threading;
+using System.IO;
+using BaseSouce.SharedSignalrData.Server;
+using BaseSouce.SharedSignalrData.BotClient;
+using LiveStreamBOT.Helpers;
+using System.Data.Common;
+
+namespace LiveStreamBOT.Queues
+{
+    internal class WorkQueue : IQueue
+    {
+        public RenderCommand RenderCommand { get; }
+        readonly IServerHub _serverHub;
+        readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        readonly string _workingDir;
+        CancellationToken CancellationToken { get { return _cancellationTokenSource.Token; } }
+        public WorkQueue(RenderCommand renderCommand, IServerHub serverHub)
+        {
+            this.RenderCommand = renderCommand ?? throw new ArgumentNullException(nameof(renderCommand));
+            this._serverHub = serverHub ?? throw new ArgumentNullException(nameof(serverHub));
+
+            _workingDir = Path.Combine(Singleton.BaseWorkingDir, $"{RenderCommand.ItemId}_{RenderCommand.WorkId}");
+        }
+
+
+        public bool IsPrioritize => false;
+
+        public void Cancel()
+        {
+            _cancellationTokenSource.Cancel();
+        }
+
+        public void Dispose()
+        {
+            _cancellationTokenSource.Dispose();
+        }
+
+        public async Task DoWork()
+        {
+            try
+            {
+                await DownloadFileAsync();
+                await LiveStreamAsync();
+
+                await _serverHub.RenderUpdateAsync(new RenderMessage()
+                {
+                    ItemId = RenderCommand.ItemId,
+                    WorkId = RenderCommand.WorkId,
+                    RenderStatus = RenderStatus.Ended,
+                });
+            }
+            catch (OperationCanceledException)
+            {
+                await _serverHub.RenderUpdateAsync(new RenderMessage()
+                {
+                    ItemId = RenderCommand.ItemId,
+                    WorkId = RenderCommand.WorkId,
+                    RenderStatus = RenderStatus.Cancelled,
+                });
+            }
+            catch (Exception ex)
+            {
+                if (ex is AggregateException ae) await SendErrorAsync(ae.InnerException);
+                else await SendErrorAsync(ex.InnerException);
+            }
+            finally
+            {
+                if (Directory.Exists(_workingDir))
+                {
+                    Directory.Delete(_workingDir, true);
+                }
+            }
+        }
+
+
+        async Task DownloadFileAsync()
+        {
+            double sizeDownloaded = 0;
+            double totalSize = RenderCommand.FileDatas.Sum(x => x.Size);
+            DateTime dateTime = DateTime.Now;
+            foreach (var file in RenderCommand.FileDatas)
+            {
+                await file.DownloadAsync(_workingDir, async (x) =>
+                {
+                    sizeDownloaded += x;
+
+                    if (dateTime > DateTime.Now)
+                    {
+                        dateTime = DateTime.Now.AddSeconds(1);
+
+                        await _serverHub.RenderUpdateAsync(new RenderMessage()
+                        {
+                            ItemId = RenderCommand.ItemId,
+                            WorkId = RenderCommand.WorkId,
+                            RenderStatus = RenderStatus.Downloading,
+                            DownloadPercentage = sizeDownloaded,
+                        });
+                    }
+                }, CancellationToken);
+            }
+
+            await _serverHub.RenderUpdateAsync(new RenderMessage()
+            {
+                ItemId = RenderCommand.ItemId,
+                WorkId = RenderCommand.WorkId,
+                RenderStatus = RenderStatus.Downloading,
+                DownloadPercentage = sizeDownloaded,
+            });
+        }
+
+
+        Task SendErrorAsync(Exception exception)
+        {
+            return _serverHub.RenderUpdateAsync(new RenderMessage()
+            {
+                ItemId = RenderCommand.ItemId,
+                WorkId = RenderCommand.WorkId,
+                RenderStatus = RenderStatus.Error,
+                ExceptionInfo = new ExceptionInfo()
+                {
+                    Message = exception.Message,
+                    Name = exception.GetType().FullName,
+                    StackTrace = exception.StackTrace,
+                }
+            });
+        }
+
+
+        async Task LiveStreamAsync()
+        {
+            FFmpegRender render = FFmpegRender.FromArguments(RenderCommand.Arguments, new FFmpegRenderConfig()
+            {
+                WorkingDirectory = _workingDir,
+            });
+            render.OnEncodingProgress += Render_OnEncodingProgress;
+            await _serverHub.RenderUpdateAsync(new RenderMessage()
+            {
+                ItemId = RenderCommand.ItemId,
+                WorkId = RenderCommand.WorkId,
+                RenderStatus = RenderStatus.LiveStreaming,
+                RenderInfo = new RenderInfo()
+                {
+                    Bitrate = 0,
+                    Fps = 0,
+                    Size = 0,
+                    Time = new TimeSpan(0)
+                }
+            });
+            await render.ExecuteAsync(CancellationToken);
+        }
+
+
+        async void Render_OnEncodingProgress(RenderProgress obj)
+        {
+            await _serverHub.RenderUpdateAsync(new RenderMessage()
+            {
+                ItemId = RenderCommand.ItemId,
+                WorkId = RenderCommand.WorkId,
+                RenderStatus = RenderStatus.LiveStreaming,
+                RenderInfo = new RenderInfo()
+                {
+                    Bitrate = obj.Bitrate,
+                    Fps = obj.Fps,
+                    Size = obj.Size,
+                    Time = obj.Time
+                }
+            });
+        }
+    }
+}

@@ -11,16 +11,10 @@ using TypedSignalR.Client;
 using System.Timers;
 using System.Net.Http;
 using System.Threading;
+using LiveStreamBOT.Enums;
 
 namespace LiveStreamBOT.Services
 {
-    internal enum SignalRConnectionState
-    {
-        Connecting,
-        DisConnected,
-        Connected,
-        Reconnecting
-    }
     internal class SignalrClient : IAsyncDisposable, IDisposable
     {
         class RetryPolicy : IRetryPolicy
@@ -44,6 +38,49 @@ namespace LiveStreamBOT.Services
                 return Task.CompletedTask;
             }
         }
+        class SafeServerHub : IServerHub
+        {
+            readonly IServerHub _baseServerHub;
+            internal SafeServerHub(IServerHub baseServerHub)
+            {
+                this._baseServerHub = baseServerHub ?? throw new ArgumentNullException(nameof(baseServerHub));
+            }
+
+            public async Task PingAsync(ClientInfo clientInfo)
+            {
+                try
+                {
+                    await _baseServerHub.PingAsync(clientInfo);
+                }
+                catch (Exception ex)
+                {
+                    if (ex is AggregateException ae) ex = ae.InnerException;
+
+                    Console.WriteLine($"{ex.GetType().FullName}: {ex.Message}, {ex.StackTrace}");
+                }
+            }
+
+            public async Task RenderUpdateAsync(RenderMessage renderMessage)
+            {
+                try
+                {
+                    await _baseServerHub.RenderUpdateAsync(renderMessage);
+                }
+                catch (Exception ex)
+                {
+                    if (ex is AggregateException ae) ex = ae.InnerException;
+
+                    Console.WriteLine($"{ex.GetType().FullName}: {ex.Message}, {ex.StackTrace}");
+                    ThreadPool.QueueUserWorkItem((o) =>
+                    {
+                        Task.Delay(1000).ContinueWith((t) =>
+                        {
+                            _ = this.RenderUpdateAsync(renderMessage);
+                        });
+                    });
+                }
+            }
+        }
 
 
         internal event Action<RenderCommand> OnRenderCommand;
@@ -54,8 +91,7 @@ namespace LiveStreamBOT.Services
 
         readonly HubConnection _connection;
         readonly IDisposable _clientSubscription;
-        //
-        //readonly System.Timers.Timer _timer = new System.Timers.Timer(500);
+
         internal SignalrClient(Uri uri, string botId)
         {
             if (uri is null) throw new ArgumentNullException(nameof(uri));
@@ -84,7 +120,7 @@ namespace LiveStreamBOT.Services
                 )
             .Build();
 
-            _connection.CreateHubProxy<IServerHub>();
+            this.ServerHub = new SafeServerHub(_connection.CreateHubProxy<IServerHub>());
             _clientSubscription = _connection.Register<IBotClientHub>(new BotClientHub(this));
 
             _connection.KeepAliveInterval = TimeSpan.FromSeconds(5);

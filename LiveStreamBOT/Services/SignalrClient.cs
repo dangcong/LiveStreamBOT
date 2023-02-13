@@ -21,7 +21,7 @@ namespace LiveStreamBOT.Services
         Connected,
         Reconnecting
     }
-    internal class SignalrClient : IBotClientHub
+    internal class SignalrClient : IAsyncDisposable, IDisposable
     {
         class RetryPolicy : IRetryPolicy
         {
@@ -30,24 +30,42 @@ namespace LiveStreamBOT.Services
                 return TimeSpan.FromSeconds(3);
             }
         }
+        class BotClientHub : IBotClientHub
+        {
+            readonly SignalrClient _signalrClient;
+            internal BotClientHub(SignalrClient signalrClient)
+            {
+                this._signalrClient = signalrClient ?? throw new ArgumentNullException(nameof(signalrClient));
+            }
+
+            public Task RenderAsync(RenderCommand renderCommand)
+            {
+                _signalrClient.OnRenderCommand?.Invoke(renderCommand);
+                return Task.CompletedTask;
+            }
+        }
 
 
-
+        internal event Action<RenderCommand> OnRenderCommand;
         internal event Action<SignalRConnectionState> OnConnectionStateChange;
-        public IServerHub ServerHub { get; }
+        internal IServerHub ServerHub { get; }
+
+
 
         readonly HubConnection _connection;
         readonly IDisposable _clientSubscription;
         //
         //readonly System.Timers.Timer _timer = new System.Timers.Timer(500);
-        internal SignalrClient(Uri uri)
+        internal SignalrClient(Uri uri, string botId)
         {
+            if (uri is null) throw new ArgumentNullException(nameof(uri));
+            if (string.IsNullOrWhiteSpace(botId)) throw new ArgumentNullException(nameof(botId));
+
             Uri hubUri = new Uri($"{uri.Scheme}://{uri.Authority}/BotHub");
             HubConnectionBuilder hubConnectionBuilder = new();
             _connection = hubConnectionBuilder
                 .WithAutomaticReconnect(new RetryPolicy())
                 .WithUrl(hubUri
-#if DEBUG
                 , (opts) =>
                 {
                     opts.HttpMessageHandlerFactory = (message) =>
@@ -58,13 +76,16 @@ namespace LiveStreamBOT.Services
                                  (sender, certificate, chain, sslPolicyErrors) => { return true; };
                         return message;
                     };
+                    opts.Headers = new Dictionary<string, string>()
+                    {
+                        { "BotId", botId }
+                    };
                 }
-#endif
                 )
             .Build();
 
             _connection.CreateHubProxy<IServerHub>();
-            _clientSubscription = _connection.Register<IBotClientHub>(this);
+            _clientSubscription = _connection.Register<IBotClientHub>(new BotClientHub(this));
 
             _connection.KeepAliveInterval = TimeSpan.FromSeconds(5);
             _connection.Reconnecting += _connection_Reconnecting;
@@ -72,6 +93,26 @@ namespace LiveStreamBOT.Services
             _connection.Closed += _connection_Closed;
             //_timer.Elapsed += _timer_Elapsed;
             //_timer.AutoReset = false;
+        }
+        ~SignalrClient()
+        {
+            Dispose(false);
+        }
+        public async ValueTask DisposeAsync()
+        {
+            _clientSubscription.Dispose();
+            await _connection.DisposeAsync();
+            GC.SuppressFinalize(this);
+        }
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+        void Dispose(bool disposing)
+        {
+            _clientSubscription.Dispose();
+            _connection.DisposeAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
         private void _timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -97,26 +138,15 @@ namespace LiveStreamBOT.Services
             return Task.CompletedTask;
         }
 
-        public Task Start(CancellationToken cancellationToken = default)
+        public Task StartAsync(CancellationToken cancellationToken = default)
         {
             //_timer.Start();
             return _connection.StartAsync(cancellationToken);
         }
-        public Task Stop(CancellationToken cancellationToken = default)
+        public Task StopAsync()
         {
             //_timer.Stop();
-            return _connection.StopAsync(cancellationToken);
+            return _connection.StopAsync();
         }
-
-
-
-        #region IBotClientHub
-        public event Action<RenderCommand> OnRenderCommand;
-        public Task RenderAsync(RenderCommand renderCommand)
-        {
-            OnRenderCommand?.Invoke(renderCommand);
-            return Task.CompletedTask;
-        }
-        #endregion
     }
 }

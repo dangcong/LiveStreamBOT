@@ -133,13 +133,14 @@ namespace LiveStreamBOT.Queues
         }
 
 
-        async Task LiveStreamAsync()
+        async Task LiveStreamAsync(Stream stream = null)
         {
             FFmpegRender render = FFmpegRender.FromArguments(RenderCommand.Arguments, new FFmpegRenderConfig()
             {
                 WorkingDirectory = _workingDir,
             });
             render.OnEncodingProgress += Render_OnEncodingProgress;
+            if (stream != null) render.WithStdInStream(stream);
             await _serverHub.RenderUpdateAsync(new RenderMessage()
             {
                 ItemId = RenderCommand.ItemId,

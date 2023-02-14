@@ -73,7 +73,7 @@ namespace LiveStreamBOT.Services
                     Console.WriteLine($"{ex.GetType().FullName}: {ex.Message}, {ex.StackTrace}");
                     ThreadPool.QueueUserWorkItem((o) =>
                     {
-                        Task.Delay(1000).ContinueWith((t) =>
+                        Task.Delay(100).ContinueWith((t) =>
                         {
                             _ = this.RenderUpdateAsync(renderMessage);
                         });

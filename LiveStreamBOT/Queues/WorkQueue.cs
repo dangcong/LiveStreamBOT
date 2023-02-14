@@ -46,15 +46,31 @@ namespace LiveStreamBOT.Queues
         {
             try
             {
-                await DownloadFileAsync();
-                await LiveStreamAsync();
-
-                await _serverHub.RenderUpdateAsync(new RenderMessage()
+                switch (RenderCommand.FileType)
                 {
-                    ItemId = RenderCommand.ItemId,
-                    WorkId = RenderCommand.WorkId,
-                    RenderStatus = RenderStatus.Ended,
-                });
+                    case FileType.File:
+                        {
+                            await DownloadFileAsync();
+                            await LiveStreamAsync();
+
+                            await _serverHub.RenderUpdateAsync(new RenderMessage()
+                            {
+                                ItemId = RenderCommand.ItemId,
+                                WorkId = RenderCommand.WorkId,
+                                RenderStatus = RenderStatus.Ended,
+                            });
+                            break;
+                        }
+
+                    case FileType.LiveStream:
+                        {
+                            using Stream stream = await GetLivestreamAsync();
+
+                            break;
+                        }
+                    default:
+                        throw new NotSupportedException(RenderCommand.FileType.ToString());
+                }
             }
             catch (OperationCanceledException)
             {
@@ -113,6 +129,11 @@ namespace LiveStreamBOT.Queues
                 RenderStatus = RenderStatus.Downloading,
                 DownloadPercentage = sizeDownloaded,
             });
+        }
+
+        Task<Stream> GetLivestreamAsync()
+        {
+            throw new NotSupportedException();
         }
 
 

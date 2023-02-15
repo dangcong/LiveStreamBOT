@@ -2,7 +2,8 @@
 
 FROM mcr.microsoft.com/dotnet/runtime:6.0 AS base
 RUN apt update
-RUN apt-get install -y ffmpeg=7:4.3.5-0+deb11u1
+RUN apt-get install -y procps
+RUN apt-get install -y ffmpeg
 WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build 

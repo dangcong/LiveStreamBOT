@@ -17,11 +17,12 @@ namespace LiveStreamBOT.Helpers
     /// </summary>
     internal static class ClientInfoHelper
     {
-        internal static async Task<ClientInfo> GetClientInfo()
+        internal static ClientInfo GetClientInfo()
         {
             var clientInfo = new ClientInfo();
             clientInfo.CpuUsage = GetPercentCpu();
             clientInfo.RamUsage = GetPercentRam();
+            clientInfo.Bandwidth = GetBandwidth();
             return clientInfo;
         }
 
@@ -29,17 +30,13 @@ namespace LiveStreamBOT.Helpers
         static double GetPercentCpu()
         {
             //https://www.baeldung.com/linux/get-cpu-usage#2-getting-cpu-usage-using-procstat
-            var lines = File.ReadAllLines("/proc/stat", Encoding.ASCII);
+            var lines = File.ReadAllLines("/proc/stat", Encoding.ASCII).Select(x => x.Trim()).ToArray();
             int cpuLineCount = lines.Count(x => x.StartsWith("cpu"));
 
             var numColumns = lines
                 .First(x => x.StartsWith("cpu "))
                 .Split(' ')
-                .Select(x =>
-                {
-                    if (double.TryParse(x.Trim(), out double r)) return r;
-                    return double.NaN;
-                })
+                .Select(x => GetNumValue(x.Trim()))
                 .Where(x => !double.IsNaN(x))
                 .ToArray();
             double idle = numColumns.Skip(3).FirstOrDefault();//default is 0
@@ -48,7 +45,7 @@ namespace LiveStreamBOT.Helpers
 
         static double GetPercentRam()
         {
-            var lines = File.ReadAllLines("/proc/meminfo", Encoding.ASCII);
+            var lines = File.ReadAllLines("/proc/meminfo", Encoding.ASCII).Select(x => x.Trim()).ToArray();
 
             string lineMemTotal = lines.FirstOrDefault(x => x.StartsWith("MemTotal:"));
             string lineMemFree = lines.FirstOrDefault(x => x.StartsWith("MemFree:"));
@@ -59,10 +56,39 @@ namespace LiveStreamBOT.Helpers
             return (memTotal - memFree) / memTotal;
         }
 
+        static double old_Transmit = double.NaN;
+        static DateTime old_TransmitTime = DateTime.Now;
         static double GetBandwidth()
         {
+            var lines = File.ReadAllLines("/proc/net/dev", Encoding.ASCII).Select(x => x.Trim()).ToArray();
 
-            return double.NaN;
+            var mainLine = lines.FirstOrDefault(x => x.StartsWith(Singleton.Setting.Setting.NetworkName));
+
+            var numColumns = mainLine
+                .Split(' ')
+                .Select(x => GetNumValue(x.Trim()))
+                .Where(x => !double.IsNaN(x))
+                .ToArray();
+
+            if (double.IsNaN(old_Transmit))
+            {
+                old_Transmit = numColumns.Skip(7).FirstOrDefault();
+                old_TransmitTime = DateTime.Now;
+                return double.NaN;
+            }
+            else
+            {
+                double new_Transmit = numColumns.Skip(7).FirstOrDefault();
+                DateTime new_TransmitTime = DateTime.Now;
+
+                double byte_Transmit = new_Transmit - old_Transmit;
+                double time_Transmit = (new_TransmitTime - old_TransmitTime).TotalSeconds;
+
+                old_Transmit = new_Transmit;
+                old_TransmitTime = new_TransmitTime;
+
+                return byte_Transmit / time_Transmit;
+            }
         }
 
 

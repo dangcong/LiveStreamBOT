@@ -5,17 +5,23 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace LiveStreamBOT.Helpers
 {
+    /// <summary>
+    /// https://wiki.tino.org/docs/cac-tap-lenh-co-ban-cua-thu-muc-proc-trong-linux/
+    /// cpu /proc/stat
+    /// ram /proc/meminfo
+    /// </summary>
     internal static class ClientInfoHelper
     {
         internal static async Task<ClientInfo> GetClientInfo()
         {
             var clientInfo = new ClientInfo();
             clientInfo.CpuUsage = GetPercentCpu();
-            clientInfo.RamUsage = await GetPercentRamAsync();
+            clientInfo.RamUsage = GetPercentRam();
             return clientInfo;
         }
 
@@ -31,36 +37,50 @@ namespace LiveStreamBOT.Helpers
                 .Split(' ')
                 .Select(x =>
                 {
-                    if (int.TryParse(x, out int r)) return r;
-                    return new Nullable<int>();
+                    if (double.TryParse(x.Trim(), out double r)) return r;
+                    return double.NaN;
                 })
-                .Where(x => x.HasValue)
-                .Select(x => x.Value)
+                .Where(x => !double.IsNaN(x))
                 .ToArray();
-            double idle = numColumns.Skip(3).First();
-
-            return idle / numColumns.Sum() / (cpuLineCount - 1);
+            double idle = numColumns.Skip(3).FirstOrDefault();//default is 0
+            return idle / numColumns.Sum() / (cpuLineCount - 1);//div 0 -> infinity
         }
 
-        static async Task<double> GetPercentRamAsync()
+        static double GetPercentRam()
         {
-            IEnumerable<string> lines = await ShellExecuteAsync("/usr/bin/free");
+            var lines = File.ReadAllLines("/proc/meminfo", Encoding.ASCII);
 
-            string lineMem = lines.First(x => x.StartsWith("Mem:"));
-            var numColumns = lineMem
-                .Split(' ')
-                .Select(x =>
-                {
-                    if (int.TryParse(x, out int r)) return r;
-                    return new Nullable<int>();
-                })
-                .Where(x => x.HasValue)
-                .Select(x => x.Value)
-                .ToArray();
+            string lineMemTotal = lines.FirstOrDefault(x => x.StartsWith("MemTotal:"));
+            string lineMemFree = lines.FirstOrDefault(x => x.StartsWith("MemFree:"));
 
-            return numColumns[1] * 1.0 / numColumns[0];
+            double memTotal = GetNumValue(lineMemTotal);
+            double memFree = GetNumValue(lineMemFree);
+
+            return (memTotal - memFree) / memTotal;
         }
 
+        static double GetBandwidth()
+        {
+
+            return double.NaN;
+        }
+
+
+
+
+        static readonly Regex regex_num = new Regex("\\d+");
+        static double GetNumValue(string text)
+        {
+            if (!string.IsNullOrWhiteSpace(text))
+            {
+                Match match = regex_num.Match(text);
+                if (match.Success)
+                {
+                    return double.Parse(match.Value);
+                }
+            }
+            return double.NaN;
+        }
 
         static async Task<IEnumerable<string>> ShellExecuteAsync(string filename, string args = null, bool isShell = false)
         {

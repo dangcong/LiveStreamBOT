@@ -2,7 +2,6 @@
 
 FROM mcr.microsoft.com/dotnet/runtime:6.0 AS base
 RUN apt update
-RUN apt-get install -y procps
 RUN apt-get install -y ffmpeg
 WORKDIR /app
 

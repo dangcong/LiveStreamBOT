@@ -7,6 +7,7 @@ using LiveStreamBOT.Services;
 using System;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using TqkLibrary.Queues.TaskQueues;
 
@@ -20,18 +21,26 @@ if (Uri.TryCreate(args.FirstOrDefault(), UriKind.Absolute, out Uri uri))
     try
     {
         await using SignalrClient signalrClient = new SignalrClient(uri, Singleton.Setting.Setting.BotId);
-        await signalrClient.StartAsync();
         ServerHub = signalrClient.ServerHub;
-
         signalrClient.OnConnectionStateChange += SignalrClient_OnConnectionStateChange;
         signalrClient.OnRenderCommand += SignalrClient_OnRenderCommand;
+
+        await signalrClient.StartAsync();
 
         Singleton.Setting.Save();
         Console.WriteLine("Started");
         while (true)
         {
-            await Task.Delay(1000);
-            await ServerHub.PingAsync(ClientInfoHelper.GetClientInfo());
+            await Task.Delay(Singleton.Setting.Setting.PingInterval);
+
+            ClientInfo clientInfo = null;
+            try
+            {
+                clientInfo = ClientInfoHelper.GetClientInfo();
+            }
+            catch { }
+
+            if (clientInfo is not null) await ServerHub.PingAsync(clientInfo);
         }
     }
     finally

@@ -23,6 +23,12 @@ namespace BaseSource.AppUI.Controllers
             return View();
         }
 
+        [Route("ServicePack")]
+        [HttpGet]
+        public IActionResult ServicePack()
+        {
+            return View();
+        }
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {

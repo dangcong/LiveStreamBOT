@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace LiveStreamBOT.Helpers
 {
@@ -12,11 +14,10 @@ namespace LiveStreamBOT.Helpers
             _baseStream = baseStream ?? throw new ArgumentNullException(nameof(baseStream));
             _bufferTransferCallback = bufferTransferCallback ?? throw new ArgumentNullException(nameof(bufferTransferCallback));
         }
-
-
-
-
-
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+        }
 
         public override bool CanRead => _baseStream.CanRead;
 
@@ -36,7 +37,7 @@ namespace LiveStreamBOT.Helpers
         public override int Read(byte[] buffer, int offset, int count)
         {
             int result = _baseStream.Read(buffer, offset, count);
-            _bufferTransferCallback.Invoke(result);
+            ThreadPool.QueueUserWorkItem((o) => _bufferTransferCallback.Invoke(result));
             return result;
         }
 
@@ -53,7 +54,61 @@ namespace LiveStreamBOT.Helpers
         public override void Write(byte[] buffer, int offset, int count)
         {
             _baseStream.Write(buffer, offset, count);
-            _bufferTransferCallback.Invoke(count);
+            ThreadPool.QueueUserWorkItem((o) => _bufferTransferCallback.Invoke(count));
         }
+
+
+
+
+        //https://devblogs.microsoft.com/pfxteam/overriding-stream-asynchrony/
+        //must overwite BeginRead/EndRead, BeginWrite/EndWrite for asynchronous 
+        public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+        {
+            return _baseStream.BeginRead(buffer, offset, count, callback, state);
+        }
+        public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+        {
+            ThreadPool.QueueUserWorkItem((o) => _bufferTransferCallback.Invoke(count));
+            return _baseStream.BeginWrite(buffer, offset, count, callback, state);
+        }
+        public override int EndRead(IAsyncResult asyncResult)
+        {
+            int result = _baseStream.EndRead(asyncResult);
+            ThreadPool.QueueUserWorkItem((o) => _bufferTransferCallback.Invoke(result));
+            return result;
+        }
+        public override void EndWrite(IAsyncResult asyncResult)
+        {
+            _baseStream.EndWrite(asyncResult);
+        }
+
+        public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
+        {
+            int byte_read = await _baseStream.ReadAsync(buffer, offset, count, cancellationToken).ConfigureAwait(false);
+            ThreadPool.QueueUserWorkItem((o) => _bufferTransferCallback.Invoke(byte_read));
+            return byte_read;
+        }
+        public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken = default)
+        {
+            ThreadPool.QueueUserWorkItem((o) => _bufferTransferCallback.Invoke(count));
+            return _baseStream.WriteAsync(buffer, offset, count, cancellationToken);
+        }
+        public override Task FlushAsync(CancellationToken cancellationToken = default)
+        {
+            return _baseStream.FlushAsync(cancellationToken);
+        }
+#if NET5_0_OR_GREATER
+        public override async ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            int byte_read = await _baseStream.ReadAsync(buffer, cancellationToken);
+            ThreadPool.QueueUserWorkItem((o) => _bufferTransferCallback.Invoke(byte_read));
+            return byte_read;
+        }
+        public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken = default)
+        {
+            ThreadPool.QueueUserWorkItem((o) => _bufferTransferCallback.Invoke(buffer.Length));
+            return _baseStream.WriteAsync(buffer, cancellationToken);
+        }
+#endif
     }
 }

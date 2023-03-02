@@ -1,0 +1,181 @@
+﻿@*<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - BaseSource.AppUI</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/BaseSource.AppUI.styles.css" asp-append-version="true" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container-fluid">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">BaseSource.AppUI</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2023 - BaseSource.AppUI - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
+*@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
+    <title>Admin</title>
+
+    <!-- General CSS Files -->
+    @*<link href="~/admin-themes/assets/modules/bootstrap/css/bootstrap.min.css" rel="stylesheet" />*@
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+    @*<link href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" rel=" stylesheet" />*@
+    <link href="~/admin-themes/assets/modules/fontawesome/css/all.min.css" rel="stylesheet" />
+
+    <!-- CSS Libraries -->
+    <link href="~/admin-themes/assets/modules/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" />
+    <link href="~/admin-themes/assets/modules/datatables/select.bootstrap4.min.css" rel="stylesheet" />
+    <!-- Template CSS -->
+    <link href="~/admin-themes/assets/css/style.css" rel="stylesheet" />
+    <link href="~/admin-themes/assets/css/components.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div id="app">
+        <div class="main-wrapper">
+            <div class="navbar-bg"></div>
+            <nav class="navbar navbar-expand-lg main-navbar">
+                <form class="form-inline mr-auto">
+                    <ul class="navbar-nav mr-3">
+                        <li><a href="#" data-toggle="sidebar" class="nav-link nav-link-lg"><i class="fas fa-bars"></i></a></li>
+                        <li><a href="#" data-toggle="search" class="nav-link nav-link-lg d-sm-none"><i class="fas fa-search"></i></a></li>
+                    </ul>
+                </form>
+                <ul class="navbar-nav navbar-right">
+
+                    <li class="dropdown">
+                        <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
+                            <img alt="image" src="~/admin-themes/assets/img/avatar/avatar-1.png" class="rounded-circle mr-1">
+                            <div class="d-sm-none d-lg-inline-block">Hi, Admin</div>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right">
+
+                            <div class="dropdown-divider"></div>
+                            <a href="/account/LogoutABC" class="dropdown-item has-icon text-danger">
+                                <i class="fas fa-sign-out-alt"></i> Thoát
+                            </a>
+                        </div>
+                    </li>
+                </ul>
+            </nav>
+            <div class="main-sidebar">
+                <aside id="sidebar-wrapper">
+                    <div class="sidebar-brand">
+                        <a href="/bitcoin">AutoLive</a>
+                    </div>
+                    <div class="sidebar-brand sidebar-brand-sm">
+                        <a href="/bitcoin">AutoLive</a>
+                    </div>
+                    <ul class="sidebar-menu">
+
+                        <li><a class="nav-link" href="/ServicePack"><i class="fas fa-columns"></i> <span>Live Stream</span></a></li>
+                        <li><a class="nav-link" href="/admin/Authenticator/EnableAuthenticator"><i class="fas fa-columns"></i> <span>Gói Cước</span></a></li>
+                        <li><a class="nav-link" href="/admin/Authenticator/EnableAuthenticator"><i class="fas fa-columns"></i> <span>Cá nhân</span></a></li>
+                        <li><a class="nav-link" href="/admin/Setting/Index"><i class="fas fa-columns"></i> <span>Hướng dẫn</span></a></li>
+                      
+                    </ul>
+                </aside>
+            </div>
+            <!-- Main Content -->
+            <div class="main-content">
+                @RenderBody()
+                <div class="modal fade" role="dialog" id="model2FA">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Bào vệ 2FA</h5>
+                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <form method="post" action="/admin/Authenticator/ValidateAuthenticator" id="ValidateAuthenticator">
+                                    <p>Nhập mã xác thực 2FA để thực hiện thao tác</p>
+                                    <input type="number" required name="code" id="code2FA" value="" placeholder="Nhập Mã 2FA" class="form-control" />
+                                    <p class="text-danger text-error2FA"></p>
+                                    <button type="submit" class="btn btn-primary mt-1">Xác nhận</button>
+                                </form>
+                            </div>
+                            <div class="modal-footer bg-whitesmoke br">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <footer class="main-footer">
+                <div class="footer-left">
+                    Copyright &copy; 2021 <div class="bullet"></div>
+                </div>
+            </footer>
+        </div>
+
+    </div>
+
+    <!-- General JS Scripts -->
+    <script src="~/admin-themes/assets/modules/jquery.min.js"></script>
+    <script src="~/admin-themes/assets/modules/popper.js"></script>
+    <script src="~/admin-themes/assets/modules/bootstrap/js/bootstrap.min.js"></script>
+    <script src="~/admin-themes/assets/modules/jquery.nicescroll.min.js"></script>
+    <script src="~/admin-themes/assets/modules/moment.min.js"></script>
+    <script src="~/admin-themes/assets/js/stisla.js"></script>
+
+    <!-- JS Libraies -->
+    <script src="~/admin-themes/assets/modules/datatables/datatables.min.js"></script>
+    <script src="~/admin-themes/assets/modules/datatables/dataTables.bootstrap4.min.js"></script>
+    <script src="~/admin-themes/assets/modules/datatables/dataTables.select.min.js"></script>
+
+    <!-- Template JS File -->
+    <script src="~/admin-themes/assets/js/scripts.js"></script>
+    <script src="~/admin-themes/assets/js/custom.js"></script>
+    <script src="~/admin-themes/assets/js/page/bootstrap-modal.js"></script>
+    <!-- Page Specific JS File -->
+    <script src="~/admin-themes/assets/js/page/modules-datatables.js"></script>
+    <script>
+
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+
+</body>
+</html>

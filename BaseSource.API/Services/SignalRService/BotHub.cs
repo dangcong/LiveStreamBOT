@@ -20,7 +20,11 @@ namespace BaseSource.API.Services.SignalRService
         {
             if (this.Context.GetHttpContext()?.Request?.Headers?.TryGetValue("BotId", out StringValues strings) == true)
             {
-                _botDataCache[strings] = clientInfo;
+                string key = strings.ToString();
+                if (!string.IsNullOrWhiteSpace(key))
+                {
+                    _botDataCache[key] = clientInfo;
+                }
             }
             return Task.CompletedTask;
         }

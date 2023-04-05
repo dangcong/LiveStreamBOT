@@ -7,6 +7,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="FFmpegArgs" Version="1.5.0" />
+    <PackageReference Include="FFmpegArgs.Filters" Version="1.5.0" />
+    <PackageReference Include="FFmpegArgs.Inputs" Version="1.5.0" />
+    <PackageReference Include="FFmpegArgs.Outputs" Version="1.5.1" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="7.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.2.3" />

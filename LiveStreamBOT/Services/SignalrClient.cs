@@ -151,11 +151,6 @@ namespace LiveStreamBOT.Services
             _connection.DisposeAsync().ConfigureAwait(false).GetAwaiter().GetResult();
         }
 
-        private void _timer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-
-        }
-
         private Task _connection_Closed(Exception arg)
         {
             OnConnectionStateChange?.Invoke(SignalRConnectionState.DisConnected);

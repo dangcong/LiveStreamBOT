@@ -66,6 +66,10 @@ namespace LiveStreamBOT.Services
                 {
                     await _baseServerHub.RenderUpdateAsync(renderMessage);
                 }
+                catch (ObjectDisposedException)
+                {
+                    return;
+                }
                 catch (Exception ex)
                 {
                     if (ex is AggregateException ae) ex = ae.InnerException;

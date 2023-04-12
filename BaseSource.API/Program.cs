@@ -1,5 +1,6 @@
 using BaseSource.API;
 using BaseSource.API.Extensions;
+using BaseSource.API.Helpers;
 using BaseSource.API.Services.SignalRService;
 using BaseSource.API.Singletons;
 
@@ -13,6 +14,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSignalR();
 builder.Services.AddSingleton<IBotDataCache, BotDataCache>();
+builder.Services.AddTransient<IRenderArgumentGenerateHelper, RenderArgumentGenerateHelper>();
 builder.AddTelegram();
 
 

@@ -12,6 +12,8 @@ using System.Timers;
 using System.Net.Http;
 using System.Threading;
 using LiveStreamBOT.Enums;
+using Microsoft.Extensions.DependencyInjection;
+using System.Text.Json.Serialization;
 
 namespace LiveStreamBOT.Services
 {
@@ -122,6 +124,7 @@ namespace LiveStreamBOT.Services
                     };
                 }
                 )
+                .AddJsonProtocol(configure => configure.PayloadSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals)
             .Build();
 
             this.ServerHub = new SafeServerHub(_connection.CreateHubProxy<IServerHub>());

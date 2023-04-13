@@ -62,12 +62,12 @@ namespace LiveStreamBOT.Queues
                             break;
                         }
 
-                    case FileType.LiveStream:
-                        {
-                            using Stream stream = await GetLivestreamAsync();
+                    //case FileType.LiveStream:
+                    //    {
+                    //        using Stream stream = await GetLivestreamAsync();
 
-                            break;
-                        }
+                    //        break;
+                    //    }
                     default:
                         throw new NotSupportedException(RenderCommand.FileType.ToString());
                 }
@@ -101,9 +101,11 @@ namespace LiveStreamBOT.Queues
             double sizeDownloaded = 0;
             double totalSize = RenderCommand.FileDatas.Sum(x => x.Size);
             DateTime dateTime = DateTime.Now;
+
+            using DownloadHelper downloadHelper = new DownloadHelper();
             foreach (var file in RenderCommand.FileDatas)
             {
-                await file.DownloadAsync(_workingDir, async (x) =>
+                await downloadHelper.DownloadAsync(file, _workingDir, async (x) =>
                 {
                     sizeDownloaded += x;
 

@@ -2,16 +2,16 @@
   "profiles": {
     "LivestreamBot": {
       "commandName": "Project",
-      "commandLineArgs": "https://localhost:2222"
+      "commandLineArgs": "https://localhost:7122"
     },
     "WSL Ubuntu-22.04": {
       "commandName": "WSL",
       "distributionName": "Ubuntu-22.04",
-      "commandLineArgs": "https://localhost:2222"
+      "commandLineArgs": "https://localhost:7122"
     },
     "Docker": {
       "commandName": "Docker",
-      "commandLineArgs": "https://localhost:2222"
+      "commandLineArgs": "https://host.docker.internal:7122"
     }
   }
 }

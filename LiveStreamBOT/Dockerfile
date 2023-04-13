@@ -1,7 +1,7 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
 FROM mcr.microsoft.com/dotnet/runtime:6.0 AS base
-RUN apt update
+RUN apt-get -y update
 RUN apt-get install -y ffmpeg
 WORKDIR /app
 

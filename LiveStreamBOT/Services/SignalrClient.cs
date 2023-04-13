@@ -12,6 +12,8 @@ using System.Timers;
 using System.Net.Http;
 using System.Threading;
 using LiveStreamBOT.Enums;
+using Microsoft.Extensions.DependencyInjection;
+using System.Text.Json.Serialization;
 
 namespace LiveStreamBOT.Services
 {
@@ -66,6 +68,10 @@ namespace LiveStreamBOT.Services
                 {
                     await _baseServerHub.RenderUpdateAsync(renderMessage);
                 }
+                catch (ObjectDisposedException)
+                {
+                    return;
+                }
                 catch (Exception ex)
                 {
                     if (ex is AggregateException ae) ex = ae.InnerException;
@@ -118,6 +124,7 @@ namespace LiveStreamBOT.Services
                     };
                 }
                 )
+                .AddJsonProtocol(configure => configure.PayloadSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals)
             .Build();
 
             this.ServerHub = new SafeServerHub(_connection.CreateHubProxy<IServerHub>());
@@ -149,11 +156,6 @@ namespace LiveStreamBOT.Services
         {
             _clientSubscription.Dispose();
             _connection.DisposeAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-        }
-
-        private void _timer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-
         }
 
         private Task _connection_Closed(Exception arg)

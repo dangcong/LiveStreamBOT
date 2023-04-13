@@ -9,9 +9,14 @@ namespace BaseSouce.Data.Entities
         public int ServicePackId { get; set; }
         public int Month { get; set; }
         public DateTime CreatedTime { get; set; }
+        public DateTime ExpiredTime { get; set; }
         public double Price { get; set; }
         public OrderStatus Status { get; set; }
         public string UserId { get; set; }
         public bool IsActive { get; set; }
+        public int NumberOfThreads { get; set; }
+        public  AppUser User { get; set; }
+
+        public ServicePack ServicePack { get; set; }
     }
 }

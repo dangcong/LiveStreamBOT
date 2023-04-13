@@ -1,0 +1,75 @@
+﻿@model ServicePackByMonthCreateDto
+@{
+    ViewData["Title"] = "Tạo mới gói tháng";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<section class="section">
+    <div class="section-header">
+        <h1>Cài đặt</h1>
+        <div class="section-header-breadcrumb">
+            <div class="breadcrumb-item active"><a href="#">Home</a></div>
+            <div class="breadcrumb-item"><a href="#">Tạo gói tháng</a></div>
+            <div class="breadcrumb-item">Tạo gói tháng</div>
+        </div>
+    </div>
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Tạo gói tháng</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="/admin/ServicePackByMonth/Create">
+                            <div class="row">
+                               
+                                <div class="col-12">
+                                    <h6>Tạo gói tháng</h6>
+                                    <div class="form-group mb-4">
+                                        <label class="">Số tháng</label>
+                                        <div class="">
+                                            <input type="number" min="1" name="Month" value="@Model.Month" placeholder="Số tháng" class="form-control" />
+                                            <input name="ServicePackId" value="@Model.ServicePackId" style="display:none" class="form-control" />
+                                            <span asp-validation-for="Month" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group mb-4">
+                                        <label class="">Giá</label>
+                                        <div class="">
+                                            <input type="number" min="1" name="Price" value="@Model.Price" class="form-control" />
+                                            <span asp-validation-for="Price"  class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mb-4">
+                                        <label class="">Phần trăm giảm giá(%)</label>
+                                        <div class="">
+                                            <input type="number" name="Percent" value="@Model.Percent" class="form-control"/>
+                                            <span asp-validation-for="Percent"  class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                               
+                            </div>
+                            <div class="form-group row mb-4">
+                                <label class="col-form-label text-md-right col-12 col-md-4 col-lg-4"></label>
+                                <div class="buttons col-sm-12 col-md-8">
+                                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                    <button type="submit" class="btn btn-info btn-lg btn-icon btn-setting"><i class="fas fa-check"></i>&ensp;Tạo mới</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@section Scripts{
+    <script>
+        $('body').on('click', '.btn-setting', function () {
+            showModal(null, 'updateSetting');
+        });
+    </script>
+}
+

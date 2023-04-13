@@ -10,5 +10,7 @@ namespace BaseSouce.Data.Entities
         public double Price { get; set; }
         public double Discount { get; set; }
         public double Percent { get; set; }
+
+        public ServicePack ServicePack { get; set; }
     }
 }

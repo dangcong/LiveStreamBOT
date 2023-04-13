@@ -1,0 +1,65 @@
+﻿@model List<ServicePackDto>
+@{
+    ViewData["Title"] = "ServicePacks";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<section class="section">
+    <div class="section-header">
+        <h1>Danh sách gói cước Live</h1>
+        <div class="section-header-breadcrumb">
+            <div class="breadcrumb-item active"><a href="#">Home</a></div>
+            <div class="breadcrumb-item"><a href="#">Danh sách gói cước Live</a></div>
+            <div class="breadcrumb-item">Danh sách</div>
+        </div>
+    </div>
+
+    <div class="section-body">
+        <h2 class="section-title">Danh sách gói cước Live</h2>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Danh sách gói cước Live</h4>
+                        <a class="btn btn-success" href="/admin/servicePack/create">Tạo mới</a>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="table-all-user">
+                                <thead>
+                                    <tr>
+                                        <th>Tên</th>
+                                        <th>Số luồng</th>
+                                        <th>Giá</th>
+                                        <th>Discount</th>
+                                        <th>Ngày tạo</th>
+                                        <th>Trạng thái</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>@item.Name</td>
+                                            <td>@item.NumberOfThreads</td>
+                                            <td>@item.Price</td>
+                                            <td>@item.Discount</td>
+                                            <td>@item.CreatedTime</td>
+                                            <td>@(item.IsPublished ? "Hiển thị" : "Ẩn")</td>
+                                            <td>
+                                                <a class="btn btn-primary" href="/admin/ServicePack/edit/@(item.Id)">Sửa</a>
+                                                <a class="btn btn-success" href="/admin/ServicePackByMonth/Index/@(item.Id)">Gói tháng</a>
+                                                <button class="btn btn-danger">Ẩn</button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

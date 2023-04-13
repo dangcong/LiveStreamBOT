@@ -1,9 +1,5 @@
 ﻿using BaseSouce.Shared.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BaseSource.Data.Entities;
 
 namespace BaseSouce.Data.Entities
 {
@@ -17,5 +13,7 @@ namespace BaseSouce.Data.Entities
         public DateTime CreatedTime { get; set; }
         public DateTime? DeletedTime { get; set; }
         public int Retry { get; set; }
+
+        public ICollection<StreamHistory > StreamHistorys { get; set; }
     }
 }

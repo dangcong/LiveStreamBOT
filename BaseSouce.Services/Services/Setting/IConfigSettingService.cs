@@ -1,0 +1,14 @@
+﻿using BaseSource.ViewModels.Setting;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace BaseSouce.Services.Services.Setting
+{
+    public interface IConfigSettingService
+    {
+        Task<ConfigSettingVm> GetSettingAsync();
+    }
+}

@@ -1,0 +1,255 @@
+﻿@{
+    ViewData["Title"] = "Invoice";
+}
+<style>
+    .theme--light .card-box {
+        background-color: #fff;
+        border-color: #fff;
+        border-radius: 0.35rem;
+        border: 0px;
+        box-shadow: 0 1px 2px rgb(0 0 0 / 20%);
+    }
+
+    .theme--light .btn-icon {
+        background: #ccc;
+        color: #000;
+        border: none;
+        padding: 3px 6px 3px 6px;
+    }
+
+    .radius35 {
+        border-radius: 0.35rem;
+    }
+
+    .btn-month-payment {
+        height: 130px;
+        width: 170px;
+    }
+
+    .cur-point {
+        cursor: pointer;
+    }
+
+    .m-r-15 {
+        margin-right: 15px !important;
+    }
+
+    .color-red {
+        color: #e93636;
+    }
+
+    .color-green {
+        color: green;
+    }
+
+    .font-18 {
+        font-size: 18px;
+    }
+
+    #img_bank img {
+        width: 120px;
+        height: 120px
+    }
+
+    .text-line-through {
+        text-decoration: line-through;
+    }
+
+    .theme--light .btn-icon:hover {
+        background: #9f9f9f;
+    }
+
+    .theme--light .pricing-box-active {
+        /* border: 1px solid #ac3bda !important; */
+        box-shadow: inset 0px 0px 0px 1px #ac3bda;
+        background: #9f9f9f;
+    }
+</style>
+<section class="section theme--light">
+    <div class="section-body">
+
+        <div class="row animated fadeInDown">
+            <div class="col-12">
+                <div class="card-box m-b-10">
+                    <div class="panel-body">
+                        <div class="clearfix">
+                            <div class="pull-left">
+                                <h3 class="text-right"><i class="ti-credit-card"></i> Hóa Đơn</h3>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 pull-left m-t-30">
+                                <address>
+                                    <p class="m-t-10"><strong>Tài khoản:</strong> minhyen97</p>
+                                    <p class="m-t-10"><strong>Facebook:</strong> https://www.facebook.com/profile.php?id=100035406228253</p>
+                                    <p class="m-t-10"><strong>Gói cước hiện tại:</strong> LIVETEST</p>
+                                    <p class="m-t-10"><strong>Hạn dùng: </strong> Đã hết hạn</p>
+                                </address>
+                            </div>
+                            <div class="col-md-6 pull-right m-t-30 text-right">
+                                <p class="m-t-10"><strong>Mã hóa đơn: </strong> MINHYEN97-LIVE1-12</p>
+                                <p class="m-t-10"><strong> Ngày tạo: </strong> 2023/03/08 16:04:12</p>
+                                <p class="m-t-10"><strong> Gói cước: </strong> LIVE1</p>
+                                <p class="m-t-10"><strong>Ngày hết hạn: </strong> <span class="expire-date">2023/06/09 16:04:12</span></p>
+                                <p class="payment-pending m-t-10 more">
+                                    <strong>Trạng thái: </strong> <span class="badge badge-warning"><i class="ion-load-c fa-spin"></i> Đang chờ xử lý</span>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="table-responsive">
+                                    <table>
+                                        <tbody>
+                                            <tr>
+                                                <td>
+                                                    <button type="button" class="btn-month-payment btn-icon cur-point m-r-15 pa-20 btn-month radius35" value="1">
+                                                        <div><span>Mua 1 Tháng</span></div>
+                                                        <div>
+                                                            <div><span class="text-line-through color-red">200.000</span></div>
+                                                            <span><h4>200.000</h4></span>
+                                                        </div>
+                                                    </button>
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn-month-payment btn-icon cur-point m-r-15 pa-20 btn-month radius35 pricing-box-active" value="3">
+                                                        <div><span>Mua 3 Tháng</span></div>
+                                                        <div><span class="text-line-through color-red">600.000</span></div>
+                                                        <div>
+                                                            <span><h4>550.000</h4></span>
+                                                            <span>Tiết kiệm</span><span class="font-20"> -10%</span>
+                                                        </div>
+                                                    </button>
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn-month-payment btn-icon cur-point m-r-15 pa-20 btn-month radius35" value="6">
+                                                        <div><span>Mua 6 Tháng</span></div>
+                                                        <div><span class="text-line-through color-red">1.200.000</span></div>
+                                                        <div>
+                                                            <span><h4>1.000.000</h4></span>
+                                                            <span>Tiết kiệm</span><span class="font-20"> -16%</span>
+                                                        </div>
+                                                    </button>
+                                                </td>
+                                                <td>
+                                                    <button type="button" class="btn-month-payment btn-icon cur-point m-r-15 pa-20 btn-month radius35" value="12">
+                                                        <div><span>Mua 12 Tháng</span></div>
+                                                        <div><span class="text-line-through color-red">2.400.000</span></div>
+                                                        <div>
+                                                            <span><h4>1.800.000</h4></span>
+                                                            <span>Tiết kiệm</span><span class="font-20"> -20%</span>
+                                                        </div>
+                                                    </button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="table-responsive">
+                                    <table class="table m-t-30">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Sản phẩm</th>
+                                                <th style="text-align: center;">Số tháng</th>
+
+                                                <th style="text-align: center;">Giá niêm yết</th>
+                                                <th style="text-align: center;">Giảm giá</th>
+                                                <th style="text-align: center;">Ngày còn lại</th>
+                                                <th style="text-align: left;">Mô tả</th>
+                                                <th style="text-align: center;">Tổng cộng</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>1</td>
+                                                <td>LIVE1</td>
+                                                <td style="text-align: center;" class="month_text">3</td>
+
+                                                <td style="text-align: center;">200.000</td>
+                                                <td style="text-align: center;" class="discount color-red font-bold">55.000 (10%)</td>
+                                                <td style="text-align: center;" class="date_remain">0</td>
+                                                <td class="date_remain_text"></td>
+                                                <td style="text-align: center;" class="sub_total">495,000</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="col-md-12">
+                                <p>
+                                    Bạn hãy chuyển tiền tới tài khoản sau với nội dung chuyển khoản là:
+                                    <span class="color-red"><b>MINHYEN97-LIVE1-12</b> <i data-toggle="tooltip" data-placement="top" title="" class="fa fa-copy color-green" onclick="copyText('iv')" data-original-title="Copy"></i></span>
+                                </p>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="row align-items-center">
+                                    <div class="col-md-2">
+                                        <div class="qr" id="img_bank" data-toggle="tooltip" data-placement="top" title="" data-original-title="Bấm vào để phóng to"></div>
+                                        @* <img data-toggle="tooltip" data-placement="top" title="" class="qr" src="/images/sang_qr2.jpg" data-original-title="Bấm vào để phóng to" />*@
+                                    </div>
+                                    <div class="col-md-10">
+                                        <div class="row">
+                                            <div class="col-md-12 m-b-15"><span class="font-16 m-r-15">Số tài khoản</span> <span class="color-green font-18 font-bold">996688688</span></div>
+                                            <div class="col-md-12 m-b-15"><span class="font-16 m-r-15">Chủ tài khoản</span> <span class="color-green font-18 font-bold">Nguyễn Văn Sáng</span></div>
+                                            <div class="col-md-12 m-b-15">
+                                                <span class="font-16 m-r-15">Ngân hàng Á Châu </span> <span><img style="height: 20px;" src="images/ACB.png" /></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12 col-no-padding" style="overflow: auto;">
+                                <p class="text-muted well well-sm no-shadow color-red" style="margin-top: 10px; font-weight: bold; font-size: 16px;">
+                                    Lưu ý, sau khi chuyển tiền thành công thì mới ấn nút "Xác nhận chuyển tiền", nếu sau 10p mà chưa vào được hệ thống thì chụp ảnh Hóa đơn gửi facebook cho <a href="https://www.facebook.com/gaumeo.hp">Admin</a>
+                                </p>
+                            </div>
+                        </div>
+                        <div class="d-print-none">
+                            <div class="text-right">
+                                <a href="javascript:window.print()" class="btn btn-dark waves-effect waves-light"><i class="fa fa-print"></i></a>
+                                <button id="btn-confirm-payment" type="button" class="btn btn-primary waves-effect waves-light">Thanh toán</button>
+                            </div>
+                        </div>
+                        <form id="form-invoice">
+                            <input type="hidden" name="invoiceId" id="iv" value="MINHYEN97-LIVE1-12" />
+                            <input type="hidden" name="month" value="3" class="month" />
+                            <input type="hidden" name="price" value="200000" class="price" />
+                            <input type="hidden" name="package_code" value="LIVE1" />
+                            <input type="hidden" name="_token" value="DKgv8uzdV2sece2ehFRl6vYA4fX8p67L1kbQ2QBi" />
+                            <input type="hidden" id="phone-number" value="996688688" />
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+
+    </div>
+</section>
+
+@section Scripts{
+    <script src="/lib/qrcodejs/qrcode.js"></script>
+    <script type="text/javascript">
+        //text: "Html.Raw(Model.WalletBSC)",
+        new QRCode(document.getElementById("img_bank"),
+            {
+                text: "123123"
+                // width: 120,
+                // height: 120
+            });
+    </script>
+}
+

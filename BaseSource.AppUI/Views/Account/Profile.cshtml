@@ -1,0 +1,233 @@
+﻿@model ProfifleInfoDto
+@{
+    ViewData["Title"] = "Thông tin người dùng";
+    var orders = ViewBag.Orders as List<OrderInfoDto>;
+}
+
+<section class="section">
+    <div class="section-header">
+        <h1>User</h1>
+        <div class="section-header-breadcrumb">
+            <div class="breadcrumb-item active"><a href="#">Dashboard</a></div>
+            <div class="breadcrumb-item"><a href="#">Components</a></div>
+            <div class="breadcrumb-item">User</div>
+        </div>
+    </div>
+
+    <div class="section-body">
+
+        <div class="row">
+            <div class="col-12 col-sm-12 col-lg-5">
+                <div class="card author-box card-primary">
+                    <div class="card-body">
+                        <div class="author-box-left">
+                            <img alt="image" src="/admin-themes/assets/img/avatar/avatar-1.png" class="rounded-circle author-box-picture">
+                            <div class="clearfix"></div>
+                            <a href="#" class="btn btn-danger mt-3 follow-btn" data-follow-action="alert('follow clicked');" data-unfollow-action="alert('unfollow clicked');">Đổi mật khẩu</a>
+                        </div>
+                        <div class="author-box-details">
+                            <div class="author-box-name">
+                                <a href="#">@Model.UserName</a>
+                            </div>
+                            <div class="author-box-job">Người dùng</div>
+                            <div class="author-box-description">
+
+                                <p>
+                                    <strong>Số điện thoại: </strong>
+                                    <span>@Model.Phone</span>
+                                </p>
+                                <p>
+                                    <strong>Link FB: </strong>
+                                    <span><a href="@Model.LinkFB">linkFB</a></span>
+                                </p>
+                                <h2 class="section-title">Gói LIVE-1080</h2>
+                                <p>
+                                    <strong>Gói đang sử dụng: </strong>
+                                    <span>LIVE</span>
+
+                                </p>
+                                <p>
+                                    <strong>Được tạo: </strong>
+                                    <span>5 luồng live</span>
+                                </p>
+                                <p>
+                                    <strong>Số luồng chạy đồng thời: </strong>
+                                    <span>5 luồng live</span>
+                                </p>
+                                <p>
+                                    <strong>Ngày đăng ký LIVE-1080: </strong>
+                                    <span>@(Model.PackageLive1080?.CreatedTime?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")</span>
+                                </p>
+                                <p>
+                                    <strong>Ngày hết hạn LIVE-1080: </strong>
+                                    <span>@(Model.PackageLive1080?.ExpiredTime?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")</span>
+                                </p>
+                                <h2 class="section-title">Gói LIVE-4K</h2>
+                                <p>
+                                    <strong>Được tạo: </strong>
+                                    <span>5 luồng live</span>
+                                </p>
+                                <p>
+                                    <strong>Số luồng chạy đồng thời: </strong>
+                                    <span>5 luồng live</span>
+                                </p>
+                                <p>
+                                    <strong>Ngày đăng ký LIVE-4K: </strong>
+                                    <span>@(Model.PackageLive4k?.CreatedTime?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")</span>
+                                </p>
+                                <p>
+                                    <strong>Ngày hết hạn LIVE-4K: </strong>
+                                    <span>@(Model.PackageLive4k?.ExpiredTime?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")</span>
+                                </p>
+
+                            </div>
+                            <a href="#" class="btn btn-social-icon btn-facebook mr-1">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-12 col-sm-12 col-lg-7">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Thông tin Số luồng đang chạy</h4>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled user-progress list-unstyled-border list-unstyled-noborder">
+                            <li class="media">
+
+                                <div class="media-body">
+                                    <div class="media-title">Số luồng LIVE 1080 đang chạy</div>
+
+                                </div>
+                                <div class="media-progressbar">
+                                    <div class="progress-text">30%</div>
+                                    <div class="progress" data-height="6">
+                                        <div class="progress-bar bg-primary" data-width="30%"></div>
+                                    </div>
+                                </div>
+
+                            </li>
+                            <li class="media">
+
+                                <div class="media-body">
+                                    <div class="media-title">Số luồng LIVE 1080 đã tạo</div>
+
+                                </div>
+                                <div class="media-progressbar">
+                                    <div class="progress-text">67%</div>
+                                    <div class="progress" data-height="6">
+                                        <div class="progress-bar bg-primary" data-width="67%"></div>
+                                    </div>
+                                </div>
+
+                            </li>
+                            <li class="media">
+
+                                <div class="media-body">
+                                    <div class="media-title">Số luồng LIVE-4k đang chạy</div>
+
+                                </div>
+                                <div class="media-progressbar">
+                                    <div class="progress-text">45%</div>
+                                    <div class="progress" data-height="6">
+                                        <div class="progress-bar bg-primary" data-width="45%"></div>
+                                    </div>
+                                </div>
+
+                            </li>
+                            <li class="media">
+
+                                <div class="media-body">
+                                    <div class="media-title">Số luồng LIVE-4k đã tạo</div>
+
+                                </div>
+                                <div class="media-progressbar">
+                                    <div class="progress-text">45%</div>
+                                    <div class="progress" data-height="6">
+                                        <div class="progress-bar bg-primary" data-width="45%"></div>
+                                    </div>
+                                </div>
+
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 col-sm-12 col-lg-12">
+                <div class="card mt-4">
+                    <div class="card-header">
+                        <h4>Lịch sử giao dịch</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="table-responsive">
+                                            <table class="table table-striped" id="table-1">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Mã hóa đơn</th>
+                                                        <th>Số tháng</th>
+                                                        <th>Ngày tạo</th>
+                                                        <th>Số tiền</th>
+                                                        <th>Trạng thái</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @if (orders != null)
+                                                    {
+                                                        foreach (var item in orders)
+                                                        {
+                                                            <tr>
+                                                                <td>
+                                                                    @item.OrderId
+                                                                </td>
+                                                                <td>@item.Month</td>
+
+                                                                <td>@item.CreatedTime.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                                                <td>@item.Price</td>
+                                                                @switch (item.Status)
+                                                                {
+                                                                    case OrderStatus.Success:
+                                                                        <td>
+                                                                            <div class="badge badge-success">Thành công</div>
+                                                                        </td>
+                                                                        break;
+                                                                    case OrderStatus.Waiting:
+                                                                        <td>
+                                                                            <div class="badge badge-waring">Chờ xử lý</div>
+                                                                        </td>
+                                                                        break;
+                                                                    case OrderStatus.Cancel:
+                                                                        <td>
+                                                                            <div class="badge badge-danger">Đã hủy</div>
+                                                                        </td>
+                                                                        break;
+
+                                                                }
+                                                            </tr>
+                                                        }
+                                                    }
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

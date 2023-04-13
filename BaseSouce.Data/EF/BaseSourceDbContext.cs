@@ -22,6 +22,8 @@ namespace BaseSouce.Data.EF
             builder.Entity<AppUserToken>().ToTable("AppUserTokens");
             builder.Entity<AppRoleClaim>().ToTable("AppRoleClaims");
 
+
+
             builder.EnableAutoHistory();
             builder.ApplyConfigurationsFromAssembly(typeof(BaseSourceDbContext).Assembly);
             #endregion
@@ -29,6 +31,7 @@ namespace BaseSouce.Data.EF
             builder.Seed();
 
         }
+        
 
     }
 }

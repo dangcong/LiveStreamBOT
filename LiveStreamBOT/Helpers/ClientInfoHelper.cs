@@ -20,9 +20,9 @@ namespace LiveStreamBOT.Helpers
         internal static ClientInfo GetClientInfo()
         {
             var clientInfo = new ClientInfo();
-            clientInfo.CpuUsage = GetPercentCpu();
-            clientInfo.RamUsage = GetPercentRam();
-            clientInfo.Bandwidth = GetBandwidth();
+            //clientInfo.CpuUsage = GetPercentCpu();
+            //clientInfo.RamUsage = GetPercentRam();
+            //clientInfo.Bandwidth = GetBandwidth();
             return clientInfo;
         }
 

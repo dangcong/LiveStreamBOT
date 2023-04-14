@@ -16,6 +16,11 @@ namespace BaseSouce.Shared.Enums
         _1080 = 1,
         _4K = 2,
     }
+    public enum PlatformType : byte
+    {
+        Youtube = 1,
+        Facebook = 2
+    }
     public enum LiveOrder : byte
     {
         Sequence = 1,

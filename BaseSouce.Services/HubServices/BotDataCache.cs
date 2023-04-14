@@ -1,12 +1,12 @@
 ﻿using BaseSouce.SharedSignalrData.Server;
 
-namespace BaseSource.API.Singletons
+namespace BaseSouce.Services.HubServices
 {
     public interface IBotDataCache
     {
         ClientInfo? this[string key] { get; set; }
     }
-    class BotDataCache : IBotDataCache
+    public class BotDataCache : IBotDataCache
     {
         readonly Dictionary<string, ClientInfo> ClientInfoDict = new Dictionary<string, ClientInfo>();
 

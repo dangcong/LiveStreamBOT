@@ -5,7 +5,7 @@ using FFmpegArgs.Cores.Maps;
 using FFmpegArgs.Inputs;
 using FFmpegArgs.Outputs;
 
-namespace BaseSource.API.Helpers
+namespace BaseSource.Shared.Helpers
 {
     public class RenderData
     {

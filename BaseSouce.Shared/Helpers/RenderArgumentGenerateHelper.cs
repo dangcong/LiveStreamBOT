@@ -16,10 +16,17 @@ namespace BaseSource.Shared.Helpers
     }
     public class PackageConfig
     {
-        //để sau thay thế hoặc thêm
-        // dùng dictionary tốt nhất nếu được ở db
-        public string OutputOption { get; set; }
-        public string GlobalOption { get; set; }
+        public List<string> OutputOptions { get; } = new List<string>();
+        public string OutputOption { get { return string.Join(" ", OutputOptions); } }
+
+        public List<string> GlobalOptions { get; } = new List<string>();
+        public string GlobalOption { get { return string.Join(" ", GlobalOptions); } }
+
+        public List<string> VideoInputOptions { get; } = new List<string>();
+        public string VideoInputOption { get { return string.Join(" ", VideoInputOptions); } }
+
+        public List<string> AudioInputOptions { get; } = new List<string>();
+        public string AudioInputOption { get { return string.Join(" ", AudioInputOptions); } }
     }
 
 
@@ -47,12 +54,18 @@ namespace BaseSource.Shared.Helpers
 
             FFmpegArg ffmpegArg = new FFmpegArg();
 
-            var video_map = ffmpegArg.AddVideoInput(new VideoFileInput(renderData.VideoName));
+            VideoFileInput videoFileInput = new VideoFileInput(renderData.VideoName);
+            if(!string.IsNullOrWhiteSpace(packageConfig.VideoInputOption))
+                videoFileInput.SetFlag(packageConfig.VideoInputOption.Trim());
+            var video_map = ffmpegArg.AddVideoInput(videoFileInput);
 
             AudioMap? audioMap = null;
             if (!string.IsNullOrWhiteSpace(renderData.AudioName))
             {
-                audioMap = ffmpegArg.AddAudiosInput(new AudioFileInput(renderData.AudioName)).First();
+                AudioFileInput audioFileInput = new AudioFileInput(renderData.AudioName);
+                if (!string.IsNullOrWhiteSpace(packageConfig.AudioInputOption))
+                    audioFileInput.SetFlag(packageConfig.AudioInputOption.Trim());
+                audioMap = ffmpegArg.AddAudiosInput(audioFileInput).First();
             }
 
             ImageMap imageMap = video_map.ImageMaps.First();

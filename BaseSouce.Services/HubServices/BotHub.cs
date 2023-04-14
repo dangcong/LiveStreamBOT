@@ -1,10 +1,9 @@
 ﻿using BaseSouce.SharedSignalrData.BotClient;
 using BaseSouce.SharedSignalrData.Server;
-using BaseSource.API.Singletons;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Primitives;
 
-namespace BaseSource.API.Services.SignalRService
+namespace BaseSouce.Services.HubServices
 {
     public class BotHub : Hub<IBotClientHub>, IServerHub
     {
@@ -13,7 +12,7 @@ namespace BaseSource.API.Services.SignalRService
              IBotDataCache botDataCache
             )
         {
-            this._botDataCache = botDataCache;
+            _botDataCache = botDataCache;
         }
 
         public Task PingAsync(ClientInfo clientInfo)

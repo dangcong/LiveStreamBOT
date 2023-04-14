@@ -1,8 +1,5 @@
 using BaseSource.API;
 using BaseSource.API.Extensions;
-using BaseSource.API.Helpers;
-using BaseSource.API.Services.SignalRService;
-using BaseSource.API.Singletons;
 using System.Text.Json.Serialization;
 
 using BaseSouce.Data.EF;
@@ -12,6 +9,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using BaseSource.API.Cofigurations;
 using EFCore.UnitOfWork;
+using BaseSource.Shared.Helpers;
+using BaseSouce.Services.HubServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,8 +55,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddSignalR().AddJsonProtocol(configure => configure.PayloadSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals);
-builder.Services.AddSingleton<IBotDataCache, BotDataCache>();
-builder.Services.AddTransient<IRenderArgumentGenerateHelper, RenderArgumentGenerateHelper>();
+
 builder.AddTelegram();
 
 

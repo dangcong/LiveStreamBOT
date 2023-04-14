@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 
-namespace BaseSource.API.Services.SignalRService
+namespace BaseSouce.Services.HubServices
 {
     public class WebHub : Hub
     {

@@ -18,6 +18,15 @@ namespace BaseSource.Shared.Helpers
         //https://drive.google.com/drive/folders/0BwW2GEsJcvZKTkxFbE1INnV5a0U?resourcekey=0-HiIxNVLEeO1BHi1PwBOWrA&usp=share_link
         static readonly Regex regex_folder = new Regex("(?<=drive\\/folders\\/).*?(?=\\?)", RegexOptions.Compiled);
 
+        public static IGoogleDriveItemResult? TryParse(string url)
+        {
+            if (Uri.TryCreate(url, UriKind.Absolute, out var result))
+            {
+                return Parse(result);
+            }
+            return null;
+        }
+        public static IGoogleDriveItemResult? TryParse(Uri uri) => Parse(uri);
         public static IGoogleDriveItemResult? Parse(string url) => Parse(new Uri(url));
         public static IGoogleDriveItemResult? Parse(Uri uri)
         {

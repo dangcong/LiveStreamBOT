@@ -89,7 +89,7 @@ namespace BaseSouce.Services.Services.Stream
 
                 PackageConfig packageConfig = new PackageConfig();
                 packageConfig.GlobalOptions.Add("-y");
-                if(model.IsForever)
+                if (model.IsForever)
                 {
                     packageConfig.VideoInputOptions.Add($"-stream_loop -1");
                     packageConfig.AudioInputOptions.Add($"-stream_loop -1");
@@ -99,11 +99,17 @@ namespace BaseSouce.Services.Services.Stream
                     case LiveType._4K:
                         {
                             packageConfig.OutputOptions.Add("-s 4096x2160");
+                            packageConfig.OutputOptions.Add("-r 24");
+                            packageConfig.OutputOptions.Add("-maxrate 35000k");
+                            packageConfig.OutputOptions.Add($"-x264-params keyint={24 * 4}:scenecut=0");
                             break;
                         }
                     case LiveType._1080:
                         {
-                            packageConfig.OutputOptions.Add("-s 1080x720");
+                            packageConfig.OutputOptions.Add("-s 1920x1080");
+                            packageConfig.OutputOptions.Add("-r 24");
+                            packageConfig.OutputOptions.Add("-maxrate 8000k");
+                            packageConfig.OutputOptions.Add($"-x264-params keyint={24 * 4}:scenecut=0");
                             break;
                         }
 
@@ -148,7 +154,7 @@ namespace BaseSouce.Services.Services.Stream
                 }
 
 
-                if(model.IsLiveNow)
+                if (model.IsLiveNow)
                 {
                     await _botContextHub.Clients.All.RenderAsync(renderCommand);
                     return new KeyValuePair<bool, string>(true, string.Empty);

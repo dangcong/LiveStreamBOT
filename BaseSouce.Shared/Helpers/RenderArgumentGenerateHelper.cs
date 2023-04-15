@@ -72,6 +72,8 @@ namespace BaseSource.Shared.Helpers
             if (audioMap is null) audioMap = video_map.AudioMaps.First();
 
             VideoUrlOutput videoFileOutput = new VideoUrlOutput(renderData.StreamOutput, MuxingFileFormat.flv, imageMap, audioMap);
+            videoFileOutput.Vcodec("h264");
+            videoFileOutput.Acodec("aac");
             if (!string.IsNullOrWhiteSpace(packageConfig?.OutputOption))
                 videoFileOutput.SetFlag(packageConfig.OutputOption.Trim());
 

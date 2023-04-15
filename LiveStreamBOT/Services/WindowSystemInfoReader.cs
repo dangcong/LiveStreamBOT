@@ -31,7 +31,7 @@ namespace LiveStreamBOT.Services
 
         public double GetBandwidth()
         {
-            return pcsents.Sum(x => x.NextValue());
+            return pcsents.Sum(x => x.NextValue()) / 1024;
         }
 
         public double GetPercentCpu()

@@ -2,11 +2,13 @@
 using LiveStreamBOT;
 using LiveStreamBOT.Enums;
 using LiveStreamBOT.Helpers;
+using LiveStreamBOT.Interfaces;
 using LiveStreamBOT.Queues;
 using LiveStreamBOT.Services;
 using System;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using TqkLibrary.Queues.TaskQueues;
@@ -28,6 +30,8 @@ if (Uri.TryCreate(args.FirstOrDefault(), UriKind.Absolute, out Uri uri))
         await signalrClient.StartAsync();
 
         Singleton.Setting.Save();
+        using ISystemInfoReader systemInfoReader = GetSystemInfoReader();
+
         Console.WriteLine("Started");
         while (true)
         {
@@ -36,7 +40,7 @@ if (Uri.TryCreate(args.FirstOrDefault(), UriKind.Absolute, out Uri uri))
             ClientInfo clientInfo = null;
             try
             {
-                clientInfo = ClientInfoHelper.GetClientInfo();
+                clientInfo = systemInfoReader?.GetClientInfo();
             }
             catch { }
 
@@ -48,6 +52,21 @@ if (Uri.TryCreate(args.FirstOrDefault(), UriKind.Absolute, out Uri uri))
         taskQueue.ShutDown();
     }
 }
+
+
+ISystemInfoReader GetSystemInfoReader()
+{
+    if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+    {
+        return new LinuxSystemInfoReader();
+    }
+    else if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+    {
+        return new WindowSystemInfoReader();
+    }
+    return null;
+}
+
 
 void SignalrClient_OnRenderCommand(RenderCommand obj)
 {

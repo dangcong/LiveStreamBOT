@@ -1,6 +1,7 @@
 ﻿using BaseSouce.Data.Entities;
 using BaseSouce.Services.HubServices;
 using BaseSouce.Services.ServicePackage;
+using BaseSouce.Services.Services.BOT;
 using BaseSouce.Services.Services.Order;
 using BaseSouce.Services.Services.OrderAdmin;
 using BaseSouce.Services.Services.SendMail;
@@ -8,6 +9,7 @@ using BaseSouce.Services.Services.ServicePackage;
 using BaseSouce.Services.Services.ServicePackageByMonth;
 using BaseSouce.Services.Services.Setting;
 using BaseSouce.Services.Services.Stream;
+using BaseSouce.Services.Services.StreamAdmin;
 using BaseSouce.Services.Services.User;
 using BaseSource.Shared.Helpers;
 using Microsoft.AspNetCore.Identity;
@@ -32,6 +34,11 @@ namespace BaseSource.API.Cofigurations
             services.AddTransient<IOrderService, OrderService>();
             services.AddTransient<IOrderAdminService, OrderAdminService>();
             services.AddTransient<IStreamClientService, StreamClientService>();
+
+            services.AddTransient<IManagerBOTService, ManagerBOTService>();
+            services.AddTransient<IStreamAdminService, StreamAdminService>();
+
+            
 
             //bot DI
             services.AddSingleton<IBotDataCache, BotDataCache>();

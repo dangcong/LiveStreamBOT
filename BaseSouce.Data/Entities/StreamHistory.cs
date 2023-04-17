@@ -12,7 +12,7 @@ namespace BaseSource.Data.Entities
     {
         public int Id { get; set; }
         public string UserId { get; set; }
-        public int ManagerBOTId { get; set; }
+        public int? ManagerBOTId { get; set; }
         public string BotId { get; set; }
         public string StreamKey { get; set; }
         public string RTMP { get; set; }

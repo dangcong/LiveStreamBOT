@@ -1,0 +1,249 @@
+﻿@model StreamCreateDto
+@{
+    ViewData["Title"] = "Thuê SMS";
+}
+<section class="section">
+    <div class="section-header">
+        <h1>Cấu hình</h1>
+        <div class="section-header-breadcrumb">
+            <div class="breadcrumb-item active"><a href="#">Dashboard</a></div>
+            <div class="breadcrumb-item"><a href="#">Cấu hình</a></div>
+            <div class="breadcrumb-item">Cấu hình LIVE</div>
+        </div>
+    </div>
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12 col-md-12 col-lg-12">
+
+                <div class="card">
+                    <form asp-action="Create" class="needs-validation" novalidate="">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <div class="card-header">
+                            <h4>Cấu hình</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-group">
+                                <label>Tên luồng live</label>
+                                <input type="number" asp-for="StreamName" placeholder="Đặt tên để gợi nhớ" class="form-control" required="">
+                                <span asp-validation-for="StreamName" class="text-danger"></span>
+                            </div>
+
+                            <div class="section-title">Nền tảng</div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="youtube" checked name="PlatformType" class="custom-control-input">
+                                <label class="custom-control-label" for="youtube">Youtube</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="facebook" name="PlatformType" class="custom-control-input">
+                                <label class="custom-control-label" for="facebook">Facebook</label>
+                            </div>
+                            <div class="form-group">
+                                <label>Khóa luồng</label>
+                                <input class="form-control" required asp-for="StreamKey" rows="1" />
+                                <span asp-validation-for="StreamKey" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Link Video</label>
+                                <input class="form-control" required asp-for="Video" rows="1" />
+                                <span asp-validation-for="Video" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Link Audio</label>
+                                <input class="form-control" required asp-for="Audio" rows="1" />
+                                <span asp-validation-for="Audio" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="d-block">Cài đặt</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" asp-for="IsForever" type="checkbox" id="defaultCheck1">
+                                    <label class="form-check-label" for="defaultCheck1">
+                                        Live 24/7(vĩnh viễn)
+                                    </label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input"  asp-for="IsLiveNow" type="checkbox" id="defaultCheck3">
+                                    <label class="form-check-label" for="defaultCheck3">
+                                        Live ngay bây giờ
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="section-title">Hẹn lịch</div>
+                            <div class="form-group">
+                                <label>Thời gian bắt đầu</label>
+                                <input type="datetime-local" asp-for="StartTimeLive" class="form-control" placeholder="Thời gian bắt đầu">
+                            </div>
+                            <div class="form-group">
+                                <label>Thời gian kết thúc</label>
+                                <input type="datetime-local" asp-for="EndTimeLive" class="form-control" placeholder="Thời gian kết thúc">
+                            </div>
+                        </div>
+                        <div class="card-footer text-left">
+                            <button class="btn btn-primary">Auto live</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-6">
+            </div>
+            <div class="col-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Thông tin</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col text-center">
+
+                                <div class="mt-2 font-weight-bold badge badge-info">Tổng số</div>
+                                <div class="text-muted ">
+                                    <span class="text-primary">
+                                        48
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col text-center">
+
+                                <div class="mt-2 font-weight-bold badge badge-success">Mới</div>
+                                <div class="text-muted ">
+                                    <span class="text-primary">
+                                        26
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col text-center">
+
+                                <div class="mt-2 font-weight-bold badge badge-primary">Đang live</div>
+                                <div class="text-muted ">
+                                    <span class="text-danger">
+                                        14
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col text-center">
+                                <div class="mt-2 font-weight-bold badge badge-warning">Đang xử lý</div>
+                                <div class="text-muted ">7</div>
+                            </div>
+                            <div class="col text-center">
+
+                                <div class="mt-2 font-weight-bold badge badge-danger">Đã dừng</div>
+                                <div class="text-muted ">
+                                    <span class="text-primary">
+                                      5
+                                    </span> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>DANH SÁCH CẤU HÌNH <span class="text-success">(NẾU BỊ LỖI THÌ COPY ID (CHỮ SỐ MÀU ĐỎ) GỬI CHO ADMIN)</span> </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="table-1">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center">
+                                            #
+                                        </th>
+                                        <th>Task Name</th>
+                                        <th>Progress</th>
+                                        <th>Members</th>
+                                        <th>Due Date</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            1
+                                        </td>
+                                        <td>Create a mobile app</td>
+                                        <td class="align-middle">
+                                            <div class="progress" data-height="4" data-toggle="tooltip" title="100%">
+                                                <div class="progress-bar bg-success" data-width="100%"></div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <img alt="image" src="assets/img/avatar/avatar-5.png" class="rounded-circle" width="35" data-toggle="tooltip" title="Wildan Ahdian">
+                                        </td>
+                                        <td>2018-01-20</td>
+                                        <td><div class="badge badge-success">Completed</div></td>
+                                        <td><a href="#" class="btn btn-secondary">Detail</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            2
+                                        </td>
+                                        <td>Redesign homepage</td>
+                                        <td class="align-middle">
+                                            <div class="progress" data-height="4" data-toggle="tooltip" title="0%">
+                                                <div class="progress-bar" data-width="0"></div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <img alt="image" src="assets/img/avatar/avatar-1.png" class="rounded-circle" width="35" data-toggle="tooltip" title="Nur Alpiana">
+                                            <img alt="image" src="assets/img/avatar/avatar-3.png" class="rounded-circle" width="35" data-toggle="tooltip" title="Hariono Yusup">
+                                            <img alt="image" src="assets/img/avatar/avatar-4.png" class="rounded-circle" width="35" data-toggle="tooltip" title="Bagus Dwi Cahya">
+                                        </td>
+                                        <td>2018-04-10</td>
+                                        <td><div class="badge badge-info">Todo</div></td>
+                                        <td><a href="#" class="btn btn-secondary">Detail</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            3
+                                        </td>
+                                        <td>Backup database</td>
+                                        <td class="align-middle">
+                                            <div class="progress" data-height="4" data-toggle="tooltip" title="70%">
+                                                <div class="progress-bar bg-warning" data-width="70%"></div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <img alt="image" src="assets/img/avatar/avatar-1.png" class="rounded-circle" width="35" data-toggle="tooltip" title="Rizal Fakhri">
+                                            <img alt="image" src="assets/img/avatar/avatar-2.png" class="rounded-circle" width="35" data-toggle="tooltip" title="Hasan Basri">
+                                        </td>
+                                        <td>2018-01-29</td>
+                                        <td><div class="badge badge-warning">In Progress</div></td>
+                                        <td><a href="#" class="btn btn-secondary">Detail</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            4
+                                        </td>
+                                        <td>Input data</td>
+                                        <td class="align-middle">
+                                            <div class="progress" data-height="4" data-toggle="tooltip" title="100%">
+                                                <div class="progress-bar bg-success" data-width="100%"></div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <img alt="image" src="assets/img/avatar/avatar-2.png" class="rounded-circle" width="35" data-toggle="tooltip" title="Rizal Fakhri">
+                                            <img alt="image" src="assets/img/avatar/avatar-5.png" class="rounded-circle" width="35" data-toggle="tooltip" title="Isnap Kiswandi">
+                                            <img alt="image" src="assets/img/avatar/avatar-4.png" class="rounded-circle" width="35" data-toggle="tooltip" title="Yudi Nawawi">
+                                            <img alt="image" src="assets/img/avatar/avatar-1.png" class="rounded-circle" width="35" data-toggle="tooltip" title="Khaerul Anwar">
+                                        </td>
+                                        <td>2018-01-16</td>
+                                        <td><div class="badge badge-success">Completed</div></td>
+                                        <td><a href="#" class="btn btn-secondary">Detail</a></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

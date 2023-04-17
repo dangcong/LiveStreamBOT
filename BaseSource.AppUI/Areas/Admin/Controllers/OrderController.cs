@@ -70,9 +70,11 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             var result = await _orderAdminApiClient.Accept(id);
             if (result == null || !result.IsSuccessed)
             {
-                return Json(new { code = ErrorCodeJson.ErrorMess, err = result?.Message ?? "Cập nhật không thành công!" });
+                return RedirectToAction("Index");
+                //return Json(new { code = ErrorCodeJson.ErrorMess, err = result?.Message ?? "Cập nhật không thành công!" });
             }
-            return Json(new { code = ErrorCodeJson.Success });
+            return RedirectToAction("Index");
+            //return Json(new { code = ErrorCodeJson.Success });
         }
         [HttpPost]
         public async Task<IActionResult> Cancel(int id)
@@ -80,9 +82,11 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             var result = await _orderAdminApiClient.Cancel(id);
             if (result == null || !result.IsSuccessed)
             {
-                return Json(new { code = ErrorCodeJson.ErrorMess, err = result?.Message ?? "Cập nhật không thành công!" });
+                return RedirectToAction("Index");
+                // return Json(new { code = ErrorCodeJson.ErrorMess, err = result?.Message ?? "Cập nhật không thành công!" });
             }
-            return Json(new { code = ErrorCodeJson.Success });
+            return RedirectToAction("Index");
+            //return Json(new { code = ErrorCodeJson.Success });
         }
     }
 }

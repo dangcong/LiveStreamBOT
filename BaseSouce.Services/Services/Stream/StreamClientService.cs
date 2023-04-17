@@ -1,22 +1,21 @@
 ﻿using AutoMapper;
 using BaseSouce.Data.EF;
+using BaseSouce.Data.Entities;
 using BaseSouce.Services.HubServices;
+using BaseSouce.Services.Services.User;
 using BaseSouce.Shared.Enums;
 using BaseSouce.SharedSignalrData.BotClient;
 using BaseSouce.SharedSignalrData.Server;
 using BaseSource.Shared.Enums;
+using BaseSource.Data.Entities;
 using BaseSource.Shared.Helpers;
 using BaseSource.ViewModels.Stream;
 using EFCore.UnitOfWork;
+using EFCore.UnitOfWork.PageList;
 using FFmpegArgs;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using TqkLibrary.Net.CloudStorage.GoogleDrive;
 
 namespace BaseSouce.Services.Services.Stream
 {
@@ -27,18 +26,22 @@ namespace BaseSouce.Services.Services.Stream
         private readonly IMapper _mapper;
         private readonly IRenderArgumentGenerateHelper _argumentGenerateHelper;
         private readonly IHubContext<BotHub, IBotClientHub> _botContextHub;
+        private readonly IUserService _userService;
         public StreamClientService(
             IUnitOfWork<BaseSourceDbContext> unitOfWork,
             ILogger<StreamClientService> logger,
             IMapper mapper,
             IRenderArgumentGenerateHelper argumentGenerateHelper,
-            IHubContext<BotHub, IBotClientHub> botContextHub)
+            IHubContext<BotHub, IBotClientHub> botContextHub,
+            IUserService userService)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
             _mapper = mapper;
             _argumentGenerateHelper = argumentGenerateHelper;
             _botContextHub = botContextHub;
+            _userService = userService;
+
         }
 
         public async Task<KeyValuePair<bool, string>> CreateAsync(string userId, StreamCreateDto model)
@@ -175,6 +178,113 @@ namespace BaseSouce.Services.Services.Stream
             {
 
                 throw;
+            }
+        }
+
+        public async Task<KeyValuePair<bool, string>> DeleteAsync(string userId, int id)
+        {
+            try
+            {
+                var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
+                var streamEntity = await _repositoryStream.GetFirstOrDefaultAsync(
+                    predicate: x => x.UserId == userId && x.Id == id, disableTracking: false);
+                if (streamEntity == null)
+                {
+                    return new KeyValuePair<bool, string>(false, "Luồng không tồn tại, vui lòng thử lại!");
+                }
+                _repositoryStream.Delete(streamEntity);
+
+                await _unitOfWork.SaveChangesAsync();
+
+                return new KeyValuePair<bool, string>(true, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Delete Stream failed by error:[{ex}]");
+                return new KeyValuePair<bool, string>(false, "Xóa luồng không thành công, vui lòng thử lại!");
+            }
+        }
+
+        public async Task<IPagedList<StreamClientInfoDto>> GetByFilterAsync(string userId, StreamClientRequestDto model)
+        {
+            var _repository = _unitOfWork.GetRepository<StreamHistory>();
+
+            var query = _repository.Queryable().AsNoTracking();
+            query = query.Where(x => x.UserId == userId);
+
+            return await _repository.GetStagesPagedListAsync(
+                stages: query,
+                selector: x => _mapper.Map<StreamClientInfoDto>(x),
+                include: x => x.Include(i => i.AppUser),
+               orderBy: x => x.OrderByDescending(i => i.CreatedTime),
+               pageIndex: model.Page, pageSize: model.PageSize
+                );
+        }
+
+        public async Task<KeyValuePair<bool, string>> StartStreamAsync(string userId, int id)
+        {
+            try
+            {
+                var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
+
+                var streamEntity = await _repositoryStream.GetFirstOrDefaultAsync(
+                   predicate: x => x.UserId == userId && x.Id == id,
+                   disableTracking: false);
+
+                if (streamEntity == null)
+                {
+                    return new KeyValuePair<bool, string>(false, "Luồng không tồn tại, vui lòng thử lại!");
+                }
+                streamEntity.Status = StreamStatus.Streaming;
+
+                _repositoryStream.Update(streamEntity);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new KeyValuePair<bool, string>(true, string.Empty);
+                //send to BOT
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Start livestream failed by error:[{ex}]");
+                return new KeyValuePair<bool, string>(false, "Live không thành công vui lòng thử lại");
+            }
+        }
+
+        public async Task<KeyValuePair<bool, string>> UpdateAsync(string userId, int id, StreamUpdateDto model)
+        {
+            try
+            {
+                var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
+
+                var streamEntity = await _repositoryStream.GetFirstOrDefaultAsync(
+                    predicate: x => x.UserId == userId && x.Id == id,
+                    disableTracking: false);
+
+                if (streamEntity == null)
+                {
+                    return new KeyValuePair<bool, string>(false, "Luồng không tồn tại, vui lòng thử lại!");
+                }
+                //update data
+                streamEntity.Video = model.Video;
+                streamEntity.Audio = model.Audio;
+                streamEntity.IsForever = model.IsForever;
+                streamEntity.IsLiveNow = model.IsLiveNow;
+                streamEntity.RTMP = model.RTMP;
+                streamEntity.StartTimeLive = model.StartTimeLive;
+                streamEntity.EndTimeLive = model.EndTimeLive;
+                streamEntity.StreamKey = model.StreamKey;
+                streamEntity.LiveOrder = model.LiveOrder;
+
+                _repositoryStream.Update(streamEntity);
+
+                await _unitOfWork.SaveChangesAsync();
+
+                return new KeyValuePair<bool, string>(true, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Update Stream [{id}] failed by error:[{ex}]");
+                return new KeyValuePair<bool, string>(false, "Cập nhật luồng không thành công, vui lòng thử lại!");
             }
         }
     }

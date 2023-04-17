@@ -16,9 +16,13 @@ using FFmpegArgs;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using TqkLibrary.Net.CloudStorage.GoogleDrive;
+using System.Linq.Expressions;
 
 namespace BaseSouce.Services.Services.Stream
 {
+
+
     public class StreamClientService : IStreamClientService
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -44,45 +48,11 @@ namespace BaseSouce.Services.Services.Stream
 
         }
 
-        public async Task<KeyValuePair<bool, string>> CreateAsync(string userId, StreamCreateDto model)
+
+        public async Task<BoolStringKeyValuePair> SendDataToBOTAsync(StreamHistory model)
         {
             try
             {
-                var driveVideoItem = GoogleDriveHelper.TryParse(model.Video);
-                if (driveVideoItem is null ||
-                    driveVideoItem.LinkType != GoogleDriveLinkType.File)
-                    return new KeyValuePair<bool, string>(false, "Link video không hỗ trợ hoặc không hợp lệ");
-
-                var driveAudioItem = GoogleDriveHelper.TryParse(model.Audio);
-                if (!string.IsNullOrWhiteSpace(model.Audio) &&
-                    (driveAudioItem is null || driveAudioItem.LinkType != GoogleDriveLinkType.File))
-                    return new KeyValuePair<bool, string>(false, "Link audio không hỗ trợ hoặc không hợp lệ");
-
-
-                using (DriveApiNonLogin driveApiNonLogin = new DriveApiNonLogin())
-                {
-                    try
-                    {
-                        var videoMetadata = await driveApiNonLogin.GetMetadataAsync(driveVideoItem.ID);
-                    }
-                    catch (Exception)
-                    {
-                        return new KeyValuePair<bool, string>(false, "Link video không truy cập được");
-                    }
-
-                    if (driveAudioItem is not null)
-                    {
-                        try
-                        {
-                            var videoMetadata = await driveApiNonLogin.GetMetadataAsync(driveAudioItem.ID);
-                        }
-                        catch (Exception)
-                        {
-                            return new KeyValuePair<bool, string>(false, "Link audio không truy cập được");
-                        }
-                    }
-                }
-
 
                 Uri uri = model.PlatformType switch
                 {
@@ -134,7 +104,7 @@ namespace BaseSouce.Services.Services.Stream
                     Arguments = fFmpegArg.GetFullCommandline(),
                     Command = Command.Start,
                     WorkId = 0,//quan trọng, cần để cancel/update/tạo thư mục
-                    ItemId = 0,//quan trọng, cần để cancel/update/tạo thư mục
+                    ItemId = model.Id,//quan trọng, cần để cancel/update/tạo thư mục( stream ID)
                     FileDatas = new List<FileData>()
                     {
                         new FileData()
@@ -160,24 +130,134 @@ namespace BaseSouce.Services.Services.Stream
                 if (model.IsLiveNow)
                 {
                     await _botContextHub.Clients.All.RenderAsync(renderCommand);
-                    return new KeyValuePair<bool, string>(true, string.Empty);
+                    return true;
                 }
                 else
                 {
                     //hẹn giờ
 
 
-                    return new KeyValuePair<bool, string>(true, string.Empty);
+                    return true;
                 }
             }
             catch (NotSupportedException nse)
             {
-                return new KeyValuePair<bool, string>(false, $"{nse.Message} chưa hỗ trợ");
+                _logger.LogError($"Send data to BOT failed by error:[{nse}]");
+                return $"{nse.Message} chưa hỗ trợ";
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _logger.LogError($"Send data to BOT failed by error:[{ex}]");
+                return $"Lỗi {ex.Message}";
+            }
+        }
 
-                throw;
+
+        private async Task<BoolStringKeyValuePair> ValidateLink(string video, string audio)
+        {
+            var driveVideoItem = GoogleDriveHelper.TryParse(video);
+            if (driveVideoItem is null ||
+                driveVideoItem.LinkType != GoogleDriveLinkType.File)
+                return "Link video không hỗ trợ hoặc không hợp lệ";
+
+            var driveAudioItem = GoogleDriveHelper.TryParse(audio);
+            if (!string.IsNullOrWhiteSpace(audio) &&
+                (driveAudioItem is null || driveAudioItem.LinkType != GoogleDriveLinkType.File))
+                return new BoolStringKeyValuePair(false, "Link audio không hỗ trợ hoặc không hợp lệ");
+
+
+            using (DriveApiNonLogin driveApiNonLogin = new DriveApiNonLogin())
+            {
+                try
+                {
+                    var videoMetadata = await driveApiNonLogin.GetMetadataAsync(driveVideoItem.ID);
+                }
+                catch (Exception)
+                {
+                    return "Link video không truy cập được";
+                }
+
+                if (driveAudioItem is not null)
+                {
+                    try
+                    {
+                        var videoMetadata = await driveApiNonLogin.GetMetadataAsync(driveAudioItem.ID);
+                    }
+                    catch (Exception)
+                    {
+                        return "Link audio không truy cập được";
+                    }
+                }
+            }
+
+            return true;
+        }
+
+
+        public async Task<BoolStringKeyValuePair> CreateAsync(string userId, StreamCreateDto model)
+        {
+            try
+            {
+                //check link audio
+                var result = await ValidateLink(model.Video, model.Audio);
+                if (!result)
+                {
+                    return result;
+                }
+
+                //add database
+                var _repositoryUser = _unitOfWork.GetRepository<AppUser>();
+                var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
+
+                var profileUser = await _userService.GetProfileInfoAsync(userId);
+
+                var packageCurrent = model.LiveType == LiveType._1080 ? profileUser.PackageLive1080 : profileUser.PackageLive4k;
+
+                if (packageCurrent == null)
+                {
+                    return "Bạn chưa đăng ký gói cước để Livestream, vui lòng đăng ký để sử dụng!";
+                }
+
+                else if (packageCurrent.NumberOfThreadsCreatedInRun >= packageCurrent.NumberOfThreadsCreated)
+                {
+                    return "Số lượng luồng của bạn đã vượt giới hạn của gói hiện tại, vui lòng thử lại!";
+                }
+                var streamEntityNew = new StreamHistory
+                {
+                    Audio = model.Audio,
+                    Video = model.Video,
+                    StreamName = model.StreamName,
+                    BotId = string.Empty,
+                    CreatedTime = DateTime.Now,
+                    IsForever = model.IsForever,
+                    IsLiveNow = model.IsLiveNow,
+                    RTMP = model.RTMP,
+                    StartTimeLive = model.StartTimeLive,
+                    EndTimeLive = model.EndTimeLive,
+                    Status = StreamStatus.Stop,
+                    StreamKey = model.StreamKey,
+                    UserId = userId,
+                    LiveType = model.LiveType,
+                    LiveOrder = model.LiveOrder,
+                };
+
+                _repositoryStream.Insert(streamEntityNew);
+
+                await _unitOfWork.SaveChangesAsync();
+
+                ///send data to BOT
+                result = await SendDataToBOTAsync(streamEntityNew);
+                if (!result)
+                {
+                    return result;
+                }
+                return true;
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Send data to BOT failed by error:[{ex}]");
+                return $"Lỗi {ex.Message}";
             }
         }
 

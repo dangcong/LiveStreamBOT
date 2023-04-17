@@ -30,6 +30,8 @@ namespace BaseSource.Data.Entities
         public DateTime? Updatedtime { get; set; }
         public StreamStatus Status { get; set; }
 
+        public PlatformType PlatformType { get; set; }
+
 
 
         public ManagerBOT ManagerBOT { get; set; }

@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using BaseSouce.Data.Entities;
 using BaseSource.Data.Entities;
+using BaseSource.ViewModels.ManagerBOT;
 using BaseSource.ViewModels.Order;
 using BaseSource.ViewModels.ServicePackage;
 using BaseSource.ViewModels.Setting;
+using BaseSource.ViewModels.Stream;
 
 namespace BaseSouce.Services.MappingProfile
 {
@@ -26,6 +28,22 @@ namespace BaseSouce.Services.MappingProfile
                 .ForMember(dest => dest.UserName, options => options.MapFrom(source => source.User.UserName))
                 .ForMember(dest => dest.ServicePackName, options => options.MapFrom(source => source.ServicePack.Name))
                 .ForMember(dest => dest.Type, options => options.MapFrom(source => source.ServicePack.Type));
+            #endregion
+
+            #region ManagerBOT
+
+            CreateMap<ManagerBOT, ManagerBotInfoDto>();
+
+            #endregion
+
+            #region Stream History
+
+            CreateMap<StreamHistory, StreamClientInfoDto>();
+            
+
+            CreateMap<StreamHistory, StreamAdminInfoDto>()
+               .ForMember(dest => dest.UserName, options => options.MapFrom(source => source.AppUser.UserName))
+               .ForMember(dest => dest.Email, options => options.MapFrom(source => source.AppUser.Email));
             #endregion
         }
 

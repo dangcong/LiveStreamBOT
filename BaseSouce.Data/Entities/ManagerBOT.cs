@@ -14,6 +14,11 @@ namespace BaseSouce.Data.Entities
         public DateTime? DeletedTime { get; set; }
         public int Retry { get; set; }
 
+        public int NumberOfThreads { get; set; }
+        public double CPU { get; set; }
+        public double RAM { get; set; }
+        public double Bandwidth { get; set; }
+
         public ICollection<StreamHistory > StreamHistorys { get; set; }
     }
 }

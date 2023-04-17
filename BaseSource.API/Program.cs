@@ -45,15 +45,19 @@ builder.Services.AuthorizationPolyConfiguration();
 //Declare DI
 builder.Services.DIConfiguration();
 
-//add autoMapper
-builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 
 // Add services to the container.
 
 builder.Services.AddControllers();
+//add autoMapper
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+// Register the Swagger generator, defining 1 or more Swagger documents
+builder.Services.SwaggerConfiguration(builder.Configuration);
+
+
 builder.Services.AddSignalR().AddJsonProtocol(configure => configure.PayloadSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals);
 
 builder.AddTelegram();

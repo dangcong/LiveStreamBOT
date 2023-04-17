@@ -198,6 +198,7 @@ namespace BaseSouce.Services.Services.Stream
         {
             try
             {
+
                 //check link audio
                 var result = await ValidateLink(model.Video, model.Audio);
                 if (!result)
@@ -222,12 +223,28 @@ namespace BaseSouce.Services.Services.Stream
                 {
                     return "Số lượng luồng của bạn đã vượt giới hạn của gói hiện tại, vui lòng thử lại!";
                 }
+
+                //get bot 
+
+                var _repositoryBOT = _unitOfWork.GetRepository<ManagerBOT>();
+
+                var botCurrent = await _repositoryBOT.GetFirstOrDefaultAsync(
+                    predicate: x => x.NumberOfThreads > 0 && x.Status == ManagerBOTStatus.Connected);
+
+                if (botCurrent == null)
+                {
+                    return "Không có BOT, vui lòng thử lại";
+                }
+
                 var streamEntityNew = new StreamHistory
                 {
                     Audio = model.Audio,
                     Video = model.Video,
                     StreamName = model.StreamName,
-                    BotId = string.Empty,
+                    BotId = botCurrent.BotId,
+                    ManagerBOTId = botCurrent.Id,
+                    PlatformType = model.PlatformType,
+                    RenderStatus = RenderStatus.Created,
                     CreatedTime = DateTime.Now,
                     IsForever = model.IsForever,
                     IsLiveNow = model.IsLiveNow,
@@ -245,12 +262,6 @@ namespace BaseSouce.Services.Services.Stream
 
                 await _unitOfWork.SaveChangesAsync();
 
-                ///send data to BOT
-                result = await SendDataToBOTAsync(streamEntityNew);
-                if (!result)
-                {
-                    return result;
-                }
                 return true;
 
             }
@@ -320,8 +331,15 @@ namespace BaseSouce.Services.Services.Stream
                 _repositoryStream.Update(streamEntity);
                 await _unitOfWork.SaveChangesAsync();
 
+
+                ///send data to BOT
+                var result = await SendDataToBOTAsync(streamEntity);
+                if (!result)
+                {
+                    return new KeyValuePair<bool, string>(false, result.Value);
+                }
                 return new KeyValuePair<bool, string>(true, string.Empty);
-                //send to BOT
+
             }
             catch (Exception ex)
             {
@@ -357,6 +375,7 @@ namespace BaseSouce.Services.Services.Stream
 
                 _repositoryStream.Update(streamEntity);
 
+
                 await _unitOfWork.SaveChangesAsync();
 
                 return new KeyValuePair<bool, string>(true, string.Empty);
@@ -365,6 +384,80 @@ namespace BaseSouce.Services.Services.Stream
             {
                 _logger.LogError($"Update Stream [{id}] failed by error:[{ex}]");
                 return new KeyValuePair<bool, string>(false, "Cập nhật luồng không thành công, vui lòng thử lại!");
+            }
+        }
+
+        public async Task<KeyValuePair<bool, string>> UpdateStreamAsync(RenderMessage model)
+        {
+            try
+            {
+                var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
+
+                var streamEntity = await _repositoryStream.GetFirstOrDefaultAsync(
+                    predicate: x => x.Id == model.ItemId,
+                    disableTracking: false);
+
+                if (streamEntity == null)
+                {
+                    return new KeyValuePair<bool, string>(false, "Luồng không tồn tại, vui lòng thử lại!");
+                }
+
+                //
+                streamEntity.RenderStatus = model.RenderStatus;
+                if (model.RenderStatus == RenderStatus.Error)
+                {
+                    _logger.LogError($"Error when render :[{model.ExceptionInfo}]");
+
+                    streamEntity.ErrorMessage = model.ExceptionInfo.Message;
+                }
+                _repositoryStream.Update(streamEntity);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new KeyValuePair<bool, string>(true, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Update Stream [{model.ItemId}] failed by error:[{ex}]");
+                return new KeyValuePair<bool, string>(false, "Cập nhật luồng không thành công, vui lòng thử lại!");
+            }
+        }
+
+        public async Task<KeyValuePair<bool, string>> CancelStreamAsync(string userId, int id)
+        {
+            try
+            {
+                var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
+
+                var streamEntity = await _repositoryStream.GetFirstOrDefaultAsync(
+                    predicate: x => x.Id == id && x.UserId == userId,
+                    disableTracking: false);
+
+                if (streamEntity == null)
+                {
+                    return new KeyValuePair<bool, string>(false, "Luồng không tồn tại, vui lòng thử lại!");
+                }
+
+                //
+                streamEntity.Status = StreamStatus.Stop;
+
+                _repositoryStream.Update(streamEntity);
+                await _unitOfWork.SaveChangesAsync();
+
+                // call BOT cancel
+
+                await _botContextHub.Clients.All.RenderAsync(new RenderCommand
+                {
+                    ItemId = streamEntity.Id,
+                    Command = Command.Cancel
+                });
+
+
+                return new KeyValuePair<bool, string>(true, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Cancel Stream [{id}] failed by error:[{ex}]");
+                return new KeyValuePair<bool, string>(false, "Dừng luồng không thành công, vui lòng thử lại!");
             }
         }
     }

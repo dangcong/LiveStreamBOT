@@ -2,6 +2,7 @@
 {
     public enum RenderStatus
     {
+        Created,
         Waitting,
         Downloading,
         LiveStreaming,

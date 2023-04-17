@@ -11,6 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\BaseSouce.SharedSignalrData\BaseSouce.SharedSignalrData.csproj" />
     <ProjectReference Include="..\BaseSouce.Shared\BaseSource.Shared.csproj" />
   </ItemGroup>
 

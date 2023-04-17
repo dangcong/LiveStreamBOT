@@ -1,4 +1,5 @@
-﻿using BaseSource.Shared.Helpers;
+﻿using BaseSouce.SharedSignalrData.BotClient;
+using BaseSource.Shared.Helpers;
 using BaseSource.ViewModels.Stream;
 using EFCore.UnitOfWork.PageList;
 
@@ -11,5 +12,8 @@ namespace BaseSouce.Services.Services.Stream
         Task<KeyValuePair<bool, string>> DeleteAsync(string userId, int id);
         Task<KeyValuePair<bool, string>> StartStreamAsync(string userId, int id);
         Task<IPagedList<StreamClientInfoDto>> GetByFilterAsync(string userId, StreamClientRequestDto model);
+
+        Task<KeyValuePair<bool, string>> UpdateStreamAsync(RenderMessage model);
+        Task<KeyValuePair<bool, string>> CancelStreamAsync(string userId, int id);
     }
 }

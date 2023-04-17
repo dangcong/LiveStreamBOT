@@ -1,4 +1,5 @@
 ﻿using BaseSouce.Shared.Enums;
+using BaseSouce.SharedSignalrData.Server;
 using BaseSouce.ViewModels.Common;
 using System;
 using System.Collections.Generic;
@@ -8,8 +9,9 @@ using System.Threading.Tasks;
 
 namespace BaseSource.ViewModels.ManagerBOT
 {
-    public class ManagerBotCreateDto
+    public class ManagerBotCreateDto : ClientInfo
     {
+        public string ConnectionId { get; set; }
         public string BotId { get; set; }
         public string Name { get; set; }
         public string Group { get; set; }

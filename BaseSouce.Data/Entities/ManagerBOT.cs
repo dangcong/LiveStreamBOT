@@ -7,6 +7,7 @@ namespace BaseSouce.Data.Entities
     {
         public int Id { get; set; }
         public string BotId { get; set; }
+        public string ConnectionId { get; set; }
         public string Name { get; set; }
         public string Group { get; set; }
         public ManagerBOTStatus Status { get; set; }
@@ -18,6 +19,7 @@ namespace BaseSouce.Data.Entities
         public double CPU { get; set; }
         public double RAM { get; set; }
         public double Bandwidth { get; set; }
+        
 
         public ICollection<StreamHistory > StreamHistorys { get; set; }
     }

@@ -1,5 +1,6 @@
 ﻿using BaseSouce.Data.Entities;
 using BaseSouce.Shared.Enums;
+using BaseSouce.SharedSignalrData.BotClient;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,8 @@ namespace BaseSource.Data.Entities
 
         public PlatformType PlatformType { get; set; }
 
-
+        public RenderStatus RenderStatus { get; set; }
+        public string ErrorMessage { get; set; }
 
         public ManagerBOT ManagerBOT { get; set; }
         public AppUser AppUser { get; set; }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BaseSouce.Data.EF;
 using BaseSouce.Shared.Enums;
+using BaseSouce.SharedSignalrData.BotClient;
 using BaseSource.ViewModels.ManagerBOT;
 using EFCore.UnitOfWork;
 using EFCore.UnitOfWork.PageList;
@@ -29,15 +30,31 @@ namespace BaseSouce.Services.Services.BOT
             {
                 var _repository = _unitOfWork.GetRepository<Data.Entities.ManagerBOT>();
 
-                _repository.Insert(new Data.Entities.ManagerBOT
-                {
-                    BotId = model.BotId,
-                    CreatedTime = DateTime.Now,
-                    Group = model.Group,
-                    Name = model.Name,
-                    Status = ManagerBOTStatus.Connected,
-                });
+                var botCurrent = await _repository.GetFirstOrDefaultAsync(
+                    predicate: x => x.BotId == model.BotId,
+                    disableTracking: false);
 
+                if (botCurrent == null)
+                {
+                    _repository.Insert(new Data.Entities.ManagerBOT
+                    {
+                        BotId = model.BotId,
+                        CreatedTime = DateTime.Now,
+                        Group = model.Group,
+                        Name = model.Name,
+                        Status = ManagerBOTStatus.Connected,
+                    });
+                }
+                else
+                {
+                    botCurrent.ConnectionId = model.ConnectionId;
+                    botCurrent.Bandwidth = model.Bandwidth;
+                    botCurrent.RAM = model.RamUsage;
+                    botCurrent.CPU = model.CpuUsage;
+                    botCurrent.Status = ManagerBOTStatus.Connected;
+                    _repository.Update(botCurrent);
+
+                }
 
                 await _unitOfWork.SaveChangesAsync();
 
@@ -126,6 +143,7 @@ namespace BaseSouce.Services.Services.BOT
                 return new KeyValuePair<bool, string>(false, "Cập nhật BOT không thành công!");
             }
         }
+
 
         public async Task<KeyValuePair<bool, string>> UpdateStatusAsync(int id, ManagerBOTStatus status)
         {

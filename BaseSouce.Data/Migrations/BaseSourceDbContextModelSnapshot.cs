@@ -58,7 +58,7 @@ namespace BaseSource.Data.Migrations
                         new
                         {
                             Id = "c1105ce5-9dbc-49a9-a7d5-c963b6daa62a",
-                            ConcurrencyStamp = "727a060b-3873-47b5-b372-ea69ed3c7c6a",
+                            ConcurrencyStamp = "a6a5f9ae-019b-43fb-b743-b4231d2ad538",
                             Description = "Administrator role",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -188,7 +188,7 @@ namespace BaseSource.Data.Migrations
                         {
                             Id = "ffded6b0-3769-4976-841b-69459049a62d",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "ab0ed0a3-86b8-4836-9828-033822fe4360",
+                            ConcurrencyStamp = "bda3bd7f-3b76-4327-9b2a-71d4fbd47ba3",
                             CreatedTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
@@ -199,7 +199,7 @@ namespace BaseSource.Data.Migrations
                             NumberOfThreads1080Create = 0,
                             NumberOfThreads4K = 0,
                             NumberOfThreads4KCreate = 0,
-                            PasswordHash = "AQAAAAEAACcQAAAAEGAnjYnoVRjDEVItBD1wFrz2DGeC10e2GQal8CXPNw067gHQ+C1d8yMSuPtmSW9VGg==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEFc+hrmRbrlRLcaCJUyzxeynQzv3lvo8O8WQC9sWmq5ypX7kV6eQeSFhLbLLDPjgmg==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -311,6 +311,9 @@ namespace BaseSource.Data.Migrations
 
                     b.Property<double>("CPU")
                         .HasColumnType("float");
+
+                    b.Property<string>("ConnectionId")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
@@ -516,6 +519,9 @@ namespace BaseSource.Data.Migrations
                     b.Property<DateTime?>("EndTimeLive")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("ErrorMessage")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("IsForever")
                         .HasColumnType("bit");
 
@@ -531,8 +537,14 @@ namespace BaseSource.Data.Migrations
                     b.Property<int?>("ManagerBOTId")
                         .HasColumnType("int");
 
+                    b.Property<byte>("PlatformType")
+                        .HasColumnType("tinyint");
+
                     b.Property<string>("RTMP")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("RenderStatus")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("StartTimeLive")
                         .HasColumnType("datetime2");

@@ -65,7 +65,7 @@ namespace BaseSouce.Services.Services.Order
                         ExpiredTime = DateTime.Now.AddMonths(model.Month),
                         IsActive = false,
                         NumberOfThreads = packageCurrent.NumberOfThreads,
-                        Price = packageCurrent.PriceDiscount>0?packageCurrent.PriceDiscount:packageCurrent.PriceMonth,
+                        Price = packageCurrent.PriceDiscount > 0 ? packageCurrent.PriceDiscount : packageCurrent.PriceMonth,
                         Month = model.Month,
                         ServicePackId = packageCurrent.Id,
                         UserId = userId,
@@ -90,7 +90,7 @@ namespace BaseSouce.Services.Services.Order
             return await _repositoryOrder.GetStagesPagedListAsync(
                 stages: query,
                 selector: x => _mapper.Map<OrderInfoDto>(x),
-                include: x => x.Include(i => i.User),
+                include: x => x.Include(i => i.User).Include(i => i.ServicePack),
                 orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                 pageIndex: model.Page, pageSize: model.PageSize);
 

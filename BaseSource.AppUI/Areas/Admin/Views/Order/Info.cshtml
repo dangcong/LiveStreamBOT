@@ -5,11 +5,11 @@
 }
 <section class="section">
     <div class="section-header">
-        <h1>Cài đặt</h1>
+        <h1>Thông tin</h1>
         <div class="section-header-breadcrumb">
             <div class="breadcrumb-item active"><a href="#">Home</a></div>
-            <div class="breadcrumb-item"><a href="#">Tạo gói tháng</a></div>
-            <div class="breadcrumb-item">Tạo gói tháng</div>
+            <div class="breadcrumb-item"><a href="#">Gói LIVE</a></div>
+            <div class="breadcrumb-item">Thông tin</div>
         </div>
     </div>
     <div class="section-body">
@@ -20,35 +20,85 @@
                         <h4>Thông tin gói LIVE</h4>
                     </div>
                     <div class="card-body">
-                        <form method="post" action="/admin/ServicePackByMonth/Create">
-                            <div class="row">
-                               
-                                <div class="col-12">
-                                    <h6>Tạo gói tháng</h6>
-                                    <div class="form-group mb-4">
-                                        <label class="">Số tháng</label>
-                                        <div class="">
-                                            <input type="number" min="1" name="Month" value="@Model.Month" placeholder="Số tháng" class="form-control" />
-                                            <input name="ServicePackId" value="@Model.ServicePackId" style="display:none" class="form-control" />
-                                           
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="form-group mb-4">
-                                        <label class="">Giá</label>
-                                        <div class="">
-                                            <input type="number" min="1" name="Price" value="@Model.Price" class="form-control" />
-                                            <span asp-validation-for="Price"  class="text-danger"></span>
-                                        </div>
-                                    </div>
+
+                        <form>
+
+                            <div class="form-group row mb-4">
+                                <label class="col-form-label text-md-right col-12 col-md-4 col-lg-4">Gói live</label>
+                                <div class="col-sm-12 col-md-8">
+                                    @switch (Model.Type)
+                                    {
+                                        case ServicePackType._1080:
+                                            <div class="text-info "><span class="badge badge-success">Gói live 1080</span></div>
+                                            break;
+                                        case ServicePackType._4K:
+                                            <div class="text-info "><span class="badge badge-success">Gói live 4k</span></div>
+                                            break;
+                                    }
+
                                 </div>
-                               
                             </div>
+                            <div class="form-group row mb-4">
+                                <label class="col-form-label text-md-right col-12 col-md-4 col-lg-4">Mã chuyển tiền</label>
+                                <div class="col-sm-12 col-md-8">
+                                    <div class="text-info "><span>@Model.OrderId</span></div>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-4">
+                                <label class="col-form-label text-md-right col-12 col-md-4 col-lg-4">Giá</label>
+                                <div class="col-sm-12 col-md-8">
+                                    <div class="text-info "><span>@Model.Price</span></div>
+                                </div>
+                            </div>-
+                            <div class="form-group row mb-4">
+                                <label class="col-form-label text-md-right col-12 col-md-4 col-lg-4">Số tháng</label>
+                                <div class="col-sm-12 col-md-8">
+                                    <div class="text-info "><span>@Model.Month</span></div>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-4">
+                                <label class="col-form-label text-md-right col-12 col-md-4 col-lg-4">Số luồng</label>
+                                <div class="col-sm-12 col-md-8">
+                                    <div class="text-danger "><span>@Model.NumberOfThreads</span></div>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-4">
+                                <label class="col-form-label text-md-right col-12 col-md-4 col-lg-4">Ngày tạo</label>
+                                <div class="col-sm-12 col-md-8">
+                                    <div class="text-info "><span>@Model.CreatedTimeString</span></div>
+                                </div>
+                            </div>
+                            <div class="form-group row mb-4">
+                                <label class="col-form-label text-md-right col-12 col-md-4 col-lg-4">Trạng thái</label>
+                                <div class="col-sm-12 col-md-8">
+                                    @switch (Model.Status)
+                                    {
+                                        case OrderStatus.Waiting:
+                                            <div><span class="text-warning">Chờ xử lý</span></div>
+                                            break;
+                                        case OrderStatus.Success:
+                                            <div><span class="text-success">Thành công</span></div>
+                                            break;
+                                        case OrderStatus.Cancel:
+                                            <div><span class="text-danger">Đã hủy</span></div>
+                                            break;
+                                    }
+
+                                </div>
+                            </div>
+                            <div class="form-group row mb-4">
+                                <label class="col-form-label text-md-right col-12 col-md-4 col-lg-4">Người dùng</label>
+                                <div class="col-sm-12 col-md-8">
+                                    <div class="text-info "><span>@Model.UserName</span></div>
+                                </div>
+                            </div>
+
                             <div class="form-group row mb-4">
                                 <label class="col-form-label text-md-right col-12 col-md-4 col-lg-4"></label>
                                 <div class="buttons col-sm-12 col-md-8">
                                     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-                                    <button type="submit" class="btn btn-info btn-lg btn-icon btn-setting"><i class="fas fa-check"></i>&ensp;Tạo mới</button>
+                                    <button type="button" data-toggle="modal" data-target="#acceptModal" class="btn btn-success btn-lg "><i class="fas fa-check"></i>Chấp nhận</button>
+                                    <button type="button" data-toggle="modal" data-target="#cancelModal" class="btn btn-danger btn-lg "><i class="fas fa-check"></i>&ensp;Hủy</button>
                                 </div>
                             </div>
                         </form>
@@ -58,6 +108,52 @@
         </div>
     </div>
 </section>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="acceptModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thông tin gói live</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Sau khi nhận được tiền, vui lòng xác nhận đơn hàng</p>
+            </div>
+            <div class="modal-footer bg-whitesmoke br">
+                <form method="post" action="/admin/Order/Accept">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Xác nhận</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" role="dialog" id="cancelModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thông tin gói live</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn có muốn hủy bỏ đơn hàng này?</p>
+            </div>
+            <div class="modal-footer bg-whitesmoke br">
+                <form method="post" action="/admin/Order/Cancel">
+                    <input type="hidden" name="id" value="@Model.Id" />
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Xác nhận</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts{
     <script>
         $('body').on('click', '.btn-setting', function () {

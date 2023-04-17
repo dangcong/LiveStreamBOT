@@ -3,6 +3,7 @@ using BaseSource.ApiIntegration.WebApi.Order;
 using BaseSource.ApiIntegration.WebApi.OrderAdmin;
 using BaseSource.ApiIntegration.WebApi.SerivePackage;
 using BaseSource.ApiIntegration.WebApi.Setting;
+using BaseSource.ApiIntegration.WebApi.Stream;
 
 namespace BaseSource.AppUI.Configuration
 {
@@ -24,6 +25,7 @@ namespace BaseSource.AppUI.Configuration
 
             services.AddTransient<IOrderAdminApiClient, OrderAdminApiClient>();
 
+            services.AddTransient<IStreamApiClient, StreamApiClient>();
             
             return services;
         }

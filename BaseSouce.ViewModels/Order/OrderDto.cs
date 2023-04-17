@@ -16,6 +16,7 @@ namespace BaseSource.ViewModels.Order
         public int Id { get; set; }
         public string OrderId { get; set; }
         public int ServicePackId { get; set; }
+        public string ServicePackName { get; set; }
         public int Month { get; set; }
         public DateTime CreatedTime { get; set; }
         public string CreatedTimeString
@@ -32,6 +33,7 @@ namespace BaseSource.ViewModels.Order
         public bool IsActive { get; set; }
         public int NumberOfThreads { get; set; }
         public string UserName { get; set; }
+        public ServicePackType Type { get; set; }
 
     }
     public class OrderRequestDto : PageQuery

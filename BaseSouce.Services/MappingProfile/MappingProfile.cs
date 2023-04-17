@@ -22,8 +22,10 @@ namespace BaseSouce.Services.MappingProfile
             CreateMap<ConfigSystem, ConfigSettingVm>();
             #endregion
             #region Order
-            CreateMap<Data.Entities.Order, OrderInfoDto>()
-                .ForMember(dest => dest.UserName, options => options.MapFrom(source => source.User.UserName));
+            CreateMap<Order, OrderInfoDto>()
+                .ForMember(dest => dest.UserName, options => options.MapFrom(source => source.User.UserName))
+                .ForMember(dest => dest.ServicePackName, options => options.MapFrom(source => source.ServicePack.Name))
+                .ForMember(dest => dest.Type, options => options.MapFrom(source => source.ServicePack.Type));
             #endregion
         }
 

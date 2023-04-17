@@ -95,12 +95,12 @@
                     },
                     {
                         "data": "status", "name": "Status", "autoWidth": true,
-                        "render": function (data) {
+                        "render": function (data,row,type) {
                             switch (data) {
                                 case 2:
-                                    return `<a class="btn btn-primary" href="/admin/order?id=${data.id}">Thao tác</a>`;
-                               
+                                    return `<a class="btn btn-primary" href="/admin/order/Info?id=${type.id}">Thao tác</a>`;
                             }
+                            return '';
                         }
                     },
                 ]

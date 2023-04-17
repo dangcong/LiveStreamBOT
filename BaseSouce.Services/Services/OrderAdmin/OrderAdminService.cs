@@ -132,13 +132,21 @@ namespace BaseSouce.Services.Services.OrderAdmin
             var _repositoryOrder = _unitOfWork.GetRepository<Data.Entities.Order>();
             var query = _repositoryOrder.Queryable().AsNoTracking();
 
-
-            return await _repositoryOrder.GetStagesPagedListAsync(
+            try
+            {
+                return await _repositoryOrder.GetStagesPagedListAsync(
                 stages: query,
                 selector: x => _mapper.Map<OrderInfoDto>(x),
-                include: x => x.Include(i => i.User),
+                include: x => x.Include(i => i.User).Include(i => i.ServicePack),
                 orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                 pageIndex: model.Page, pageSize: model.PageSize);
+            }
+            catch (Exception ex)
+            {
+
+                throw;
+            }
+            
         }
 
         public async Task<OrderInfoDto> GetByIdAsync(int id)
@@ -146,7 +154,8 @@ namespace BaseSouce.Services.Services.OrderAdmin
             var _reposiotry = _unitOfWork.GetRepository<Data.Entities.Order>();
             return await _reposiotry.GetFirstOrDefaultAsync(
                 predicate: x => x.Id == id,
-                selector: x => _mapper.Map<OrderInfoDto>(x));
+                selector: x => _mapper.Map<OrderInfoDto>(x),
+                include: x => x.Include(i => i.User).Include(i => i.ServicePack));
         }
     }
 }

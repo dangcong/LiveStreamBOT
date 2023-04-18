@@ -175,7 +175,7 @@ namespace LiveStreamBOT.Queues
                     Bitrate = 0,
                     Fps = 0,
                     Size = 0,
-                    Time = new TimeSpan(0)
+                    Time = TimeSpan.Zero
                 }
             });
             await render.ExecuteAsync(CancellationToken);
@@ -184,21 +184,23 @@ namespace LiveStreamBOT.Queues
 
         async void Render_OnEncodingProgress(RenderProgress obj)
         {
-            await _serverHub.RenderUpdateAsync(new RenderMessage()
+            if (obj is not null)
             {
-                ItemId = RenderCommand.ItemId,
-                WorkId = RenderCommand.WorkId,
-                RenderStatus = RenderStatus.LiveStreaming,
-                RenderInfo = new RenderInfo()
+                await _serverHub.RenderUpdateAsync(new RenderMessage()
                 {
-                    Bitrate = obj.Bitrate,
-                    Fps = obj.Fps,
-                    Size = obj.Size,
-                    Time = obj.Time
-                }
-            });
+                    ItemId = RenderCommand.ItemId,
+                    WorkId = RenderCommand.WorkId,
+                    RenderStatus = RenderStatus.LiveStreaming,
+                    RenderInfo = new RenderInfo()
+                    {
+                        Bitrate = obj.Bitrate,
+                        Fps = obj.Fps,
+                        Size = obj.Size,
+                        Time = obj.Time
+                    }
+                });
+            }
         }
-    }
 
 
         async Task WaitTimeAsync()

@@ -51,6 +51,7 @@ namespace LiveStreamBOT.Queues
                     case FileType.File:
                         {
                             await DownloadFileAsync();
+                            await WaitTimeAsync();
                             await LiveStreamAsync();
 
                             await _serverHub.RenderUpdateAsync(new RenderMessage()
@@ -196,6 +197,35 @@ namespace LiveStreamBOT.Queues
                     Time = obj.Time
                 }
             });
+        }
+    }
+
+
+        async Task WaitTimeAsync()
+        {
+            if (RenderCommand.UtcStartTime.HasValue)
+            {
+                while (true)
+                {
+                    var utc_current = DateTime.UtcNow;
+                    TimeSpan diff = RenderCommand.UtcStartTime.Value - utc_current;
+                    if (diff > TimeSpan.Zero)
+                    {
+                        await Task.Delay(5000, CancellationToken);
+                        await _serverHub.RenderUpdateAsync(new RenderMessage()
+                        {
+                            ItemId = RenderCommand.ItemId,
+                            WorkId = RenderCommand.WorkId,
+                            RenderStatus = RenderStatus.Waitting,
+                        });
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+            }
         }
     }
 }

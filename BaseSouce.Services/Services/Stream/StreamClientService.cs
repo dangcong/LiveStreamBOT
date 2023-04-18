@@ -103,6 +103,7 @@ namespace BaseSouce.Services.Services.Stream
                 {
                     Arguments = fFmpegArg.GetFullCommandline(),
                     Command = Command.Start,
+                    UtcStartTime = model.StartTimeLive?.ToUniversalTime(),
                     WorkId = 0,//quan trọng, cần để cancel/update/tạo thư mục
                     ItemId = model.Id,//quan trọng, cần để cancel/update/tạo thư mục( stream ID)
                     FileDatas = new List<FileData>()

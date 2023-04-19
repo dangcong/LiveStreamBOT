@@ -91,7 +91,6 @@ namespace BaseSource.AppUI.Controllers
             {
                 return RedirectToLocal(returnUrl);
             }
-
             return RedirectToLocal("/");
         }
 

@@ -34,6 +34,10 @@ namespace BaseSource.AppUI.Controllers
         [Authorize]
         public IActionResult Index()
         {
+            if (User.IsInRole("Admin"))
+            {
+                return Redirect("/admin");
+            }
             return View();
         }
 

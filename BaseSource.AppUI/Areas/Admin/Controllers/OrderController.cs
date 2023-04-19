@@ -2,6 +2,7 @@
 using BaseSource.Shared.Constants;
 using BaseSource.ViewModels.Order;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace BaseSource.AppUI.Areas.Admin.Controllers
 {
@@ -87,6 +88,21 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             }
             return RedirectToAction("Index");
             //return Json(new { code = ErrorCodeJson.Success });
+        }
+
+
+        [HttpGet]
+        [Route("/admin/order/user")]
+        public async Task<IActionResult> GetOrderByUserId(string userId)
+        {
+
+            if (userId == null)
+            {
+                return NotFound();
+            }
+            var result = await _orderAdminApiClient.GetOrderByUserIdAsync(userId);
+
+            return View(result?.ResultObj);
         }
     }
 }

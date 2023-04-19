@@ -58,7 +58,7 @@ namespace BaseSource.Data.Migrations
                         new
                         {
                             Id = "c1105ce5-9dbc-49a9-a7d5-c963b6daa62a",
-                            ConcurrencyStamp = "a6a5f9ae-019b-43fb-b743-b4231d2ad538",
+                            ConcurrencyStamp = "0a403e1f-a5f2-4cf5-85f4-fda7b20c3b5e",
                             Description = "Administrator role",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -148,6 +148,9 @@ namespace BaseSource.Data.Migrations
                     b.Property<int>("NumberOfThreads4KCreate")
                         .HasColumnType("int");
 
+                    b.Property<string>("Password")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
 
@@ -188,7 +191,7 @@ namespace BaseSource.Data.Migrations
                         {
                             Id = "ffded6b0-3769-4976-841b-69459049a62d",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "bda3bd7f-3b76-4327-9b2a-71d4fbd47ba3",
+                            ConcurrencyStamp = "cdc36ce1-d11a-4531-83c2-773e8ad9af86",
                             CreatedTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
@@ -199,7 +202,7 @@ namespace BaseSource.Data.Migrations
                             NumberOfThreads1080Create = 0,
                             NumberOfThreads4K = 0,
                             NumberOfThreads4KCreate = 0,
-                            PasswordHash = "AQAAAAEAACcQAAAAEFc+hrmRbrlRLcaCJUyzxeynQzv3lvo8O8WQC9sWmq5ypX7kV6eQeSFhLbLLDPjgmg==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEE5Yg7R8d3huVVt26gl2hNsvbHNiGWEkBQSoQj9oBB3n7lNEpAh//YgIyYpHBzgPCg==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -323,6 +326,9 @@ namespace BaseSource.Data.Migrations
 
                     b.Property<string>("Group")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsUsed")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
@@ -493,6 +499,33 @@ namespace BaseSource.Data.Migrations
                     b.ToTable("ConfigSystems", (string)null);
                 });
 
+            modelBuilder.Entity("BaseSource.Data.Entities.ManagerGroup", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Note")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<string>("UserIdManager")
+                        .HasColumnType("nvarchar(128)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("UserIdManager");
+
+                    b.ToTable("ManagerGroups", (string)null);
+                });
+
             modelBuilder.Entity("BaseSource.Data.Entities.StreamHistory", b =>
                 {
                     b.Property<int>("Id")
@@ -501,14 +534,13 @@ namespace BaseSource.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("AppUserId")
-                        .HasColumnType("nvarchar(128)");
-
                     b.Property<string>("Audio")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("BotId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
@@ -520,7 +552,8 @@ namespace BaseSource.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("ErrorMessage")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<bool>("IsForever")
                         .HasColumnType("bit");
@@ -541,7 +574,8 @@ namespace BaseSource.Data.Migrations
                         .HasColumnType("tinyint");
 
                     b.Property<string>("RTMP")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("RenderStatus")
                         .HasColumnType("int");
@@ -553,7 +587,8 @@ namespace BaseSource.Data.Migrations
                         .HasColumnType("tinyint");
 
                     b.Property<string>("StreamKey")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("StreamName")
                         .HasColumnType("nvarchar(max)");
@@ -562,18 +597,19 @@ namespace BaseSource.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Video")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AppUserId");
-
                     b.HasIndex("ManagerBOTId");
 
-                    b.ToTable("StreamHistory");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("StreamHistorys", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.EntityFrameworkCore.AutoHistory", b =>
@@ -699,15 +735,30 @@ namespace BaseSource.Data.Migrations
                     b.Navigation("ServicePack");
                 });
 
+            modelBuilder.Entity("BaseSource.Data.Entities.ManagerGroup", b =>
+                {
+                    b.HasOne("BaseSouce.Data.Entities.AppUser", "User")
+                        .WithMany("UserGroups")
+                        .HasForeignKey("UserId");
+
+                    b.HasOne("BaseSouce.Data.Entities.AppUser", "UserManager")
+                        .WithMany("ManagerGroups")
+                        .HasForeignKey("UserIdManager");
+
+                    b.Navigation("User");
+
+                    b.Navigation("UserManager");
+                });
+
             modelBuilder.Entity("BaseSource.Data.Entities.StreamHistory", b =>
                 {
-                    b.HasOne("BaseSouce.Data.Entities.AppUser", "AppUser")
-                        .WithMany("StreamHistorys")
-                        .HasForeignKey("AppUserId");
-
                     b.HasOne("BaseSouce.Data.Entities.ManagerBOT", "ManagerBOT")
                         .WithMany("StreamHistorys")
                         .HasForeignKey("ManagerBOTId");
+
+                    b.HasOne("BaseSouce.Data.Entities.AppUser", "AppUser")
+                        .WithMany("StreamHistorys")
+                        .HasForeignKey("UserId");
 
                     b.Navigation("AppUser");
 
@@ -727,11 +778,15 @@ namespace BaseSource.Data.Migrations
 
                     b.Navigation("Claims");
 
+                    b.Navigation("ManagerGroups");
+
                     b.Navigation("Orders");
 
                     b.Navigation("StreamHistorys");
 
                     b.Navigation("Tokens");
+
+                    b.Navigation("UserGroups");
 
                     b.Navigation("UserRoles");
                 });

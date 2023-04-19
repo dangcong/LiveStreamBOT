@@ -15,5 +15,7 @@ namespace BaseSouce.Services.Services.Stream
 
         Task<KeyValuePair<bool, string>> UpdateStreamAsync(RenderMessage model);
         Task<KeyValuePair<bool, string>> CancelStreamAsync(string userId, int id);
+
+        
     }
 }

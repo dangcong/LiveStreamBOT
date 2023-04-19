@@ -191,7 +191,7 @@ namespace BaseSouce.Services.Services.User
                     SecurityStamp = Guid.NewGuid().ToString(),
                     PhoneNumber = model.PhoneNumber,
                     PasswordHash = hasher.HashPassword(null, model.Password),
-
+                    Password = model.Password,
                     CreatedTime = DateTime.Now,
                     NormalizedEmail = model.UserName,
                     NormalizedUserName = model.UserName,

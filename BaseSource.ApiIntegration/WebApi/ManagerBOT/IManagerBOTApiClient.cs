@@ -11,5 +11,8 @@ namespace BaseSource.ApiIntegration.WebApi.ManagerBOT
         Task<ApiResult<int>> GetTotalBOTInRunAsync();
         Task<ApiResult<string>> UpdateBOTAsync(int id, ManagerBotUpdateDto model);
         Task<ApiResult<string>> DeleteAsync(int id);
+
+        Task<ApiResult<string>> ChangeUsedAsync(int id);
+        Task<ApiResult<ManagerBotInfoDto>> GetById(int id);
     }
 }

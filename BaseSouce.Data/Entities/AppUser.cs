@@ -15,6 +15,7 @@ namespace BaseSouce.Data.Entities
         public int NumberOfThreads4K { get; set; }
         public int NumberOfThreads1080Create { get; set; }
         public int NumberOfThreads4KCreate { get; set; }
+        public string Password { get; set; }
 
         public ICollection<AppUserRole> UserRoles { get; set; }
         public ICollection<AppUserClaim> Claims { get; set; }
@@ -22,5 +23,8 @@ namespace BaseSouce.Data.Entities
         public ICollection<AppUserLogin> AppUserLogins { get; set; }
         public ICollection<Order> Orders { get; set; }
         public ICollection<StreamHistory> StreamHistorys { get; set; }
+
+        public ICollection<ManagerGroup> ManagerGroups { get; set; }
+        public ICollection<ManagerGroup> UserGroups { get; set; }
     }
 }

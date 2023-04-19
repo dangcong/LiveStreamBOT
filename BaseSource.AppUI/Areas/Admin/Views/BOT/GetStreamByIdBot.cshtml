@@ -1,0 +1,74 @@
+﻿@model List<StreamAdminInfoDto>
+@{
+    ViewData["Title"] = "Danh sách  Stream theo BOT";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+
+<section class="section">
+    <div class="section-header">
+        <h1>@ViewData["Title"]</h1>
+        <div class="section-header-breadcrumb">
+            <div class="breadcrumb-item active"><a href="#">Dashboard</a></div>
+            <div class="breadcrumb-item"><a href="#">Danh sách</a></div>
+            <div class="breadcrumb-item">Gói live</div>
+        </div>
+    </div>
+
+    <div class="section-body">
+
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>@ViewData["Title"]</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="table-transactions">
+                                <thead>
+                                    <tr>
+                                        <th>Người dùng</th>
+                                        <th>Gói cước</th>
+                                        <th>Ngày đăng ký</th>
+                                        <th>Hạn sử dụng</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>@item.UserName</td>
+                                            <td>
+                                                @switch (item.LiveType)
+                                                {
+
+                                                    case LiveType._1080:
+                                                        <span class="badge badge-success">1080</span>
+                                                        break;
+                                                    case LiveType._4K:
+                                                        <span class="badge badge-danger">4k</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>@item.CreatedTime.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                            <td>@item.EndTime?.ToString("dd/MM/yyyy ")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+@section Scripts {
+    <script>
+
+    </script>
+}
+

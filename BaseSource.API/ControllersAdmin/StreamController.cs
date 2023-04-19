@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BaseSource.API.ControllersAdmin
 {
+    [Route("api/admin/[controller]")]
     public class StreamController : BaseAdminApiController
     {
         private readonly IStreamAdminService _streamAdminService;
@@ -17,6 +18,22 @@ namespace BaseSource.API.ControllersAdmin
         public async Task<IActionResult> GetAll([FromQuery] StreamAdminRequestDto model)
         {
             var result = await _streamAdminService.GetByFilterAsync(model);
+            return Ok(new ApiSuccessResult<object>(result));
+        }
+        [HttpGet]
+        [Route("bot/{id:int:min(1)}")]
+        public async Task<IActionResult> GetAllByBotId(int id)
+        {
+            var result = await _streamAdminService.GetByBotIdAsync(id);
+            return Ok(new ApiSuccessResult<object>(result));
+        }
+
+
+        [HttpGet]
+        [Route("user")]
+        public async Task<IActionResult> GetAllByUserId(string userId)
+        {
+            var result = await _streamAdminService.GetAllByUserIdAsync(userId);
             return Ok(new ApiSuccessResult<object>(result));
         }
     }

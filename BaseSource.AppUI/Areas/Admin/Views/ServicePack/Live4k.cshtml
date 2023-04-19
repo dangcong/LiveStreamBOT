@@ -1,4 +1,5 @@
-﻿@{
+﻿@model List<ServicePackDto>
+@{
     ViewData["Title"] = "ServicePacks";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
@@ -38,6 +39,24 @@
                                         <th>Action</th>
                                     </tr>
                                 </thead>
+                                 <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>@item.Name</td>
+                                            <td>@item.NumberOfThreads</td>
+                                            <td>@item.Price</td>
+                                            <td>@item.Discount</td>
+                                            <td>@item.CreatedTime</td>
+                                            <td>@(item.IsPublished ? "Hiển thị" : "Ẩn")</td>
+                                            <td>
+                                                <a class="btn btn-primary" href="/admin/ServicePack/edit/@(item.Id)">Sửa</a>
+                                                <a class="btn btn-success" href="/admin/ServicePackByMonth/Index/@(item.Id)">Gói tháng</a>
+                                                <button class="btn btn-danger">Ẩn</button>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
                             </table>
                         </div>
                     </div>

@@ -14,5 +14,6 @@ namespace BaseSource.ApiIntegration.WebApi.OrderAdmin
         Task<ApiResult<string>> Accept(int id);
         Task<ApiResult<string>> Cancel(int id);
         Task<ApiResult<OrderInfoDto>> GetById(int id);
+        Task<ApiResult<List<OrderInfoDto>>> GetOrderByUserIdAsync(string userId);
     }
 }

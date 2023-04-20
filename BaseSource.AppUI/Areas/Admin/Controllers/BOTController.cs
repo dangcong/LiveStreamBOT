@@ -1,25 +1,46 @@
 ﻿using BaseSource.ApiIntegration.WebApi.ManagerBOT;
+using BaseSource.ApiIntegration.WebApi.StreamAdmin;
+using BaseSource.Shared.Constants;
 using BaseSource.ViewModels.ManagerBOT;
 using Microsoft.AspNetCore.Mvc;
+using System.Threading.Tasks.Dataflow;
 
 namespace BaseSource.AppUI.Areas.Admin.Controllers
 {
     public class BOTController : BaseAdminController
     {
         private readonly IManagerBOTApiClient _managerBOTApiClient;
-        public BOTController(IManagerBOTApiClient managerBOTApiClient)
+        private readonly IStreamAdminApiClient _streamAdminApiClient;
+        public BOTController(IManagerBOTApiClient managerBOTApiClient, IStreamAdminApiClient streamAdminApiClient)
         {
             _managerBOTApiClient = managerBOTApiClient;
+            _streamAdminApiClient = streamAdminApiClient;
         }
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var result = await _managerBOTApiClient.GetBOTByFilterAsync(new ManagerBOTRequestDto
+            {
+                Page = 1,
+                PageSize = 1000
+            });
+            if (result == null || !result.IsSuccessed)
+            {
+                return NotFound();
+            }
+            return View(result.ResultObj);
         }
 
         public async Task<IActionResult> Edit(int id)
         {
-            return View();
+            var result = await _managerBOTApiClient.GetById(id);
+            if (result == null || !result.IsSuccessed)
+            {
+                return NotFound();
+            }
+            ViewBag.Id = id;
+            return View(result.ResultObj);
         }
+        [HttpPost]
         public async Task<IActionResult> Edit(ManagerBotUpdateDto model)
         {
             var result = await _managerBOTApiClient.UpdateBOTAsync(model.Id, model);
@@ -36,9 +57,34 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             var result = await _managerBOTApiClient.DeleteAsync(id);
             if (result == null || !result.IsSuccessed)
             {
-                return Json(new { });
+                return Json(new { code = ErrorCodeJson.ErrorMess, err = result?.Message ?? "Xóa không thành công!" });
             }
-            return Json(new { });
+            return Json(new { code = ErrorCodeJson.Success });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ChangeUsed(int id)
+        {
+            var result = await _managerBOTApiClient.ChangeUsedAsync(id);
+            if (result == null || !result.IsSuccessed)
+            {
+                return RedirectToAction("Index");
+                // return Json(new { code = ErrorCodeJson.ErrorMess, err = result?.Message ?? "Cập nhật không thành công!" });
+            }
+            return RedirectToAction("Index");
+            // return Json(new { code = ErrorCodeJson.Success });
+        }
+
+        [HttpGet]
+        [Route("/admin/bot/stream")]
+        public async Task<IActionResult> GetStreamByIdBot(int id)
+        {
+            var result = await _streamAdminApiClient.GetByBotIdAsync(id);
+            if (result == null || !result.IsSuccessed)
+            {
+                return NotFound();
+            }
+            return View(result.ResultObj.Items);
         }
     }
 }

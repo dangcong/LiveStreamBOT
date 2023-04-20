@@ -17,7 +17,6 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TqkLibrary.Net.CloudStorage.GoogleDrive;
-using System.Linq.Expressions;
 
 namespace BaseSouce.Services.Services.Stream
 {
@@ -364,6 +363,7 @@ namespace BaseSouce.Services.Services.Stream
                     return new KeyValuePair<bool, string>(false, "Luồng không tồn tại, vui lòng thử lại!");
                 }
                 //update data
+                streamEntity.StreamName = model.StreamName;
                 streamEntity.Video = model.Video;
                 streamEntity.Audio = model.Audio;
                 streamEntity.IsForever = model.IsForever;
@@ -460,6 +460,53 @@ namespace BaseSouce.Services.Services.Stream
                 _logger.LogError($"Cancel Stream [{id}] failed by error:[{ex}]");
                 return new KeyValuePair<bool, string>(false, "Dừng luồng không thành công, vui lòng thử lại!");
             }
+        }
+
+        public async Task<StreamClientInfoDto> GetStreamByIdAsync(string userId, int id)
+        {
+            var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
+
+            return await _repositoryStream.GetFirstOrDefaultAsync(
+                predicate: x => x.Id == id && x.UserId == userId,
+                selector: x => _mapper.Map<StreamClientInfoDto>(x),
+                include: x => x.Include(i => i.AppUser),
+                disableTracking: false);
+        }
+
+        public async Task<StreamReportDto> GetStreamReportAsync(string userId)
+        {
+            var _repository = _unitOfWork.GetRepository<AppUser>();
+
+            return await _repository.GetFirstOrDefaultAsync(
+                predicate: x => x.Id == userId,
+                selector: x => new StreamReportDto
+                {
+                    Total = x.StreamHistorys.Count(),
+                    TotalStop = x.StreamHistorys.Where(i => i.Status == StreamStatus.Stop).Count(),
+                    TotalStreaning = x.StreamHistorys.Where(i => i.Status == StreamStatus.Streaming).Count()
+                });
+        }
+
+        public async Task<KeyValuePair<bool, string>> ValidateLinkAsync(string link)
+        {
+            var driveVideoItem = GoogleDriveHelper.TryParse(link);
+            if (driveVideoItem is null ||
+                driveVideoItem.LinkType != GoogleDriveLinkType.File)
+                return new KeyValuePair<bool, string>(false,"Link  không hỗ trợ hoặc không hợp lệ") ;
+
+            using (DriveApiNonLogin driveApiNonLogin = new DriveApiNonLogin())
+            {
+                try
+                {
+                    var videoMetadata = await driveApiNonLogin.GetMetadataAsync(driveVideoItem.ID);
+                }
+                catch (Exception)
+                {
+                    return new KeyValuePair<bool, string>(false,"Link không truy cập được");
+                }
+            }
+
+            return new KeyValuePair<bool, string>(true,string.Empty);
         }
     }
 }

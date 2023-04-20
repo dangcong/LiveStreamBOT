@@ -19,5 +19,7 @@ namespace BaseSource.API.Controllers
             var result =await _configSettingService.GetSettingAsync();
             return Ok(new ApiSuccessResult<ConfigSettingVm>(result));
         }
+
+        
     }
 }

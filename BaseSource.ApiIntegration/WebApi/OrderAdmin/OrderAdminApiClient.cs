@@ -36,5 +36,11 @@ namespace BaseSource.ApiIntegration.WebApi.OrderAdmin
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
             return await client.GetAsync<ApiResult<OrderInfoDto>>($"/api/admin/order/{id}");
         }
+
+        public async Task<ApiResult<List<OrderInfoDto>>> GetOrderByUserIdAsync(string userId)
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            return await client.GetAsync<ApiResult<List<OrderInfoDto>>>($"/api/admin/order/user?userId={userId}");
+        }
     }
 }

@@ -7,5 +7,7 @@ namespace BaseSouce.Services.Services.StreamAdmin
     public interface IStreamAdminService
     {
         Task<IPagedList<StreamAdminInfoDto>> GetByFilterAsync(StreamAdminRequestDto model);
+        Task<IPagedList<StreamAdminInfoDto>> GetByBotIdAsync(int botId);
+        Task<List<StreamAdminInfoDto>> GetAllByUserIdAsync(string userId);
     }
 }

@@ -1,5 +1,4 @@
-﻿
-@{
+﻿@{
     ViewData["Title"] = "Danh sách người dùng";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
@@ -24,16 +23,14 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-striped" id="table-all-user">
+                            <table class="table table-striped" id="tableAllUser">
                                 <thead>
                                     <tr>
                                         <th>Người dùng</th>
-                                        <th>Biệt danh</th>
-                                        <th>Ngày tạo</th>
-                                        <th>Email Xác nhận</th>
-                                        <th>Xác minh TK</th>
-                                        <th>Khóa TK</th>
-                                        <th>Khóa Giao dịch</th>
+                                        <th>Mật khẩu</th>
+                                        <th>Email</th>
+                                        <th>LinkFB</th>
+                                        <th>LinkTelegram</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -45,3 +42,72 @@
         </div>
     </div>
 </section>
+<div class="modal fade" tabindex="-1" role="dialog" id="resetPassModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" id="formResetPassword" action="/admin/User/ResetPassword">
+                <div class="modal-header">
+                    <h5 class="modal-title">Reset mật khẩu của người dùng</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có muốn Reset mật khẩu của người dùng?</p>
+                    <input class="form-control" name="userId" type="hidden" />
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Xác nhận</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $("#tableAllUser").DataTable({
+                "processing": true,
+                "serverSide": true,
+                "filter": true,
+                "ajax": {
+                    "url": "/admin/user/GetAll",
+                    "type": "POST",
+                    "datatype": "json"
+                },
+                //"language": {
+                //    "url": "/language/language.json"
+                //},
+                "columnDefs": [
+                    {
+                        "targets": [1],
+                        "searchable": false,
+                        "orderable": false
+                    }],
+                "columns": [
+                    { "data": "userName", "name": "UserName", "autoWidth": true },
+                    { "data": "password", "name": "Password", "autoWidth": true },
+                    { "data": "email", "name": "Email", "autoWidth": true },
+                    { "data": "linkFB", "name": "LinkFB", "autoWidth": true },
+                    { "data": "linkTelegram", "name": "LinkTelegram", "autoWidth": true },
+
+                    {
+                        "data": "userName", "name": "userName", "autoWidth": true,
+                        "render": function (data, row, type) {
+                            return `<a class="btn btn-primary" href="/admin/order/user?userId=${type.id}">DS Gói</a>
+                                     <a class="btn btn-success" href="/admin/stream/user?userId=${type.id}">DS Stream</a>
+                                     <button class="btn btn-danger btnReset" data-id="${type.id}"  data-toggle="modal" data-target="#resetPassModal">Reset MK</button>`;
+                        }
+                    },
+                ]
+            });
+        });
+        $('body').on('click', '.btnReset', function () {
+            let id = $(this).attr('data-id');
+            $('#formResetPassword input[name="userId"]').val(id);
+        })
+    </script>
+}
+

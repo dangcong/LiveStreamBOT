@@ -1,7 +1,135 @@
-﻿
+﻿@model PagedResult<ManagerBotInfoDto>
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Danh sách BOT";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<section class="section">
+    <div class="section-header">
+        <h1>@ViewData["Title"]</h1>
+        <div class="section-header-breadcrumb">
+            <div class="breadcrumb-item active"><a href="#">Home</a></div>
+            <div class="breadcrumb-item"><a href="#">Danh sách </a></div>
+            <div class="breadcrumb-item">BOT</div>
+        </div>
+    </div>
 
+    <div class="section-body">
+        <h2 class="section-title">@ViewData["Title"]</h2>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>@ViewData["Title"]</h4>
+
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="table-all-user">
+                                <thead>
+                                    <tr>
+                                        <th>BotID</th>
+                                        <th>Name</th>
+                                        <th>Group</th>
+                                        <th>Status</th>
+                                        <th>Ngày tạo</th>
+                                        <th>Số luồng</th>
+                                        <th>CPU</th>
+                                        <th>RAM</th>
+                                        <th>Bandwidth</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Items)
+                                    {
+                                        <tr>
+                                            <td> <span class="text-sm" style="font-size:10px">@item.BotId</span></td>
+                                            <td>@item.Name</td>
+                                            <td>@item.Group</td>
+                                            <td>@item.Status</td>
+                                            <td>@item.CreatedTime.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                            <td><a href="/amdin/bot/stream?id=@item.Id">@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads)</a> </td>
+                                            <td>@(item.CPU)%</td>
+                                            <td>@item.RAM.ToString("n2")%</td>
+                                            <td>@item.Bandwidth.ToString("n2") mb/s</td>
+                                            <td>
+                                                <a class="btn btn-primary" href="/admin/bot/edit/@(item.Id)">Sửa</a>
+                                                @if (item.IsUsed)
+                                                {
+                                                    <button class="btn btn-danger btn-update" data-toggle="modal" data-target="#stopModal" data-id="@item.Id">Stop</button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn btn-success btn-update" data-toggle="modal" data-target="#startModal" data-id="@item.Id">Start</button>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div class="modal fade" tabindex="-1" role="dialog" id="startModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận thông tin </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn muốn Start BOT này ?</p>
+            </div>
+            <div class="modal-footer bg-whitesmoke br">
+                <form id="startForm" method="post" action="/admin/bot/ChangeUsed">
+                    <input name="Id" type="hidden" />
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" id="btn-confirm-payment" class="btn btn-danger">Xác nhận </button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" role="dialog" id="stopModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xác nhận thông tin</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn muốn Stop BOT này(sau khi stop tất cả các luồng sẽ dừng chạy)?</p>
+            </div>
+            <div class="modal-footer bg-whitesmoke br">
+                <form id="stopForm" method="post" action="/admin/bot/ChangeUsed">
+                    <input name="Id" type="hidden" />
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" id="btn-confirm-payment" class="btn btn-danger">Xác nhận </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        $('body').on('click', '.btn-setting', function () {
+            showModal(null, 'updateSetting');
+        });
+
+        $('body').on('click', '.btn-update', function () {
+            let id = $(this).attr('data-id');
+            $('#stopForm input[name="Id"]').val(id);
+            $('#startForm input[name="Id"]').val(id);
+        });
+    </script>
+}

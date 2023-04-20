@@ -18,5 +18,11 @@ namespace BaseSource.ApiIntegration.WebApi.Setting
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
             return await client.GetAsync<ApiResult<ConfigSettingVm>>("/api/setting");
         }
+
+        public async Task<ApiResult<string>> Update(ConfigSettingVm model)
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            return await client.PostAsync<ApiResult<string>>("/api/admin/setting", model);
+        }
     }
 }

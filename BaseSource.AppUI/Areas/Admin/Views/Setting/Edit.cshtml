@@ -1,0 +1,87 @@
+﻿@model ConfigSettingVm
+@{
+    ViewData["Title"] = "Cài đặt hệ thống";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+}
+<section class="section">
+    <div class="section-header">
+        <h1>@ViewData["Title"]</h1>
+        <div class="section-header-breadcrumb">
+            <div class="breadcrumb-item active"><a href="#">Home</a></div>
+            <div class="breadcrumb-item"><a href="#">Cài đặt</a></div>
+            <div class="breadcrumb-item">Hệ thống</div>
+        </div>
+    </div>
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>@ViewData["Title"]</h4>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" action="/admin/Setting/Edit">
+                            <div class="row">
+                               
+                                <div class="col-12">
+                                    <h6>@ViewData["Title"]</h6>
+                                    <div class="form-group mb-4">
+                                        <label class="">Tên ngân hàng</label>
+                                        <div class="">
+                                            <input asp-for="BankName" placeholder="Nhập tên ngân hàng" class="form-control" />
+                                            <span asp-validation-for="BankName" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mb-4">
+                                        <label class="">Số tài khoản ngân hàng</label>
+                                        <div class="">
+                                            <input  asp-for="BankNumber" placeholder="Nhập số tài khoản ngân hàng" class="form-control" />
+                                            <span asp-validation-for="BankNumber" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mb-4">
+                                        <label class="">Tên người nhận</label>
+                                        <div class="">
+                                            <input  asp-for="BankAccountName" placeholder="Nhập tên người nhận" class="form-control" />
+                                            <span asp-validation-for="BankAccountName" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mb-4">
+                                        <label class="">Link facebook Admin</label>
+                                        <div class="">
+                                            <input asp-for="LinkFBAdmin" placeholder="Nhập link FB Admin" class="form-control" />
+                                            <span asp-validation-for="LinkFBAdmin" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group mb-4">
+                                        <label class="">Link Hướng dẫn Youtube</label>
+                                        <div class="">
+                                            <input  asp-for="LinkYoutube" placeholder="Nhập link Youtube" class="form-control" />
+                                            <span asp-validation-for="LinkYoutube" class="text-danger"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                               
+                            </div>
+                            <div class="form-group row mb-4">
+                                <label class="col-form-label text-md-right col-12 col-md-4 col-lg-4"></label>
+                                <div class="buttons col-sm-12 col-md-8">
+                                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                                    <button type="submit" class="btn btn-info btn-lg btn-icon btn-setting"><i class="fas fa-check"></i>&ensp;Cập nhật</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@section Scripts{
+    <script>
+        $('body').on('click', '.btn-setting', function () {
+            showModal(null, 'updateSetting');
+        });
+    </script>
+}
+

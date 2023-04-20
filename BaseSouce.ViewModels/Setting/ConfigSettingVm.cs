@@ -13,5 +13,6 @@ namespace BaseSource.ViewModels.Setting
         public string BankName { get; set; }
         public string BankAccountName { get; set; }
         public string LinkFBAdmin { get; set; }
+        public string LinkYoutube { get; set; }
     }
 }

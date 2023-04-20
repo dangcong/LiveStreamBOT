@@ -13,6 +13,13 @@ namespace BaseSource.ApiIntegration.WebApi.ManagerBOT
         {
             _httpClientFactory = httpClientFactory;
         }
+
+        public async Task<ApiResult<string>> ChangeUsedAsync(int id)
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            return await client.PatchAsync<ApiResult<string>>($"/api/admin/bot/{id}/ChangeUsed");
+        }
+
         public async Task<ApiResult<string>> CreateBOTAsync(ManagerBotCreateDto model)
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
@@ -22,25 +29,31 @@ namespace BaseSource.ApiIntegration.WebApi.ManagerBOT
         public async Task<ApiResult<string>> DeleteAsync(int id)
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
-            return await client.DeleteAsync<ApiResult<string>>($"/api/bot/{id}");
+            return await client.DeleteAsync<ApiResult<string>>($"/api/admin/bot/{id}");
         }
 
         public async Task<ApiResult<PagedResult<ManagerBotInfoDto>>> GetBOTByFilterAsync(ManagerBOTRequestDto model)
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
-            return await client.GetAsync<ApiResult<PagedResult<ManagerBotInfoDto>>>("/api/bots", model);
+            return await client.GetAsync<ApiResult<PagedResult<ManagerBotInfoDto>>>("/api/admin/bots", model);
+        }
+
+        public async Task<ApiResult<ManagerBotInfoDto>> GetById(int id)
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            return await client.GetAsync<ApiResult<ManagerBotInfoDto>>($"/api/admin/bot/{id}");
         }
 
         public async Task<ApiResult<int>> GetTotalBOTInRunAsync()
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
-            return await client.GetAsync<ApiResult<int>>("/api/bot/total/run");
+            return await client.GetAsync<ApiResult<int>>("/api/admin/bot/total/run");
         }
 
         public async Task<ApiResult<string>> UpdateBOTAsync(int id, ManagerBotUpdateDto model)
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
-            return await client.PutAsync<ApiResult<string>>($"/api/bot/{id}", model);
+            return await client.PutAsync<ApiResult<string>>($"/api/admin/bot/{id}", model);
         }
     }
 }

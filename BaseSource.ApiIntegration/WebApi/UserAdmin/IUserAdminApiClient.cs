@@ -1,0 +1,15 @@
+﻿using BaseSouce.ViewModels.Common;
+using BaseSource.ViewModels.UserAdmin;
+
+namespace BaseSource.ApiIntegration.WebApi.UserAdmin
+{
+    public interface IUserAdminApiClient
+    {
+        Task<ApiResult<PagedResult<UserAdminInfoDto>>> GetUserByFilter(UserAdminRequestDto model);
+        Task<ApiResult<string>> UpdateUserGroup(UserGroupAddDto model);
+        Task<ApiResult<List<UserGroupDto>>> GetAllUserOfManager(string userId);
+        Task<ApiResult<List<UserAdminInfoDto>>> GetAllManager();
+        Task<ApiResult<string>> UpdateRoleManager(string userName);
+        Task<ApiResult<string>> ResetPassword(ResetPasswordAdminDto model);
+    }
+}

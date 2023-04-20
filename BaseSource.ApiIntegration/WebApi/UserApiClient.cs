@@ -38,6 +38,12 @@ namespace BaseSource.ApiIntegration.WebApi
             return await client.PostAsync<ApiResult<string>>("/api/Account/ForgotPassword", model);
         }
 
+        public async Task<ApiResult<PackageLiveUserDto>> GetPackageInfo()
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            return await client.GetAsync<ApiResult<PackageLiveUserDto>>("/api/Account/packageInfo");
+        }
+
         public async Task<ApiResult<ProfifleInfoDto>> GetProfileInfo()
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
@@ -62,6 +68,10 @@ namespace BaseSource.ApiIntegration.WebApi
             return await client.PostAsync<ApiResult<string>>("/api/Account/ResetPassword", model);
         }
 
-        
+        public async Task<ApiResult<string>> Update(UserUpdateDto model)
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            return await client.PostAsync<ApiResult<string>>("/api/Account/Update", model);
+        }
     }
 }

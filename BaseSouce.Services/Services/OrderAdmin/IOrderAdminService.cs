@@ -9,5 +9,7 @@ namespace BaseSouce.Services.Services.OrderAdmin
         Task<KeyValuePair<bool, string>> AcceptAsync(int id);
         Task<KeyValuePair<bool, string>> CancelAsync(int id);
         Task<OrderInfoDto> GetByIdAsync(int id);
+        Task<List<OrderInfoDto>> GetOrderByUserIdAsync(string userId);
+        
     }
 }

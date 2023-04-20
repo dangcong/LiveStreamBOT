@@ -59,5 +59,13 @@ namespace BaseSource.API.ControllersAdmin
             // AddErrors(result.Value, string.Empty);
             return Ok(new ApiErrorResult<string>(result.Value));
         }
+
+        [HttpGet]
+        [Route("user")]
+        public async Task<IActionResult> GetOrderByUserId(string userId)
+        {
+            var result = await _orderAdminService.GetOrderByUserIdAsync(userId);
+            return Ok(new ApiSuccessResult<object>(result));
+        }
     }
 }

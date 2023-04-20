@@ -37,9 +37,11 @@ namespace BaseSource.ViewModels.ManagerBOT
         public int Retry { get; set; }
 
         public int NumberOfThreads { get; set; }
+        public int NumberOfThreadsInRun { get; set; }
         public double CPU { get; set; }
         public double RAM { get; set; }
         public double Bandwidth { get; set; }
+        public bool IsUsed { get; set; }
     }
     public class ManagerBOTRequestDto : PageQuery
     {

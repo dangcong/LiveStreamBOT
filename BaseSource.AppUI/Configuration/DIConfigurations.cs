@@ -6,6 +6,7 @@ using BaseSource.ApiIntegration.WebApi.SerivePackage;
 using BaseSource.ApiIntegration.WebApi.Setting;
 using BaseSource.ApiIntegration.WebApi.Stream;
 using BaseSource.ApiIntegration.WebApi.StreamAdmin;
+using BaseSource.ApiIntegration.WebApi.UserAdmin;
 
 namespace BaseSource.AppUI.Configuration
 {
@@ -29,8 +30,9 @@ namespace BaseSource.AppUI.Configuration
 
             services.AddTransient<IStreamApiClient, StreamApiClient>();
 
-            services.AddTransient<IManagerBOTApiClient, ManagerBOTApiClient>();   
-            services.AddTransient<IStreamAdminApiClient, StreamAdminApiClient>();     
+            services.AddTransient<IManagerBOTApiClient, ManagerBOTApiClient>();
+            services.AddTransient<IStreamAdminApiClient, StreamAdminApiClient>();
+            services.AddTransient<IUserAdminApiClient, UserAdminApiClient>();
             
             
             return services;

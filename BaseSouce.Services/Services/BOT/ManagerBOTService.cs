@@ -23,6 +23,37 @@ namespace BaseSouce.Services.Services.BOT
             _mapper = mapper;
         }
 
+        public async Task<KeyValuePair<bool, string>> ChangeUsedAsync(int id)
+        {
+            try
+            {
+                var _repository = _unitOfWork.GetRepository<Data.Entities.ManagerBOT>();
+
+                var botCurrent = await _repository.GetFirstOrDefaultAsync(
+                    predicate: x => x.Id == id, disableTracking: false);
+
+                if (botCurrent == null)
+                {
+                    return new KeyValuePair<bool, string>(false, "BOT không tồn tại!");
+                }
+                botCurrent.IsUsed = !botCurrent.IsUsed;
+                _repository.Update(botCurrent);
+
+                await _unitOfWork.SaveChangesAsync();
+
+                if (!botCurrent.IsUsed)
+                {
+                    //send data to BOT
+                }
+
+                return new KeyValuePair<bool, string>(true, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Change Used BOT failed by error:[{ex}]");
+                return new KeyValuePair<bool, string>(false, "Cập nhật BOT không thành công vui lòng thử lại!");
+            }
+        }
 
         public async Task<KeyValuePair<bool, string>> CreateBOTAsync(ManagerBotCreateDto model)
         {
@@ -104,8 +135,18 @@ namespace BaseSouce.Services.Services.BOT
             return await _repository.GetStagesPagedListAsync(
                 stages: query,
                 selector: x => _mapper.Map<ManagerBotInfoDto>(x),
+                include: x => x.Include(i => i.StreamHistorys),
                 orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                 pageIndex: model.Page, pageSize: model.PageSize);
+        }
+
+        public async Task<ManagerBotInfoDto> GetBOTByIdAsync(int id)
+        {
+            var _repository = _unitOfWork.GetRepository<Data.Entities.ManagerBOT>();
+
+            return await _repository.GetFirstOrDefaultAsync(
+                predicate: x => x.Id == id,
+                selector: x => _mapper.Map<ManagerBotInfoDto>(x));
         }
 
         public async Task<int> GetTotalBOTInRunAsync()
@@ -128,6 +169,13 @@ namespace BaseSouce.Services.Services.BOT
                 {
                     return new KeyValuePair<bool, string>(false, "BOT không tồn tại!");
                 }
+                var checkNameBot = await _repository.ExistsAsync(x => x.Name == model.Name && x.Id != id);
+
+                if (checkNameBot)
+                {
+                    return new KeyValuePair<bool, string>(false, "Tên BOT đã tồn tại!");
+                }
+
                 botCurrent.Name = model.Name;
                 botCurrent.Group = model.Group;
                 botCurrent.NumberOfThreads = model.NumberOfThreads;

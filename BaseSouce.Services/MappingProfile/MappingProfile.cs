@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using BaseSouce.Data.Entities;
+using BaseSouce.Shared.Enums;
+using BaseSouce.ViewModels.User;
 using BaseSource.Data.Entities;
 using BaseSource.ViewModels.ManagerBOT;
 using BaseSource.ViewModels.Order;
@@ -32,18 +34,25 @@ namespace BaseSouce.Services.MappingProfile
 
             #region ManagerBOT
 
-            CreateMap<ManagerBOT, ManagerBotInfoDto>();
+            CreateMap<ManagerBOT, ManagerBotInfoDto>()
+                .ForMember(dest => dest.NumberOfThreadsInRun,
+                options => options.MapFrom(source => source.StreamHistorys.Where(x => x.Status == StreamStatus.Streaming).Count()));
 
             #endregion
 
             #region Stream History
 
             CreateMap<StreamHistory, StreamClientInfoDto>();
-            
+
 
             CreateMap<StreamHistory, StreamAdminInfoDto>()
                .ForMember(dest => dest.UserName, options => options.MapFrom(source => source.AppUser.UserName))
                .ForMember(dest => dest.Email, options => options.MapFrom(source => source.AppUser.Email));
+            #endregion
+
+            #region User
+            
+                CreateMap<AppUser, UserInfoResponse>();
             #endregion
         }
 

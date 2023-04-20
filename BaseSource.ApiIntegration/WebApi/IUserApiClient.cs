@@ -20,6 +20,8 @@ namespace BaseSource.ApiIntegration.WebApi
         Task<ApiResult<string>> ChangePassword(ChangePasswordVm model);
 
         Task<ApiResult<ProfifleInfoDto>> GetProfileInfo();
+        Task<ApiResult<PackageLiveUserDto>> GetPackageInfo();
+        Task<ApiResult<string>> Update(UserUpdateDto model);
 
         //Task<ApiResult<string>> AuthenticateExternalAsync(UserClaimRequest model);
         //Task<ApiResult<PagedResult<WalletTransactionVm>>> GetWalletTransactions(GetWalletTransactionRequestVm model);

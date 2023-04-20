@@ -252,8 +252,6 @@ namespace BaseSource.AppUI.Controllers
             return View(result.ResultObj);
         }
 
-
-
         #region helper
         private ClaimsPrincipal ValidateToken(string jwtToken)
         {

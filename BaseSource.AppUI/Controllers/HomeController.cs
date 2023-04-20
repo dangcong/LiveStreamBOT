@@ -38,7 +38,8 @@ namespace BaseSource.AppUI.Controllers
             {
                 return Redirect("/admin");
             }
-            return View();
+            return Redirect("/live/pricing");
+
         }
 
         public IActionResult Privacy()

@@ -3,53 +3,71 @@
     ViewData["Title"] = "ServicePack";
 }
 
+<style>
+    .pricing-highlight .pricing-title {
+        background-color: darkgrey !important;
+    }
+</style>
+
 <section class="section">
 
 
     <div class="section-body">
 
         <div class="row justify-content-center">
-            <div class="col-md-8">
-                <div class="alert alert-pink text-center">
-                    Tài khoản của bạn đã hết hạn, hãy gia hạn
-                </div>
-            </div>
             <div class="col-md-10">
 
                 <div class="row">
 
                     @foreach (var item in Model)
                     {
-                        <div class="pricing-column col-lg-3 col-md-3">
-                            <div class="ribbon"><span>Giảm -10%</span></div>
-                            <div class="inner-box card-box">
-                                <div class="plan-header text-center">
-                                    <h3 class="plan-title">@item.Name</h3>
-                                    <h4 class="color-red text-line-through">&nbsp;</h4>
-                                    <h2 class="plan-price text-line-through">@item.Price</h2>
-                                    <h3 class="color-violet">180.000</h3>
-                                    <div class="plan-duration">1 Tháng</div>
+
+                        <div class="col-12 col-md-3 col-lg-3">
+                            <div class="pricing pricing-highlight">
+                                <div class="pricing-title">
+                                    <h4> @item.Name</h4>
                                 </div>
-                                <ul class="plan-stats list-unstyled text-center">
-                                    <li><i class="ti-key text-success"></i> @item.NumberOfThreads LUỒNG SONG SONG</li>
-                                    @* <li><i class="ti-user text-success"></i> 1 TÀI KHOẢN QUẢN LÝ</li>*@
-                                    <li><i class="ti-desktop text-success"></i> KHÔNG CẦN VPS</li>
-                                    <li><i class="ti-cloud text-success"></i> KHÔNG CẦN TREO MÁY</li>
-                                    <li><i class="ti-alarm-clock text-success"></i> LIVE 24/7 VIDEO 1080p</li>
-                                    <li><i class="ti-headphone-alt text-success"></i> HỖ TRỢ MIỄN PHÍ</li>
-                                </ul>
-                                <div class="text-center">
-                                    <a href="invoice/live1" class="btn btn-danger btn-bordred btn-rounded waves-effect waves-light">Mua Ngay</a>
+                                <div class="pricing-padding">
+                                    <div class="pricing-price">
+                                        <div><h2>@item.Discount.ToString("N0").Replace(",",".")</h2></div>
+                                        <div class="text-danger " style="text-decoration:line-through">
+                                            <h6>@item.Price.ToString("N0").Replace(",",".")</h6>
+                                        </div>
+                                        <div>1 tháng</div>
+                                    </div>
+                                    <div class="pricing-details">
+                                        <div class="pricing-item">
+                                            <div class="pricing-item-icon"><i class="fas fa-check"></i></div>
+                                            <div class="pricing-item-label">@item.NumberOfThreads LUỒNG SONG SONG</div>
+                                        </div>
+                                        <div class="pricing-item">
+                                            <div class="pricing-item-icon"><i class="fas fa-check"></i></div>
+                                            <div class="pricing-item-label">KHÔNG CẦN VPS</div>
+                                        </div>
+                                        <div class="pricing-item">
+                                            <div class="pricing-item-icon"><i class="fas fa-check"></i></div>
+                                            <div class="pricing-item-label">KHÔNG CẦN TREO MÁY</div>
+                                        </div>
+                                        <div class="pricing-item">
+                                            <div class="pricing-item-icon"><i class="fas fa-check"></i></div>
+                                            <div class="pricing-item-label">LIVE 24/7 VIDEO 1080p</div>
+                                        </div>
+                                        <div class="pricing-item">
+                                            <div class="pricing-item-icon"><i class="fas fa-check"></i></div>
+                                            <div class="pricing-item-label">HỖ TRỢ MIỄN PHÍ</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <a class="btn btn-danger" href="/live/invoice/@item.Name">Mua ngay</a>
+                                        </div>
+                                    </div>
                                 </div>
+
                             </div>
                         </div>
                     }
                 </div>
             </div>
         </div>
-
-
-
     </div>
 </section>
 

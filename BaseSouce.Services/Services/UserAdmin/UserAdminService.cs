@@ -3,7 +3,6 @@ using BaseSouce.Data.Entities;
 using BaseSouce.Shared.Enums;
 using BaseSouce.Shared.Helpers;
 using BaseSource.Data.Entities;
-using BaseSource.Data.Migrations;
 using BaseSource.ViewModels.UserAdmin;
 using EFCore.UnitOfWork;
 using EFCore.UnitOfWork.PageList;
@@ -16,15 +15,12 @@ namespace BaseSouce.Services.Services.UserAdmin
     public class UserAdminService : IUserAdminService
     {
         private readonly IUnitOfWork _unitOfWork;
-        private readonly UserManager<AppUser> _userManager;
         private readonly RoleManager<AppRole> _roleManager;
         private readonly ILogger<UserAdminService> _logger;
         public UserAdminService(IUnitOfWork<BaseSourceDbContext> unitOfWork,
-            UserManager<AppUser> userManager, RoleManager<AppRole> roleManager,
-            ILogger<UserAdminService> logger)
+             RoleManager<AppRole> roleManager, ILogger<UserAdminService> logger)
         {
             _unitOfWork = unitOfWork;
-            _userManager = userManager;
             _roleManager = roleManager;
             _logger = logger;
 

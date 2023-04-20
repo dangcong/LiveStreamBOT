@@ -58,7 +58,7 @@ namespace BaseSource.Data.Migrations
                         new
                         {
                             Id = "c1105ce5-9dbc-49a9-a7d5-c963b6daa62a",
-                            ConcurrencyStamp = "0a403e1f-a5f2-4cf5-85f4-fda7b20c3b5e",
+                            ConcurrencyStamp = "9ade18ab-3603-4924-9454-b37c5f855f7f",
                             Description = "Administrator role",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -191,7 +191,7 @@ namespace BaseSource.Data.Migrations
                         {
                             Id = "ffded6b0-3769-4976-841b-69459049a62d",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "cdc36ce1-d11a-4531-83c2-773e8ad9af86",
+                            ConcurrencyStamp = "8e1508df-ea04-4102-ac4e-e4d663aa8ea5",
                             CreatedTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
@@ -202,7 +202,7 @@ namespace BaseSource.Data.Migrations
                             NumberOfThreads1080Create = 0,
                             NumberOfThreads4K = 0,
                             NumberOfThreads4KCreate = 0,
-                            PasswordHash = "AQAAAAEAACcQAAAAEE5Yg7R8d3huVVt26gl2hNsvbHNiGWEkBQSoQj9oBB3n7lNEpAh//YgIyYpHBzgPCg==",
+                            PasswordHash = "AQAAAAEAACcQAAAAELVzAeWmR7l7O9d1uoCzvMvVGxjTflK0npI9mdp6FIkGFt13PIaUZ7fko02D9ZGODA==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -491,6 +491,10 @@ namespace BaseSource.Data.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.Property<string>("LinkFBAdmin")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("LinkYoutube")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 

@@ -123,5 +123,24 @@ namespace BaseSource.API.Controllers
             return Ok(new ApiSuccessResult<ProfifleInfoDto>(result));
         }
 
+        [HttpGet]
+        [Route("packageInfo")]
+        [Authorize]
+        public async Task<IActionResult> GetPackageInfo()
+        {
+            var result = await _userServices.GetPackageInfoByUser(UserId);
+            return Ok(new ApiSuccessResult<PackageLiveUserDto>(result));
+        }
+
+        [HttpPost]
+        [Route("update")]
+        public async Task<IActionResult> Update([FromBody] UserUpdateDto model)
+        {
+            var result = await _userServices.UpdateAsync(UserId, model);
+            if (result.Key)
+                return Ok(new ApiSuccessResult<string>());
+            return Ok(new ApiErrorResult<string>(result.Value));
+        }
+
     }
 }

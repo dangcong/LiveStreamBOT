@@ -1,6 +1,9 @@
 ﻿@model StreamCreateDto
 @{
-    ViewData["Title"] = "Thuê SMS";
+    ViewData["Title"] = "Cài đặt LIVE";
+    var packageInfo = ViewBag.PackageInfo as PackageLiveUserDto;
+    var streamData = ViewBag.StreamData as List<StreamClientInfoDto>;
+    var report = ViewBag.Report as StreamReportDto;
 }
 <section class="section">
     <div class="section-header">
@@ -13,6 +16,115 @@
     </div>
     <div class="section-body">
         <div class="row">
+            <div class="col-12">
+                <div class="card card-statistic-2">
+                    <div class="card-stats">
+                        <div class="card-stats-title ">
+                            <h5>
+                                <strong>Gói cước 1080 Hiện tại: @(packageInfo.PackageLive1080?.Name ?? "Chưa đăng ký")</strong>
+                            </h5>
+                        </div>
+                        @if (packageInfo.PackageLive1080 != null && !string.IsNullOrEmpty(packageInfo.PackageLive1080.Name))
+                        {
+                            <div class="card-stats-items">
+                                <div class="card-stats-item">
+                                    <div class="card-stats-item-count text-success">
+                                        <strong>@(packageInfo.PackageLive1080.NumberOfThreadsInRun)/@(packageInfo.PackageLive1080.NumberOfThreads)</strong>
+                                    </div>
+                                    <div class="card-stats-item-label text-danger"> <strong>Số luồng 1080 đang chạy</strong></div>
+                                </div>
+                                <div class="card-stats-item">
+                                    <div class="card-stats-item-count text-danger">
+                                        <strong>@packageInfo.PackageLive1080.ExpiredTime?.ToString("dd/MM/yyyy HH:mm:ss") - (@((int)(packageInfo.PackageLive1080.ExpiredTime.GetValueOrDefault() - DateTime.Now).TotalDays) Ngày)</strong>
+                                    </div>
+                                    <div class="card-stats-item-label text-danger"><strong>Thời hạn</strong></div>
+                                </div>
+                                <div class="card-stats-item">
+                                    <div class="card-stats-item-count text-primary">
+                                        <strong>@packageInfo.PackageLive1080.NumberOfThreadsCreatedInRun</strong>
+                                    </div>
+                                    <div class="card-stats-item-label text-danger"><strong>Số luồng đã tạo</strong></div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="card-stats-items">
+                                <div class="card-stats-item">
+                                    <div class="card-stats-item-count text-success"><strong>N/A</strong></div>
+                                    <div class="card-stats-item-label text-danger"> <strong>Số luồng 1080 đang chạy</strong></div>
+                                </div>
+                                <div class="card-stats-item">
+                                    <div class="card-stats-item-count text-danger"><strong>N/A</strong></div>
+                                    <div class="card-stats-item-label text-danger"><strong>Thời hạn</strong></div>
+                                </div>
+                                <div class="card-stats-item">
+                                    <div class="card-stats-item-count text-primary"><strong>N/A</strong></div>
+                                    <div class="card-stats-item-label text-danger"><strong>Số luồng đã tạo</strong></div>
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                    <hr />
+                    <div class="card-stats">
+                        <div class="card-stats-title">
+                            <h5>
+                                <strong>Gói cước 4K Hiện tại:@(packageInfo.PackageLive4k?.Name ?? "Chưa đăng ký") </strong>
+                            </h5>
+
+                        </div>
+                        @if (packageInfo.PackageLive4k != null && !string.IsNullOrEmpty(packageInfo.PackageLive4k.Name))
+                        {
+                            <div class="card-stats-items">
+                                <div class="card-stats-item">
+                                    <div class="card-stats-item-count text-success">
+                                        <strong>@(packageInfo.PackageLive4k.NumberOfThreadsInRun)/@(packageInfo.PackageLive4k.NumberOfThreads)</strong>
+                                    </div>
+                                    <div class="card-stats-item-label text-danger"> <strong>Số luồng 4K đang chạy</strong></div>
+                                </div>
+                                <div class="card-stats-item">
+                                    <div class="card-stats-item-count text-danger">
+                                        <strong>@packageInfo.PackageLive4k.ExpiredTime?.ToString("dd/MM/yyyy HH:mm:ss") - (@((int)(packageInfo.PackageLive4k.ExpiredTime.GetValueOrDefault() - DateTime.Now).TotalDays) Ngày)</strong>
+                                    </div>
+                                    <div class="card-stats-item-label text-danger"><strong>Thời hạn</strong></div>
+                                </div>
+                                <div class="card-stats-item">
+                                    <div class="card-stats-item-count text-primary">
+                                        <strong>@packageInfo.PackageLive4k.NumberOfThreadsCreatedInRun</strong>
+                                    </div>
+                                    <div class="card-stats-item-label text-danger"><strong>Số luồng đã tạo</strong></div>
+                                </div>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="card-stats-items">
+                                <div class="card-stats-item">
+                                    <div class="card-stats-item-count text-success"><strong>N/A</strong></div>
+                                    <div class="card-stats-item-label text-danger"> <strong>Số luồng 4K đang chạy</strong></div>
+                                </div>
+                                <div class="card-stats-item">
+                                    <div class="card-stats-item-count text-danger"><strong>N/A</strong></div>
+                                    <div class="card-stats-item-label text-danger"><strong>Thời hạn</strong></div>
+                                </div>
+                                <div class="card-stats-item">
+                                    <div class="card-stats-item-count text-primary"><strong>N/A</strong></div>
+                                    <div class="card-stats-item-label text-danger"><strong>Số luồng đã tạo</strong></div>
+                                </div>
+                            </div>
+                        }
+
+                    </div>
+                    <div>
+                        <br />
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        <div class="row">
             <div class="col-12 col-md-12 col-lg-12">
 
                 <div class="card">
@@ -22,6 +134,15 @@
                             <h4>Cấu hình</h4>
                         </div>
                         <div class="card-body">
+                            <div class="section-title">Cấu hình</div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="live1080" checked name="LiveType" class="custom-control-input">
+                                <label class="custom-control-label" for="live1080">Live 1080</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="live4k" name="LiveType" class="custom-control-input">
+                                <label class="custom-control-label" for="live4k">Live 4k</label>
+                            </div>
                             <div class="form-group">
                                 <label>Tên luồng live</label>
                                 <input type="number" asp-for="StreamName" placeholder="Đặt tên để gợi nhớ" class="form-control" required="">
@@ -45,13 +166,15 @@
 
                             <div class="form-group">
                                 <label>Link Video</label>
-                                <input class="form-control" required asp-for="Video" rows="1" />
+                                <input class="form-control" name="Video" id="linkVideo" required   />
                                 <span asp-validation-for="Video" class="text-danger"></span>
+                                <span class="text-danger checkLinkVideo"></span>
                             </div>
                             <div class="form-group">
                                 <label>Link Audio</label>
-                                <input class="form-control" required asp-for="Audio" rows="1" />
+                                <input class="form-control" id="linkAudio"  asp-for="Audio"  />
                                 <span asp-validation-for="Audio" class="text-danger"></span>
+                                <span class="text-danger checkLinkAudio"></span>
                             </div>
                             <div class="form-group">
                                 <label class="d-block">Cài đặt</label>
@@ -62,7 +185,7 @@
                                     </label>
                                 </div>
                                 <div class="form-check">
-                                    <input class="form-check-input"  asp-for="IsLiveNow" type="checkbox" id="defaultCheck3">
+                                    <input class="form-check-input" asp-for="IsLiveNow" type="checkbox" id="defaultCheck3">
                                     <label class="form-check-label" for="defaultCheck3">
                                         Live ngay bây giờ
                                     </label>
@@ -87,9 +210,8 @@
         </div>
 
         <div class="row">
-            <div class="col-6">
-            </div>
-            <div class="col-6">
+
+            <div class="col-12">
                 <div class="card">
                     <div class="card-header">
                         <h4>Thông tin</h4>
@@ -101,39 +223,27 @@
                                 <div class="mt-2 font-weight-bold badge badge-info">Tổng số</div>
                                 <div class="text-muted ">
                                     <span class="text-primary">
-                                        48
+                                        @report?.Total
                                     </span>
                                 </div>
                             </div>
                             <div class="col text-center">
 
-                                <div class="mt-2 font-weight-bold badge badge-success">Mới</div>
+                                <div class="mt-2 font-weight-bold badge badge-success">Đang live</div>
                                 <div class="text-muted ">
                                     <span class="text-primary">
-                                        26
+                                        @report?.TotalStreaning
                                     </span>
                                 </div>
                             </div>
-                            <div class="col text-center">
 
-                                <div class="mt-2 font-weight-bold badge badge-primary">Đang live</div>
-                                <div class="text-muted ">
-                                    <span class="text-danger">
-                                        14
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="col text-center">
-                                <div class="mt-2 font-weight-bold badge badge-warning">Đang xử lý</div>
-                                <div class="text-muted ">7</div>
-                            </div>
                             <div class="col text-center">
 
                                 <div class="mt-2 font-weight-bold badge badge-danger">Đã dừng</div>
                                 <div class="text-muted ">
                                     <span class="text-primary">
-                                      5
-                                    </span> 
+                                        @report?.TotalStop
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -149,14 +259,13 @@
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
-                            <table class="table table-striped" id="table-1">
+                            <table class="table table-striped" id="tableStreams">
                                 <thead>
                                     <tr>
                                         <th class="text-center">
                                             ID
                                         </th>
                                         <th>Live</th>
-                                        <th>ID Bot</th>
                                         <th>Tên luồng</th>
                                         <th>Khóa luồng</th>
                                         <th>RTMP</th>
@@ -170,23 +279,124 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
-                                        <td>
-                                            1
-                                        </td>
-                                        <td>Create a mobile app</td>
-                                        <td class="align-middle">
-                                            <div class="progress" data-height="4" data-toggle="tooltip" title="100%">
-                                                <div class="progress-bar bg-success" data-width="100%"></div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <img alt="image" src="assets/img/avatar/avatar-5.png" class="rounded-circle" width="35" data-toggle="tooltip" title="Wildan Ahdian">
-                                        </td>
-                                        <td>2018-01-20</td>
-                                        <td><div class="badge badge-success">Completed</div></td>
-                                        <td><a href="#" class="btn btn-secondary">Detail</a></td>
-                                    </tr>
+                                    @if (streamData != null)
+                                    {
+                                        @foreach (var item in streamData)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    @item.Id
+                                                </td>
+                                                <td>
+                                                    @switch (item.LiveType)
+                                                    {
+                                                        case LiveType._1080:
+                                                            <span class="badge badge-success">1080</span>
+                                                            break;
+                                                        case LiveType._4K:
+                                                            <span class="badge badge-success">4K</span>
+                                                            break;
+                                                    }
+                                                </td>
+                                                <td>@item.StreamName</td>
+                                                <th>@item.StreamKey</th>
+                                                <td>@item.RTMP</td>
+                                                <td>
+                                                    @if (item.IsForever)
+                                                    {
+                                                        <span class="badge badge-success">24//7</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span class="badge badge-success">Hẹn giờ</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @(item.Updatedtime?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")
+                                                </td>
+                                                <td>
+                                                    @if (item.EndTimeLive != null)
+                                                    {
+                                                        <span>@item.EndTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>Vĩnh viễn</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @if (item.EndTimeLive != null)
+                                                    {
+                                                        <span>@item.EndTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        <span>Vĩnh viễn</span>
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @switch (item.RenderStatus)
+                                                    {
+                                                        case BaseSouce.SharedSignalrData.BotClient.RenderStatus.Created:
+                                                            <span class="badge badge-success">Mới</span>
+                                                            break;
+                                                        case BaseSouce.SharedSignalrData.BotClient.RenderStatus.Waitting:
+                                                            <span class="badge badge-warning">Chờ</span>
+                                                            break;
+                                                        case BaseSouce.SharedSignalrData.BotClient.RenderStatus.Downloading:
+                                                            <span class="badge badge-info">Tải</span>
+                                                            break;
+                                                        case BaseSouce.SharedSignalrData.BotClient.RenderStatus.LiveStreaming:
+                                                            <span class="badge badge-suceess">Đang stream</span>
+                                                            break;
+                                                        case BaseSouce.SharedSignalrData.BotClient.RenderStatus.Cancelled:
+                                                            <span class="badge badge-danger"> Hủy</span>
+                                                            break;
+                                                        case BaseSouce.SharedSignalrData.BotClient.RenderStatus.Ended:
+                                                            <span class="badge badge-danger"> Kết thúc</span>
+                                                            break;
+                                                        case BaseSouce.SharedSignalrData.BotClient.RenderStatus.Error:
+                                                            <span class="badge badge-danger"> Lỗi(@item.ErrorMessage)</span>
+                                                            break;
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @switch (item.Status)
+                                                    {
+                                                        case StreamStatus.Streaming:
+                                                            <span class="badge badge-success"> Đang stream</span>
+                                                            break;
+                                                        case StreamStatus.Stop:
+                                                            <span class="badge badge-success"> Đã dừng</span>
+                                                            break;
+                                                    }
+                                                </td>
+                                                <td>
+                                                    @switch (item.Status)
+                                                    {
+                                                        case StreamStatus.Streaming:
+                                                            <button class="btn btn-sm btn-danger btnStop"
+                                                                    data-id="@item.Id"
+                                                                    data-toggle="modal" data-target="#stopStreamModal">
+                                                                Dừng
+                                                            </button>
+                                                            break;
+                                                        case StreamStatus.Stop:
+                                                            <button class="btn btn-sm btn-success btnStart" data-id="@item.Id"
+                                                                    data-toggle="modal" data-target="#startStreamModal">
+                                                                Chạy
+                                                            </button>
+                                                            <a href="/stream/edit?id=@item.Id" class="btn btn-sm btn-primary">Sửa</a>
+                                                            <button class="btn btn-sm btn-danger btnDelete" data-id="@item.Id"
+                                                                    data-toggle="modal" data-target="#deleteStreamModal">
+                                                                Xóa
+                                                            </button>
+                                                            break;
+                                                    }
+                                                </td>
+                                            </tr>
+                                        }
+                                    }
                                 </tbody>
                             </table>
                         </div>
@@ -196,3 +406,234 @@
         </div>
     </div>
 </section>
+
+
+<div class="modal fade" tabindex="-1" role="dialog" id="stopStreamModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" action="/stream/stopStream" id="formStop">
+                <div class="modal-header">
+                    <h5 class="modal-title">Dừng luồng livestream</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có muốn dừng luồng stream này?</p>
+                    <input class="form-control" name="id" type="hidden" />
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Xác nhận</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" role="dialog" id="startStreamModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" id="formStart" action="/stream/startStream">
+                <div class="modal-header">
+                    <h5 class="modal-title">Bạn muốn chạy stream</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có muốn chạy luồng livestream này?</p>
+                    <input class="form-control" type="hidden" name="id" />
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Xác nhận</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="deleteStreamModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" id="formDelete" action="/stream/delete">
+                <div class="modal-header">
+                    <h5 class="modal-title">Xóa luồng stream</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có muốn xóa luồng livestream này?</p>
+                    <input class="form-control" type="hidden" name="id" />
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Xác nhận</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        $(document).ready(function () {
+
+            let isCheck = false;
+            $("#tableStreams").DataTable({
+
+            });
+            $('body').on('click', '.btnStop', function () {
+                let id = $(this).attr('data-id');
+                $('#formStop input[name="id"]').val(id);
+            });
+            $('body').on('click', '.btnStart', function () {
+                let id = $(this).attr('data-id');
+                $('#formStart input[name="id"]').val(id);
+            });
+            $('body').on('click', '.btnDelete', function () {
+                let id = $(this).attr('data-id');
+                $('#formDelete input[name="id"]').val(id);
+            });
+
+            $('body').on('submit', '#formStop', function (e) {
+                e.preventDefault();
+                $.ajax({
+                    type: "POST",
+                    url: "/stream/stopStream",
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        switch (response.code) {
+                            case 1:
+                                window.location = '/stream/create';
+                                break;
+                            case -2:
+
+                                iziToast.error({
+                                    title: 'Lỗi!',
+                                    message: response.err,
+                                    position: 'topRight'
+                                });
+                                break;
+                        }
+
+                    }
+                });
+            });
+            $('body').on('submit', '#formStart', function (e) {
+                e.preventDefault();
+                $.ajax({
+                    type: "POST",
+                    url: "/stream/startStream",
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        switch (response.code) {
+                            case 1:
+                                window.location = '/stream/create';
+                                break;
+                            case -2:
+                                iziToast.error({
+                                    title: 'Lỗi!',
+                                    message: response.err,
+                                    position: 'topRight'
+                                });
+                                break;
+                        }
+
+                    }
+                });
+            });
+            $('body').on('submit', '#formDelete', function (e) {
+                e.preventDefault();
+                $.ajax({
+                    type: "POST",
+                    url: "/stream/delete",
+                    data: $(this).serialize(),
+                    success: function (response) {
+                        switch (response.code) {
+                            case 1:
+                                window.location = '/stream/create';
+                                break;
+                            case -2:
+                                iziToast.error({
+                                    title: 'Lỗi!',
+                                    message: response.err,
+                                    position: 'topRight'
+                                });
+                                break;
+                        }
+
+                    }
+                });
+            });
+
+            $("body").on('change keyup paste', '#linkVideo', function (e) {
+               
+                let value = $(this).val();
+                if (!isCheck) {
+                    isCheck = true;
+                    setTimeout(function () {
+                        $.ajax({
+                            type: "POST",
+                            url: "/stream/ValidateLink",
+                            data: { link: value },
+                            success: function (response) {
+                                isCheck = false;
+                                switch (response.code) {
+                                    case 1:
+                                        $('.checkLinkVideo').removeClass('text-danger').addClass('text-success').html("Link hoạt động");
+                                        break;
+                                    case -2:
+                                        $('.checkLinkVideo').removeClass('text-success').addClass('text-danger').html("Link không hoạt động");
+                                        //iziToast.error({
+                                        //    title: 'Lỗi!',
+                                        //    message: response.err,
+                                        //    position: 'topRight'
+                                        //});
+                                        break;
+                                }
+
+                            }
+                        });
+                    }, 1000);
+                }
+
+
+            });
+            $("body").on('change keyup paste', '#linkAudio', function (e) {
+              
+                let value = $(this).val();
+                if (!isCheck) {
+                    isCheck = true;
+                    setTimeout(function () {
+                        $.ajax({
+                            type: "POST",
+                            url: "/stream/ValidateLink",
+                            data: { link: value },
+                            success: function (response) {
+                                isCheck = false;
+                                switch (response.code) {
+                                    case 1:
+                                         $('.checkLinkAudio').removeClass('text-danger').addClass('text-success').html("Link hoạt động");
+                                        break;
+                                    case -2:
+                                         $('.checkLinkAudio').removeClass('text-success').addClass('text-danger').html("Link không hoạt động");
+                                        //iziToast.error({
+                                        //    title: 'Lỗi!',
+                                        //    message: response.err,
+                                        //    position: 'topRight'
+                                        //});
+                                        break;
+                                }
+
+                            }
+                        });
+                    }, 1000);
+                }
+            });
+        });
+    </script>
+}

@@ -1,6 +1,7 @@
-﻿using BaseSource.ApiIntegration.WebApi.Stream;
+﻿using BaseSource.ApiIntegration.WebApi;
+using BaseSource.ApiIntegration.WebApi.Stream;
+using BaseSource.Shared.Constants;
 using BaseSource.ViewModels.Stream;
-using Microsoft.AspNetCore.Http.Metadata;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BaseSource.AppUI.Controllers
@@ -8,13 +9,31 @@ namespace BaseSource.AppUI.Controllers
     public class StreamController : BaseController
     {
         private readonly IStreamApiClient _streamApiClient;
-        public StreamController(IStreamApiClient streamApiClient)
+        private readonly IUserApiClient _userApiClient;
+        public StreamController(IStreamApiClient streamApiClient, IUserApiClient userApiClient)
         {
             _streamApiClient = streamApiClient;
+            _userApiClient = userApiClient;
         }
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var result = await _userApiClient.GetPackageInfo();
+            if (result == null || !result.IsSuccessed)
+            {
+                return NotFound();
+            }
+            ViewBag.PackageInfo = result.ResultObj;
+
+            var streamData = await _streamApiClient.GetByFilterAsync(new StreamClientRequestDto
+            {
+                Page = 1,
+                PageSize = 500
+            });
+            ViewBag.StreamData = streamData.ResultObj.Items.ToList();
+
+            var report = await _streamApiClient.GetReport();
+            ViewBag.Report = report.ResultObj;
             return View();
         }
 
@@ -26,7 +45,6 @@ namespace BaseSource.AppUI.Controllers
                 return View(model);
 
             }
-
             var result = await _streamApiClient.Create(model);
             if (result == null || !result.IsSuccessed)
             {
@@ -67,6 +85,74 @@ namespace BaseSource.AppUI.Controllers
             {
                 return Json(new { countData = 0, datas = new List<StreamClientInfoDto>() });
             }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> StartStream(int id)
+        {
+            var result = await _streamApiClient.StartStreamAsync(id);
+            if (result == null || !result.IsSuccessed)
+            {
+                return Json(new { code = ErrorCodeJson.ErrorMess, err = result?.Message ?? "Cập nhật không thành công!" });
+            }
+            return Json(new { code = ErrorCodeJson.Success });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> StopStream(int id)
+        {
+            var result = await _streamApiClient.StopStreamAsync(id);
+            if (result == null || !result.IsSuccessed)
+            {
+                return Json(new { code = ErrorCodeJson.ErrorMess, err = result?.Message ?? "Cập nhật không thành công!" });
+            }
+            return Json(new { code = ErrorCodeJson.Success });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await _streamApiClient.DeleteAsync(id);
+            if (result == null || !result.IsSuccessed)
+            {
+                return Json(new { code = ErrorCodeJson.ErrorMess, err = result?.Message ?? "Cập nhật không thành công!" });
+            }
+            return Json(new { code = ErrorCodeJson.Success });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var result = await _streamApiClient.GetById(id);
+            if (result == null || !result.IsSuccessed)
+            {
+                return NotFound();
+            }
+            return View(result.ResultObj);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Edit(int id, StreamUpdateDto model)
+        {
+            var result = await _streamApiClient.UpdateAsync(id, model);
+            if (result == null || !result.IsSuccessed)
+            {
+                ModelState.AddModelError("", result?.Message ?? "Không thể tạo luồng stream!");
+                return View(model);
+            }
+            return RedirectToAction("Create");
+        }
+
+
+        [HttpPost]
+        public async Task<IActionResult> ValidateLink(StreamLinkDto model)
+        {
+            var result = await _streamApiClient.ValidateLink(model);
+            if (result == null || !result.IsSuccessed)
+            {
+                return Json(new { code = ErrorCodeJson.ErrorMess, err = result?.Message ?? "Link không hoạt động!" });
+            }
+            return Json(new { code = ErrorCodeJson.Success });
         }
     }
 }

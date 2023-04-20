@@ -32,9 +32,18 @@ namespace BaseSouce.ViewModels.User
         }
     }
 
-    public class UserAccountRequestDto 
+    public class UserAccountRequestDto
     {
         public string Email { get; set; }
         public string Phone { get; set; }
+    }
+
+    public class UserUpdateDto
+    {
+        public string Email { get; set; }
+        public string Phone { get; set; }
+        public string LinkFB { get; set; }
+        public string LinkTelegram { get; set; }
+        public string TelegramAPI { get; set; }
     }
 }

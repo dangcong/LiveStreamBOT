@@ -1,4 +1,5 @@
 ﻿using BaseSouce.Shared.Enums;
+using BaseSouce.SharedSignalrData.BotClient;
 using BaseSouce.ViewModels.Common;
 using System;
 using System.Collections.Generic;
@@ -34,6 +35,7 @@ namespace BaseSource.ViewModels.Stream
 
     public class StreamClientInfoDto
     {
+        public int Id { get; set; }
         public string UserId { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
@@ -55,6 +57,8 @@ namespace BaseSource.ViewModels.Stream
         public DateTime? Updatedtime { get; set; }
         public StreamStatus Status { get; set; }
         public PlatformType PlatformType { get; set; }
+        public RenderStatus RenderStatus { get; set; }
+        public string ErrorMessage { get; set; }
     }
 
     public class StreamClientRequestDto : PageQuery
@@ -94,5 +98,34 @@ namespace BaseSource.ViewModels.Stream
     public class StreamAdminRequestDto : PageQuery
     {
 
+    }
+
+    public class StreamInfoUserDto
+    {
+        public string Live1080Name { get; set; }
+        public string Live4kName { get; set; }
+        public int NumberOfThreads1080 { get; set; }
+        public int NumberOfThreads1080InRun { get; set; }
+        public int NumberOfThreads4K { get; set; }
+        public int NumberOfThreads4KInRun { get; set; }
+        public int NumberOfThreads1080Create { get; set; }
+        public int NumberOfThreads1080CreateInRun { get; set; }
+        public int NumberOfThreads4KCreateInRun { get; set; }
+    }
+    public class StreamReportDto
+    {
+        public int Total { get; set; }
+        public int TotalCreated { get; set; }
+        public int TotalStreaning { get; set; }
+        public int TotalStop { get; set; }
+    }
+    public class StreamReportInfo
+    {
+        public StreamReportDto Live1080 { get; set; }
+        public StreamReportDto Live4K { get; set; }
+    }
+    public class StreamLinkDto
+    {
+        public string Link { get; set; }
     }
 }

@@ -30,11 +30,18 @@ namespace BaseSouce.ViewModels.User
 
     public class PackageLiveInfoDto
     {
+        public string Name { get; set; }
         public int NumberOfThreads { get; set; }
         public int NumberOfThreadsInRun { get; set; }
         public int NumberOfThreadsCreated { get; set; }
         public int NumberOfThreadsCreatedInRun { get; set; }
         public DateTime? CreatedTime { get; set; }
         public DateTime? ExpiredTime { get; set; }
+    }
+
+    public class PackageLiveUserDto
+    {
+        public PackageLiveInfoDto? PackageLive1080 { get; set; } = new PackageLiveInfoDto();
+        public PackageLiveInfoDto? PackageLive4k { get; set; } = new PackageLiveInfoDto();
     }
 }

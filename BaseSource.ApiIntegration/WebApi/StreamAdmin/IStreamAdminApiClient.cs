@@ -8,5 +8,6 @@ namespace BaseSource.ApiIntegration.WebApi.StreamAdmin
        Task<ApiResult<PagedResult<StreamAdminInfoDto>>> GetByFilterAsync(StreamAdminRequestDto model);
         Task<ApiResult<PagedResult<StreamAdminInfoDto>>> GetByBotIdAsync(int botId);
         Task<ApiResult<List<StreamAdminInfoDto>>> GetAllByUserIdAsync(string userId);
+        
     }
 }

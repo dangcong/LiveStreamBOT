@@ -5,6 +5,7 @@ using BaseSouce.Services.Services.SendMail;
 using BaseSouce.Shared.Enums;
 using BaseSouce.ViewModels.User;
 using BaseSource.Data.Entities;
+using BaseSource.Data.Migrations;
 using EFCore.UnitOfWork;
 using EFCore.UnitOfWork.PageList;
 using Microsoft.AspNetCore.Identity;
@@ -250,6 +251,66 @@ namespace BaseSouce.Services.Services.User
             throw new NotImplementedException();
         }
 
+        public async Task<PackageLiveUserDto> GetPackageInfoByUser(string userId)
+        {
+            var _repositoryUser = _unitOfWork.GetRepository<AppUser>();
+
+            var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
+
+            var packageInfo = await _repositoryUser.GetFirstOrDefaultAsync(
+                predicate: x => x.Id == userId,
+                selector: x => new PackageLiveUserDto
+                {
+                    PackageLive1080 = x.Orders.Where(i => i.ServicePack.Type == ServicePackType._1080
+                    && i.ExpiredTime > DateTime.Now && i.IsActive)
+                    .Select(i => new PackageLiveInfoDto
+                    {
+                        CreatedTime = i.CreatedTime,
+                        ExpiredTime = i.ExpiredTime,
+                        NumberOfThreads = x.NumberOfThreads1080,
+                        NumberOfThreadsCreated = x.NumberOfThreads1080Create,
+                        Name = i.ServicePack.Name
+
+                    }).FirstOrDefault(),
+                    PackageLive4k = x.Orders.Where(i => i.ServicePack.Type == ServicePackType._4K
+                    && i.ExpiredTime > DateTime.Now && i.IsActive)
+                    .Select(i => new PackageLiveInfoDto
+                    {
+                        CreatedTime = i.CreatedTime,
+                        ExpiredTime = i.ExpiredTime,
+                        NumberOfThreads = x.NumberOfThreads4K,
+                        NumberOfThreadsCreated = x.NumberOfThreads4KCreate,
+                        Name = i.ServicePack.Name
+                    }).FirstOrDefault(),
+                });
+            var streamHistorys = await _repositoryStream.Queryable()
+                     .Where(x => x.UserId == userId)
+                     .GroupBy(x => x.LiveType)
+                     .Select(x => new
+                     {
+                         Type = x.Key,
+                         NumberOfThreadsInRun = x.Where(i => i.Status == StreamStatus.Streaming).Count(),
+                         NumberOfThreadsInCreated = x.Count(),
+                     }).ToListAsync();
+
+            if (packageInfo.PackageLive1080 != null)
+            {
+                packageInfo.PackageLive1080.NumberOfThreadsCreatedInRun = streamHistorys
+                    .Where(x => x.Type == LiveType._1080).Select(x => x.NumberOfThreadsInRun).FirstOrDefault();
+                packageInfo.PackageLive1080.NumberOfThreadsCreatedInRun = streamHistorys
+                    .Where(x => x.Type == LiveType._1080).Select(x => x.NumberOfThreadsInCreated).FirstOrDefault();
+            }
+            if (packageInfo.PackageLive4k != null)
+            {
+                packageInfo.PackageLive4k.NumberOfThreadsCreatedInRun = streamHistorys
+                    .Where(x => x.Type == LiveType._4K).Select(x => x.NumberOfThreadsInRun).FirstOrDefault();
+                packageInfo.PackageLive4k.NumberOfThreadsCreatedInRun = streamHistorys
+                    .Where(x => x.Type == LiveType._4K).Select(x => x.NumberOfThreadsInCreated).FirstOrDefault();
+            }
+
+            return packageInfo;
+        }
+
         public async Task<ProfifleInfoDto> GetProfileInfoAsync(string userId)
         {
             var _repositoryUser = _unitOfWork.GetRepository<AppUser>();
@@ -345,6 +406,33 @@ namespace BaseSouce.Services.Services.User
                 return new KeyValuePair<bool, string>(true, string.Empty);
             }
             return new KeyValuePair<bool, string>(false, "Reset Password failed!");
+        }
+
+        public async Task<KeyValuePair<bool, string>> UpdateAsync(string userId, UserUpdateDto model)
+        {
+            try
+            {
+                var _repository = _unitOfWork.GetRepository<AppUser>();
+
+                var userCurrent = await _repository.GetFirstOrDefaultAsync(
+                    predicate: x => x.Id == userId,
+                    disableTracking: false);
+                if (userCurrent == null)
+                {
+                    return new KeyValuePair<bool, string>(false, "Người dùng không tồn tại!");
+                }
+                userCurrent.PhoneNumber = model.Phone;
+                userCurrent.LinkFB = model.LinkFB;
+                userCurrent.LinkTelegram = model.LinkTelegram;
+                _repository.Update(userCurrent);
+                await _unitOfWork.SaveChangesAsync();
+                return new KeyValuePair<bool, string>(true, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Update user failed by error:[{ex}]");
+                return new KeyValuePair<bool, string>(false, "Cập nhật không thành công!");
+            }
         }
 
 

@@ -15,6 +15,7 @@ using TqkLibrary.Queues.TaskQueues;
 
 TaskQueue<WorkQueue> taskQueue;
 IServerHub ServerHub;
+bool isDebug = "debug".Equals(args.Skip(1).FirstOrDefault(), StringComparison.OrdinalIgnoreCase);
 if (Uri.TryCreate(args.FirstOrDefault(), UriKind.Absolute, out Uri uri))
 {
     Console.WriteLine("Starting");
@@ -44,7 +45,14 @@ if (Uri.TryCreate(args.FirstOrDefault(), UriKind.Absolute, out Uri uri))
             }
             catch { }
 
-            if (clientInfo is not null) await ServerHub.PingAsync(clientInfo);
+            if (clientInfo is not null)
+            {
+                if(isDebug)
+                {
+                    Console.WriteLine($"PingAsync: CpuUsage:{clientInfo.CpuUsage}, RamUsage:{clientInfo.RamUsage}, Bandwidth:{clientInfo.Bandwidth}KBps");
+                }
+                await ServerHub.PingAsync(clientInfo);
+            }
         }
     }
     finally

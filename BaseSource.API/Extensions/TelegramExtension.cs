@@ -13,8 +13,8 @@ namespace BaseSource.API.Extensions
                             {
                                 TelegramBotConfiguration? botConfig = sp.GetService<IOptions<TelegramBotConfiguration>>()?.Value;
                                 if (string.IsNullOrWhiteSpace(botConfig?.BotToken)) throw new NullReferenceException($"Telegram BotToken is empty");
-                                TelegramBotClientOptions options = new(botConfig.BotToken);
-                                return new TelegramBotClient(options, httpClient);
+                               // TelegramBotClientOptions options = new(botConfig.BotToken);
+                                return new TelegramBotClient(botConfig.BotToken, httpClient);
                             });
         }
     }

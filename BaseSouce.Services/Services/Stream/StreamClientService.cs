@@ -125,20 +125,20 @@ namespace BaseSouce.Services.Services.Stream
                         UrlType = UrlType.GoogleDrive
                     });
                 }
+                await _botContextHub.Clients.Client(model.ManagerBOT.ConnectionId).RenderAsync(renderCommand);
+                return true;
+
+                //if (model.IsLiveNow)
+                //{
+
+                //}
+                //else
+                //{
+                //    //hẹn giờ
 
 
-                if (model.IsLiveNow)
-                {
-                    await _botContextHub.Clients.All.RenderAsync(renderCommand);
-                    return true;
-                }
-                else
-                {
-                    //hẹn giờ
-
-
-                    return true;
-                }
+                //    return true;
+                //}
             }
             catch (NotSupportedException nse)
             {
@@ -320,6 +320,7 @@ namespace BaseSouce.Services.Services.Stream
 
                 var streamEntity = await _repositoryStream.GetFirstOrDefaultAsync(
                    predicate: x => x.UserId == userId && x.Id == id,
+                   include: x => x.Include(i => i.ManagerBOT),
                    disableTracking: false);
 
                 if (streamEntity == null)
@@ -492,7 +493,7 @@ namespace BaseSouce.Services.Services.Stream
             var driveVideoItem = GoogleDriveHelper.TryParse(link);
             if (driveVideoItem is null ||
                 driveVideoItem.LinkType != GoogleDriveLinkType.File)
-                return new KeyValuePair<bool, string>(false,"Link  không hỗ trợ hoặc không hợp lệ") ;
+                return new KeyValuePair<bool, string>(false, "Link  không hỗ trợ hoặc không hợp lệ");
 
             using (DriveApiNonLogin driveApiNonLogin = new DriveApiNonLogin())
             {
@@ -502,11 +503,11 @@ namespace BaseSouce.Services.Services.Stream
                 }
                 catch (Exception)
                 {
-                    return new KeyValuePair<bool, string>(false,"Link không truy cập được");
+                    return new KeyValuePair<bool, string>(false, "Link không truy cập được");
                 }
             }
 
-            return new KeyValuePair<bool, string>(true,string.Empty);
+            return new KeyValuePair<bool, string>(true, string.Empty);
         }
     }
 }

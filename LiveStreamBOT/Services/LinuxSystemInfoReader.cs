@@ -30,7 +30,7 @@ namespace LiveStreamBOT.Services
             var lines = File.ReadAllLines("/proc/net/dev", Encoding.ASCII).Select(x => x.Trim()).ToArray();
 
             var mainLine = lines.FirstOrDefault(x => x.StartsWith(Singleton.Setting.Setting.NetworkName));
-            if (string.IsNullOrWhiteSpace(mainLine)) 
+            if (string.IsNullOrWhiteSpace(mainLine))
                 return double.NaN;
 
             var numColumns = mainLine
@@ -50,7 +50,7 @@ namespace LiveStreamBOT.Services
                 double new_Transmit = numColumns.Skip(9).FirstOrDefault();
                 DateTime new_TransmitTime = DateTime.Now;
 
-                double byte_Transmit = new_Transmit - old_Transmit;
+                double byte_Transmit = (new_Transmit - old_Transmit) / 1024;
                 double time_Transmit = (new_TransmitTime - old_TransmitTime).TotalSeconds;
 
                 old_Transmit = new_Transmit;

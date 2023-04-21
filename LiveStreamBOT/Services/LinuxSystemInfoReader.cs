@@ -30,6 +30,8 @@ namespace LiveStreamBOT.Services
             var lines = File.ReadAllLines("/proc/net/dev", Encoding.ASCII).Select(x => x.Trim()).ToArray();
 
             var mainLine = lines.FirstOrDefault(x => x.StartsWith(Singleton.Setting.Setting.NetworkName));
+            if (string.IsNullOrWhiteSpace(mainLine)) 
+                return double.NaN;
 
             var numColumns = mainLine
                 .Split(' ')
@@ -39,13 +41,13 @@ namespace LiveStreamBOT.Services
 
             if (double.IsNaN(old_Transmit))
             {
-                old_Transmit = numColumns.Skip(7).FirstOrDefault();
+                old_Transmit = numColumns.Skip(9).FirstOrDefault();
                 old_TransmitTime = DateTime.Now;
                 return double.NaN;
             }
             else
             {
-                double new_Transmit = numColumns.Skip(7).FirstOrDefault();
+                double new_Transmit = numColumns.Skip(9).FirstOrDefault();
                 DateTime new_TransmitTime = DateTime.Now;
 
                 double byte_Transmit = new_Transmit - old_Transmit;

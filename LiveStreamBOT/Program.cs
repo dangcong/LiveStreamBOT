@@ -47,7 +47,7 @@ if (Uri.TryCreate(args.FirstOrDefault(), UriKind.Absolute, out Uri uri))
 
             if (clientInfo is not null)
             {
-                if(isDebug)
+                if (isDebug)
                 {
                     Console.WriteLine($"PingAsync: CpuUsage:{clientInfo.CpuUsage}, RamUsage:{clientInfo.RamUsage}, Bandwidth:{clientInfo.Bandwidth}KBps");
                 }
@@ -78,12 +78,11 @@ ISystemInfoReader GetSystemInfoReader()
 
 void SignalrClient_OnRenderCommand(RenderCommand obj)
 {
-    //if (string.IsNullOrWhiteSpace(obj.ItemId) || string.IsNullOrWhiteSpace(obj.WorkId)) return;
     switch (obj.Command)
     {
         case Command.Start:
             {
-                if (!taskQueue.Runnings.Any(x => x.RenderCommand.WorkId == obj.WorkId))
+                if (!taskQueue.Runnings.Any(x => x.RenderCommand.ItemId == obj.ItemId))
                 {
                     taskQueue.Add(new WorkQueue(obj, ServerHub));
                 }
@@ -92,7 +91,7 @@ void SignalrClient_OnRenderCommand(RenderCommand obj)
 
         case Command.Cancel:
             {
-                taskQueue.Cancel(x => x.RenderCommand.WorkId.Equals(obj.WorkId));
+                taskQueue.Cancel(x => x.RenderCommand.ItemId.Equals(obj.ItemId));
                 break;
             }
     }

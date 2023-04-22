@@ -72,7 +72,7 @@ namespace BaseSouce.Services.Services.Stream
                         {
                             packageConfig.OutputOptions.Add("-s 4096x2160");
                             packageConfig.OutputOptions.Add("-r 24");
-                            packageConfig.OutputOptions.Add("-maxrate 35000k");
+                            packageConfig.OutputOptions.Add("-maxrate 280000k");
                             packageConfig.OutputOptions.Add($"-x264-params keyint={24 * 4}:scenecut=0");
                             break;
                         }
@@ -80,7 +80,7 @@ namespace BaseSouce.Services.Services.Stream
                         {
                             packageConfig.OutputOptions.Add("-s 1920x1080");
                             packageConfig.OutputOptions.Add("-r 24");
-                            packageConfig.OutputOptions.Add("-maxrate 8000k");
+                            packageConfig.OutputOptions.Add("-maxrate 64000k");
                             packageConfig.OutputOptions.Add($"-x264-params keyint={24 * 4}:scenecut=0");
                             break;
                         }
@@ -219,17 +219,17 @@ namespace BaseSouce.Services.Services.Stream
                     return "Bạn chưa đăng ký gói cước để Livestream, vui lòng đăng ký để sử dụng!";
                 }
 
-                else if (packageCurrent.NumberOfThreadsCreatedInRun >= packageCurrent.NumberOfThreadsCreated)
-                {
-                    return "Số lượng luồng của bạn đã vượt giới hạn của gói hiện tại, vui lòng thử lại!";
-                }
+                //else if (packageCurrent.NumberOfThreadsCreatedInRun >= packageCurrent.NumberOfThreadsCreated)
+                //{
+                //    return "Số lượng luồng của bạn đã vượt giới hạn của gói hiện tại, vui lòng thử lại!";
+                //}
 
                 //get bot 
 
                 var _repositoryBOT = _unitOfWork.GetRepository<ManagerBOT>();
 
                 var botCurrent = await _repositoryBOT.GetFirstOrDefaultAsync(
-                    predicate: x => x.NumberOfThreads > 0 && x.Status == ManagerBOTStatus.Connected);
+                    predicate: x => x.NumberOfThreads > 0 && x.Status == ManagerBOTStatus.Connected && x.IsUsed);
 
                 if (botCurrent == null)
                 {
@@ -318,6 +318,8 @@ namespace BaseSouce.Services.Services.Stream
             {
                 var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
 
+                var _repositoryBOT = _unitOfWork.GetRepository<ManagerBOT>();
+
                 var streamEntity = await _repositoryStream.GetFirstOrDefaultAsync(
                    predicate: x => x.UserId == userId && x.Id == id,
                    include: x => x.Include(i => i.ManagerBOT),
@@ -327,6 +329,23 @@ namespace BaseSouce.Services.Services.Stream
                 {
                     return new KeyValuePair<bool, string>(false, "Luồng không tồn tại, vui lòng thử lại!");
                 }
+
+
+                //check connection bot
+
+                var botCurrent = await _repositoryBOT.GetFirstOrDefaultAsync(
+                    predicate: x => x.Id == streamEntity.ManagerBOTId);
+
+                if (botCurrent == null)
+                {
+                     return new KeyValuePair<bool, string>(false, "BOT không tồn tại, vui lòng thử lại!");
+                }
+
+                if (botCurrent.Status==ManagerBOTStatus.Disconnected)
+                {
+                     return new KeyValuePair<bool, string>(false, "BOT đang Disconnect, vui lòng thử lại!");
+                }
+
                 streamEntity.Status = StreamStatus.Streaming;
 
                 _repositoryStream.Update(streamEntity);

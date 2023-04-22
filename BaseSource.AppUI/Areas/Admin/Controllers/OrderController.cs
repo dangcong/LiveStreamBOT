@@ -84,7 +84,7 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             if (result == null || !result.IsSuccessed)
             {
                 return RedirectToAction("Index");
-                // return Json(new { code = ErrorCodeJson.ErrorMess, err = result?.Message ?? "Cập nhật không thành công!" });
+                 //return Json(new { code = ErrorCodeJson.ErrorMess, err = result?.Message ?? "Cập nhật không thành công!" });
             }
             return RedirectToAction("Index");
             //return Json(new { code = ErrorCodeJson.Success });

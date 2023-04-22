@@ -26,11 +26,11 @@
                         <div class="card-body">
                             <div class="section-title">Cấu hình</div>
                             <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" id="live1080" checked="@(Model.LiveType==LiveType._1080)" name="LiveType" class="custom-control-input">
+                                <input type="radio" id="live1080" value="1" checked="@(Model.LiveType==LiveType._1080)" name="LiveType" class="custom-control-input">
                                 <label class="custom-control-label" for="live1080">Live 1080</label>
                             </div>
                             <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" id="live4k" checked="@(Model.LiveType==LiveType._1080)" name="LiveType" class="custom-control-input">
+                                <input type="radio" id="live4k" value="2" checked="@(Model.LiveType==LiveType._1080)" name="LiveType" class="custom-control-input">
                                 <label class="custom-control-label" for="live4k">Live 4k</label>
                             </div>
                             <div class="form-group">
@@ -41,17 +41,22 @@
 
                             <div class="section-title">Nền tảng</div>
                             <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" id="youtube" checked="@(Model.PlatformType==PlatformType.Youtube)" name="PlatformType" class="custom-control-input">
+                                <input type="radio" id="youtube" value="1" checked="@(Model.PlatformType==PlatformType.Youtube)" name="PlatformType" class="custom-control-input">
                                 <label class="custom-control-label" for="youtube">Youtube</label>
                             </div>
-                            <div class="custom-control custom-radio custom-control-inline">
+                           @* <div class="custom-control custom-radio custom-control-inline">
                                 <input type="radio" id="facebook" checked="@(Model.PlatformType==PlatformType.Facebook) name="PlatformType" class="custom-control-input">
                                 <label class="custom-control-label" for="facebook">Facebook</label>
-                            </div>
+                            </div>*@
                             <div class="form-group">
                                 <label>Khóa luồng</label>
-                                <input class="form-control" required asp-for="StreamKey" rows="1" />
+                                <input class="form-control" required asp-for="StreamKey"  />
                                 <span asp-validation-for="StreamKey" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>RTMP</label>
+                                <input class="form-control" required asp-for="RTMP"  />
+                                <span asp-validation-for="RTMP" class="text-danger"></span>
                             </div>
 
                             <div class="form-group">

@@ -40,14 +40,40 @@ namespace BaseSource.AppUI.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(StreamCreateDto model)
         {
+
             if (!ModelState.IsValid)
             {
+                var errorList = ModelState
+                .Where(x => x.Value.Errors.Count > 0)
+                .ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
+                );
+                var report = await _streamApiClient.GetReport();
+                ViewBag.Report = report.ResultObj;
+
+                var packageInfo = await _userApiClient.GetPackageInfo();
+                if (packageInfo == null || !packageInfo.IsSuccessed)
+                {
+                    return NotFound();
+                }
+                ViewBag.PackageInfo = packageInfo.ResultObj;
                 return View(model);
 
             }
             var result = await _streamApiClient.Create(model);
             if (result == null || !result.IsSuccessed)
             {
+                var report = await _streamApiClient.GetReport();
+                ViewBag.Report = report.ResultObj;
+
+                var packageInfo = await _userApiClient.GetPackageInfo();
+                if (packageInfo == null || !packageInfo.IsSuccessed)
+                {
+                    return NotFound();
+                }
+                ViewBag.PackageInfo = packageInfo.ResultObj;
+
                 ModelState.AddModelError("", result?.Message ?? "Không thể tạo luồng stream!");
                 return View(model);
             }

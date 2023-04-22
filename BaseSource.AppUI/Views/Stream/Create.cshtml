@@ -3,7 +3,8 @@
     ViewData["Title"] = "Cài đặt LIVE";
     var packageInfo = ViewBag.PackageInfo as PackageLiveUserDto;
     var streamData = ViewBag.StreamData as List<StreamClientInfoDto>;
-    var report = ViewBag.Report as StreamReportDto;
+    var  report = ViewBag.Report as StreamReportDto;
+   
 }
 <section class="section">
     <div class="section-header">
@@ -114,7 +115,6 @@
                                 </div>
                             </div>
                         }
-
                     </div>
                     <div>
                         <br />
@@ -135,29 +135,31 @@
                         </div>
                         <div class="card-body">
                             <div class="section-title">Cấu hình</div>
+
+                           
                             <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" id="live1080" checked name="LiveType" class="custom-control-input">
+                                <input type="radio" id="live1080" value="1" checked name="LiveType" class="custom-control-input">
                                 <label class="custom-control-label" for="live1080">Live 1080</label>
                             </div>
                             <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" id="live4k" name="LiveType" class="custom-control-input">
+                                <input type="radio" id="live4k"  value="2" name="LiveType" class="custom-control-input">
                                 <label class="custom-control-label" for="live4k">Live 4k</label>
                             </div>
                             <div class="form-group">
                                 <label>Tên luồng live</label>
-                                <input type="number" asp-for="StreamName" placeholder="Đặt tên để gợi nhớ" class="form-control" required="">
+                                <input  asp-for="StreamName" placeholder="Đặt tên để gợi nhớ" class="form-control" required="">
                                 <span asp-validation-for="StreamName" class="text-danger"></span>
                             </div>
 
                             <div class="section-title">Nền tảng</div>
                             <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" id="youtube" checked name="PlatformType" class="custom-control-input">
+                                <input type="radio" value="1" id="youtube" checked name="PlatformType" class="custom-control-input">
                                 <label class="custom-control-label" for="youtube">Youtube</label>
                             </div>
-                            <div class="custom-control custom-radio custom-control-inline">
+                           @* <div class="custom-control custom-radio custom-control-inline">
                                 <input type="radio" id="facebook" name="PlatformType" class="custom-control-input">
                                 <label class="custom-control-label" for="facebook">Facebook</label>
-                            </div>
+                            </div>*@
                             <div class="form-group">
                                 <label>Khóa luồng</label>
                                 <input class="form-control" required asp-for="StreamKey" rows="1" />
@@ -165,8 +167,14 @@
                             </div>
 
                             <div class="form-group">
+                                <label>RTMP</label>
+                                <input class="form-control" required asp-for="RTMP" rows="1" />
+                                <span asp-validation-for="RTMP" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
                                 <label>Link Video</label>
-                                <input class="form-control" name="Video" id="linkVideo" required   />
+                                <input class="form-control" name="Video" asp-for="Video" id="linkVideo" required   />
                                 <span asp-validation-for="Video" class="text-danger"></span>
                                 <span class="text-danger checkLinkVideo"></span>
                             </div>

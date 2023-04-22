@@ -50,8 +50,8 @@
                                             <td>@item.Status</td>
                                             <td>@item.CreatedTime.ToString("dd/MM/yyyy HH:mm:ss")</td>
                                             <td><a href="/amdin/bot/stream?id=@item.Id">@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads)</a> </td>
-                                            <td>@(item.CPU)%</td>
-                                            <td>@item.RAM.ToString("n2")%</td>
+                                            <td>@((item.CPU * 100).ToString("n2"))%</td>
+                                            <td>@(item.RAM * 100).ToString("n2")%</td>
                                             <td>@item.Bandwidth.ToString("n2") mb/s</td>
                                             <td>
                                                 <a class="btn btn-primary" href="/admin/bot/edit/@(item.Id)">Sửa</a>

@@ -74,6 +74,7 @@ namespace BaseSouce.Services.Services.BOT
                         Group = model.Group,
                         Name = model.Name,
                         Status = ManagerBOTStatus.Connected,
+                        UpdatedTime = DateTime.Now,
                     });
                 }
                 else
@@ -83,6 +84,7 @@ namespace BaseSouce.Services.Services.BOT
                     botCurrent.RAM = model.RamUsage;
                     botCurrent.CPU = model.CpuUsage;
                     botCurrent.Status = ManagerBOTStatus.Connected;
+                    botCurrent.UpdatedTime = DateTime.Now;
                     _repository.Update(botCurrent);
 
                 }
@@ -179,6 +181,8 @@ namespace BaseSouce.Services.Services.BOT
                 botCurrent.Name = model.Name;
                 botCurrent.Group = model.Group;
                 botCurrent.NumberOfThreads = model.NumberOfThreads;
+                botCurrent.UpdatedTime = DateTime.Now;
+
                 _repository.Update(botCurrent);
 
                 await _unitOfWork.SaveChangesAsync();

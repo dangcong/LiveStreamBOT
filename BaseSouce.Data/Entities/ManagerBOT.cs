@@ -19,6 +19,7 @@ namespace BaseSouce.Data.Entities
         public double CPU { get; set; }
         public double RAM { get; set; }
         public double Bandwidth { get; set; }
+        public DateTime? UpdatedTime { get; set; }
 
         public bool IsUsed { get; set; }
         

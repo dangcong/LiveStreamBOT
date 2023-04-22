@@ -14,8 +14,11 @@ namespace BaseSource.API.Controllers
             _streamClientService = streamClientService;
         }
         [HttpPost]
+
+        [Route("/api/stream")]
+        //[AllowAnonymous]
         [Authorize]
-        public async Task<IActionResult> Create(StreamCreateDto model)
+        public async Task<IActionResult> Create([FromBody] StreamCreateDto model)
         {
 
 

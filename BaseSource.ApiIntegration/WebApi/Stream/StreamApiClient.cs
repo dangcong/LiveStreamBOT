@@ -16,7 +16,7 @@ namespace BaseSource.ApiIntegration.WebApi.Stream
         public async Task<ApiResult<string>> Create(StreamCreateDto model)
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
-            return await client.PostAsync<ApiResult<string>>("/api/stream/create", model);
+            return await client.PostAsync<ApiResult<string>>("/api/stream", model);
         }
 
         public async Task<ApiResult<string>> DeleteAsync(int id)

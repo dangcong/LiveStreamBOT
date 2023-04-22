@@ -44,7 +44,6 @@ namespace BaseSource.API.Cofigurations
 
             //bot DI
             services.AddSingleton<IBotDataCache, BotDataCache>();
-            services.AddTransient<IRenderArgumentGenerateHelper, RenderArgumentGenerateHelper>();
 
             return services;
         }

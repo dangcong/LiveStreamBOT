@@ -12,7 +12,6 @@ using BaseSource.Shared.Helpers;
 using BaseSource.ViewModels.Stream;
 using EFCore.UnitOfWork;
 using EFCore.UnitOfWork.PageList;
-using FFmpegArgs;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -27,21 +26,18 @@ namespace BaseSouce.Services.Services.Stream
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<StreamClientService> _logger;
         private readonly IMapper _mapper;
-        private readonly IRenderArgumentGenerateHelper _argumentGenerateHelper;
         private readonly IHubContext<BotHub, IBotClientHub> _botContextHub;
         private readonly IUserService _userService;
         public StreamClientService(
             IUnitOfWork<BaseSourceDbContext> unitOfWork,
             ILogger<StreamClientService> logger,
             IMapper mapper,
-            IRenderArgumentGenerateHelper argumentGenerateHelper,
             IHubContext<BotHub, IBotClientHub> botContextHub,
             IUserService userService)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
             _mapper = mapper;
-            _argumentGenerateHelper = argumentGenerateHelper;
             _botContextHub = botContextHub;
             _userService = userService;
 
@@ -59,48 +55,36 @@ namespace BaseSouce.Services.Services.Stream
                     _ => throw new NotSupportedException($"{model.PlatformType.GetType().Name}.{model.PlatformType}")
                 };
 
-                PackageConfig packageConfig = new PackageConfig();
-                packageConfig.GlobalOptions.Add("-y");
-                if (model.IsForever)
-                {
-                    packageConfig.VideoInputOptions.Add($"-stream_loop -1");
-                    packageConfig.AudioInputOptions.Add($"-stream_loop -1");
-                }
-                switch (model.LiveType)
-                {
-                    case LiveType._4K:
-                        {
-                            packageConfig.OutputOptions.Add("-s 4096x2160");
-                            packageConfig.OutputOptions.Add("-r 24");
-                            packageConfig.OutputOptions.Add("-maxrate 280000k");
-                            packageConfig.OutputOptions.Add($"-x264-params keyint={24 * 4}:scenecut=0");
-                            break;
-                        }
-                    case LiveType._1080:
-                        {
-                            packageConfig.OutputOptions.Add("-s 1920x1080");
-                            packageConfig.OutputOptions.Add("-r 24");
-                            packageConfig.OutputOptions.Add("-maxrate 64000k");
-                            packageConfig.OutputOptions.Add($"-x264-params keyint={24 * 4}:scenecut=0");
-                            break;
-                        }
+                List<string> arguments = new List<string>();
+                arguments.Add("-y");
 
-                    default:
-                        throw new NotSupportedException($"{model.LiveType.GetType().Name}.{model.LiveType}");
+                {//video
+                    arguments.Add("-re");
+                    if (model.IsForever) arguments.Add($"-stream_loop -1");
+                    if (!string.IsNullOrWhiteSpace(model.Audio)) arguments.Add("-an");
+                    arguments.Add("-i video.mp4");
                 }
 
-                RenderData renderData = new RenderData()
+                if (!string.IsNullOrWhiteSpace(model.Audio))
                 {
-                    VideoName = "video.mp4"
-                };
-                if (!string.IsNullOrWhiteSpace(model.Audio)) renderData.AudioName = "sound.mp3";
-                renderData.StreamOutput = uri;
+                    arguments.Add("-re");
+                    if (model.IsForever) arguments.Add($"-stream_loop -1");
+                    arguments.Add("-vn");
+                    arguments.Add("-i sound.mp3");
+                }
+
+                {//output
+                    arguments.Add("-c copy");
+                    if (!model.IsForever) arguments.Add("-shortest");
+                    arguments.Add("-f flv");
+                    arguments.Add("-flvflags no_duration_filesize");
+                    arguments.Add($"\"{uri}\"");
+                }
 
 
-                FFmpegArg fFmpegArg = _argumentGenerateHelper.Generate(renderData, packageConfig);
                 RenderCommand renderCommand = new RenderCommand()
                 {
-                    Arguments = fFmpegArg.GetFullCommandline(),
+                    Arguments = string.Join(" ", arguments),
                     Command = Command.Start,
                     UtcStartTime = model.StartTimeLive?.ToUniversalTime(),
                     WorkId = 0,//quan trọng, cần để cancel/update/tạo thư mục
@@ -109,7 +93,7 @@ namespace BaseSouce.Services.Services.Stream
                     {
                         new FileData()
                         {
-                            Name = renderData.VideoName,
+                            Name = "video.mp4",
                             Url = model.Video,
                             UrlType = UrlType.GoogleDrive
                         }
@@ -120,7 +104,7 @@ namespace BaseSouce.Services.Services.Stream
                 {
                     renderCommand.FileDatas.Add(new FileData()
                     {
-                        Name = renderData.AudioName,
+                        Name = "sound.mp3",
                         Url = model.Audio,
                         UrlType = UrlType.GoogleDrive
                     });
@@ -338,12 +322,12 @@ namespace BaseSouce.Services.Services.Stream
 
                 if (botCurrent == null)
                 {
-                     return new KeyValuePair<bool, string>(false, "BOT không tồn tại, vui lòng thử lại!");
+                    return new KeyValuePair<bool, string>(false, "BOT không tồn tại, vui lòng thử lại!");
                 }
 
-                if (botCurrent.Status==ManagerBOTStatus.Disconnected)
+                if (botCurrent.Status == ManagerBOTStatus.Disconnected)
                 {
-                     return new KeyValuePair<bool, string>(false, "BOT đang Disconnect, vui lòng thử lại!");
+                    return new KeyValuePair<bool, string>(false, "BOT đang Disconnect, vui lòng thử lại!");
                 }
 
                 streamEntity.Status = StreamStatus.Streaming;

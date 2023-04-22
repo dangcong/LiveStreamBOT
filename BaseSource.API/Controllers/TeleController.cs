@@ -1,5 +1,4 @@
-﻿using FFmpegArgs.Filters.VideoFilters;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Telegram.Bot;
 using Telegram.Bot.Types;

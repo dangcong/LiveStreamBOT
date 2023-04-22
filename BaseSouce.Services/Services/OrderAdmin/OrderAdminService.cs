@@ -59,7 +59,7 @@ namespace BaseSouce.Services.Services.OrderAdmin
                             userCurrent.NumberOfThreads1080Create = orderEntity.ServicePack.NumberOfThreadsCreate;
 
                             var order1080Disable = _repository.Queryable().Where(x => x.IsActive
-                            && x.ServicePack.Type == ServicePackType._4K).FirstOrDefault();
+                            && x.ServicePack.Type == ServicePackType._1080).FirstOrDefault();
                             if (order1080Disable != null)
                             {
                                 order1080Disable.IsActive = false;
@@ -111,11 +111,11 @@ namespace BaseSouce.Services.Services.OrderAdmin
                     return new KeyValuePair<bool, string>(false, "Đơn hàng không tồn tại!");
                 }
                 orderEntity.Status = OrderStatus.Cancel;
-               
+
 
                 _repository.Update(orderEntity);
 
-               
+
                 await _unitOfWork.SaveChangesAsync();
 
                 return new KeyValuePair<bool, string>(true, string.Empty);
@@ -132,21 +132,13 @@ namespace BaseSouce.Services.Services.OrderAdmin
             var _repositoryOrder = _unitOfWork.GetRepository<Data.Entities.Order>();
             var query = _repositoryOrder.Queryable().AsNoTracking();
 
-            try
-            {
-                return await _repositoryOrder.GetStagesPagedListAsync(
-                stages: query,
-                selector: x => _mapper.Map<OrderInfoDto>(x),
-                include: x => x.Include(i => i.User).Include(i => i.ServicePack),
-                orderBy: x => x.OrderByDescending(i => i.CreatedTime),
-                pageIndex: model.Page, pageSize: model.PageSize);
-            }
-            catch (Exception ex)
-            {
+            return await _repositoryOrder.GetStagesPagedListAsync(
+                 stages: query,
+                 selector: x => _mapper.Map<OrderInfoDto>(x),
+                 include: x => x.Include(i => i.User).Include(i => i.ServicePack),
+                 orderBy: x => x.OrderByDescending(i => i.CreatedTime),
+                 pageIndex: model.Page, pageSize: model.PageSize);
 
-                throw;
-            }
-            
         }
 
         public async Task<OrderInfoDto> GetByIdAsync(int id)
@@ -156,6 +148,30 @@ namespace BaseSouce.Services.Services.OrderAdmin
                 predicate: x => x.Id == id,
                 selector: x => _mapper.Map<OrderInfoDto>(x),
                 include: x => x.Include(i => i.User).Include(i => i.ServicePack));
+        }
+
+        public async Task<List<OrderInfoDto>> GetOrderByUserIdAsync(string userId)
+        {
+            var _repository = _unitOfWork.GetRepository<Data.Entities.Order>();
+
+            return await _repository.Queryable().AsNoTracking()
+                .Where(x => x.UserId == userId)
+                .Include(x => x.ServicePack)
+                .Select(x => new OrderInfoDto
+                {
+                    CreatedTime = x.CreatedTime,
+                    Id = x.Id,
+                    ExpiredTime = x.ExpiredTime,
+                    IsActive = x.IsActive,
+                    Month = x.Month,
+                    OrderId = x.OrderId,
+                    ServicePackName = x.ServicePack.Name,
+                    Status = x.Status,
+                    Type = x.ServicePack.Type,
+                    Price = x.Price,
+                    NumberOfThreads = x.NumberOfThreads
+                })
+                .OrderByDescending(x => x.CreatedTime).ToListAsync();
         }
     }
 }

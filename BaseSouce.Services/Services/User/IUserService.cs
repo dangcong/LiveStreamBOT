@@ -17,7 +17,9 @@ namespace BaseSouce.Services.Services.User
         Task<KeyValuePair<bool, string>> ResetPasswordAsync(ResetPasswordVm model);
         Task<KeyValuePair<bool, string>> ChangePasswordAsync(string id, ChangePasswordVm model);
         Task<ProfifleInfoDto> GetProfileInfoAsync(string userId);
-       
+        Task<PackageLiveUserDto> GetPackageInfoByUser(string userId);
+        Task<KeyValuePair<bool, string>> UpdateAsync(string userId, UserUpdateDto model);
+
 
     }
 }

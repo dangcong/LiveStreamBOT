@@ -32,6 +32,6 @@ namespace BaseSouce.Data.EF
 
         }
         
-
+       public DbSet<ManagerBOT> ManagerBOTs { get; set; }
     }
 }

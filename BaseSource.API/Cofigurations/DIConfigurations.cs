@@ -11,6 +11,7 @@ using BaseSouce.Services.Services.Setting;
 using BaseSouce.Services.Services.Stream;
 using BaseSouce.Services.Services.StreamAdmin;
 using BaseSouce.Services.Services.User;
+using BaseSouce.Services.Services.UserAdmin;
 using BaseSource.Shared.Helpers;
 using Microsoft.AspNetCore.Identity;
 
@@ -37,7 +38,8 @@ namespace BaseSource.API.Cofigurations
 
             services.AddTransient<IManagerBOTService, ManagerBOTService>();
             services.AddTransient<IStreamAdminService, StreamAdminService>();
-
+            services.AddTransient<IUserAdminService, UserAdminService>();
+            
             
 
             //bot DI

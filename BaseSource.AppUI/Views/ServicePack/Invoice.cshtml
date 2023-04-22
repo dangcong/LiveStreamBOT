@@ -75,184 +75,164 @@
 
         <div class="row animated fadeInDown">
             <div class="col-12">
-                <div class="card-box m-b-10">
-                    <div class="panel-body">
-                        <div class="clearfix">
-                            <div class="pull-left">
-                                <h3 class="text-right"><i class="ti-credit-card"></i> Hóa Đơn</h3>
+                <div class="card">
+                    <div class="card-body m-b-10">
+                        <div class="panel-body">
+                            <div class="clearfix">
+                                <div class="pull-left">
+                                    <h3 class="text-right"><i class="ti-credit-card"></i> Hóa Đơn</h3>
+                                </div>
                             </div>
-                        </div>
 
-                        <div class="row">
-                            <div class="col-md-6 pull-left m-t-30">
-                                <address>
-                                    <p class="m-t-10"><strong>Tài khoản:</strong> @(invoiceInfo.UserName)</p>
-                                    <p class="m-t-10"><strong>Facebook:</strong> @(invoiceInfo.LinkFB)</p>
-                                    <p class="m-t-10"><strong>Gói cước hiện tại:</strong> LIVETEST</p>
-                                    <p class="m-t-10"><strong>Hạn dùng: </strong> Đã hết hạn</p>
-                                </address>
+                            <div class="row">
+                                <div class="col-md-6 pull-left m-t-30">
+                                    <address>
+                                        <p class="m-t-10"><strong>Tài khoản:</strong> @(invoiceInfo.UserName)</p>
+                                        <p class="m-t-10"><strong>Facebook:</strong> @(invoiceInfo.LinkFB)</p>
+                                        <p class="m-t-10"><strong>Gói cước hiện tại:</strong> N/A</p>
+                                        <p class="m-t-10"><strong>Hạn dùng: </strong> N/A</p>
+                                    </address>
+                                </div>
+                                <div class="col-md-6 pull-right m-t-30 text-right">
+                                    <p class="m-t-10"><strong>Mã hóa đơn: </strong> @invoiceInfo.CodeBill</p>
+                                    <p class="m-t-10"><strong> Ngày tạo: </strong> @(DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"))</p>
+                                    <p class="m-t-10"><strong> Gói cước: </strong> @invoiceInfo.PackageName</p>
+                                    <p class="m-t-10"><strong>Ngày hết hạn: </strong> <span class="expire-date">@(DateTime.Now.AddDays(30).ToString("dd/MM/yyyy HH:mm:ss"))</span></p>
+                                    <p class="payment-pending m-t-10 more">
+                                        <strong>Trạng thái: </strong> <span class="badge badge-warning"><i class="ion-load-c fa-spin"></i> Đang chờ xử lý</span>
+                                    </p>
+                                </div>
                             </div>
-                            <div class="col-md-6 pull-right m-t-30 text-right">
-                                <p class="m-t-10"><strong>Mã hóa đơn: </strong> @invoiceInfo.CodeBill</p>
-                                <p class="m-t-10"><strong> Ngày tạo: </strong> @(DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss"))</p>
-                                <p class="m-t-10"><strong> Gói cước: </strong> @invoiceInfo.PackageName</p>
-                                <p class="m-t-10"><strong>Ngày hết hạn: </strong> <span class="expire-date">@(DateTime.Now.AddDays(30).ToString("dd/MM/yyyy HH:mm:ss"))</span></p>
-                                <p class="payment-pending m-t-10 more">
-                                    <strong>Trạng thái: </strong> <span class="badge badge-warning"><i class="ion-load-c fa-spin"></i> Đang chờ xử lý</span>
-                                </p>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="table-responsive">
+                                        <table>
+                                            <tbody>
+                                                <tr>
+                                                    @foreach (var item in Model)
+                                                    {
+                                                        <td>
+                                                            <button type="button" class="btn-month-payment btn-icon cur-point m-r-15 pa-20 btn-month radius35  @(index==1?"pricing-box-active":"")" value="@item.Month"
+                                                                    data-discount="@item.Discount" data-month="@item.Month" data-price="@item.Price" data-date="@(DateTime.Now.AddMonths(item.Month).ToString("dd/MM/yyyy :HH:mm:ss"))">
+                                                                <div><span>Mua @item.Month Tháng</span></div>
+                                                                <div>
+                                                                    <div><span class="text-line-through color-red">@item.Price.ToString("N0").Replace(",",".")</span></div>
+                                                                    <span><h4>@item.Discount.ToString("N0").Replace(",",".")</h4></span>
+                                                                    @if (item.Percent > 0)
+                                                                    {
+                                                                        <span>Tiết kiệm</span>
+
+                                                                        <span class="font-20"> -@(item.Percent)%</span>
+                                                                    }
+                                                                </div>
+                                                            </button>
+                                                        </td>
+                                                        index++;
+                                                    }
+
+
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12">
-                                <div class="table-responsive">
-                                    <table>
-                                        <tbody>
-                                            <tr>
-                                                @foreach (var item in Model)
+                            <div class="row mt-2">
+                                <div class="col-12">
+                                    <div class="table-responsive">
+                                        <table class="table m-t-30">
+                                            <thead>
+                                                <tr>
+                                                    <th>#</th>
+                                                    <th>Sản phẩm</th>
+                                                    <th style="text-align: center;">Số tháng</th>
+
+                                                    <th style="text-align: center;">Giá niêm yết</th>
+                                                    <th style="text-align: center;">Giảm giá</th>
+                                                    <th style="text-align: center;">Ngày còn lại</th>
+                                                    <th style="text-align: left;">Mô tả</th>
+                                                    <th style="text-align: center;">Tổng cộng</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                @if (packageFirst != null)
                                                 {
-                                                    <td>
-                                                        <button type="button" class="btn-month-payment btn-icon cur-point m-r-15 pa-20 btn-month radius35  @(index==1?"pricing-box-active":"")" value="@item.Month"
-                                                                data-discount="@item.Discount" data-month="@item.Month" data-price="@item.Price" data-date="@(DateTime.Now.AddMonths(item.Month).ToString("dd/MM/yyyy :HH:mm:ss"))">
-                                                            <div><span>Mua @item.Month Tháng</span></div>
-                                                            <div>
-                                                                <div><span class="text-line-through color-red">@item.Price</span></div>
-                                                                <span><h4>@item.Discount</h4></span>
-                                                                @if (item.Percent > 0)
-                                                                {
-                                                                    <span>Tiết kiệm</span>
+                                                    <tr>
+                                                        <td>1</td>
+                                                        <td>@packageFirst.ServicePackName</td>
+                                                        <td style="text-align: center;" class="month_text">@packageFirst.Month</td>
 
-                                                                    <span class="font-20"> -@(item.Percent)%</span>
-                                                                }
-                                                            </div>
-                                                        </button>
-                                                    </td>
-                                                    index++;
+                                                        <td style="text-align: center;" class="price_text">@packageFirst.Price</td>
+                                                        <td style="text-align: center;" class="discount discount_text color-red font-bold">@packageFirst.Discount  @(packageFirst.Percent > 0 ? $"({packageFirst.Percent}%)" : "")</td>
+                                                        <td style="text-align: center;" class="date_remain">0</td>
+                                                        <td class="date_remain_text"></td>
+                                                        <td style="text-align: center;" class="sub_total">@packageFirst.Discount</td>
+                                                    </tr>
                                                 }
 
-                                                @*<td>
-                                                <button type="button" class="btn-month-payment btn-icon cur-point m-r-15 pa-20 btn-month radius35 pricing-box-active" value="3">
-                                                <div><span>Mua 3 Tháng</span></div>
-                                                <div><span class="text-line-through color-red">600.000</span></div>
-                                                <div>
-                                                <span><h4>550.000</h4></span>
-                                                <span>Tiết kiệm</span><span class="font-20"> -10%</span>
-                                                </div>
-                                                </button>
-                                                </td>
-                                                <td>
-                                                <button type="button" class="btn-month-payment btn-icon cur-point m-r-15 pa-20 btn-month radius35" value="6">
-                                                <div><span>Mua 6 Tháng</span></div>
-                                                <div><span class="text-line-through color-red">1.200.000</span></div>
-                                                <div>
-                                                <span><h4>1.000.000</h4></span>
-                                                <span>Tiết kiệm</span><span class="font-20"> -16%</span>
-                                                </div>
-                                                </button>
-                                                </td>
-                                                <td>
-                                                <button type="button" class="btn-month-payment btn-icon cur-point m-r-15 pa-20 btn-month radius35" value="12">
-                                                <div><span>Mua 12 Tháng</span></div>
-                                                <div><span class="text-line-through color-red">2.400.000</span></div>
-                                                <div>
-                                                <span><h4>1.800.000</h4></span>
-                                                <span>Tiết kiệm</span><span class="font-20"> -20%</span>
-                                                </div>
-                                                </button>
-                                                </td>*@
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="table-responsive">
-                                    <table class="table m-t-30">
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Sản phẩm</th>
-                                                <th style="text-align: center;">Số tháng</th>
-
-                                                <th style="text-align: center;">Giá niêm yết</th>
-                                                <th style="text-align: center;">Giảm giá</th>
-                                                <th style="text-align: center;">Ngày còn lại</th>
-                                                <th style="text-align: left;">Mô tả</th>
-                                                <th style="text-align: center;">Tổng cộng</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            @if (packageFirst != null)
-                                            {
-                                                <tr>
-                                                    <td>1</td>
-                                                    <td>@packageFirst.ServicePackName</td>
-                                                    <td style="text-align: center;" class="month_text">@packageFirst.Month</td>
-
-                                                    <td style="text-align: center;" class="price_text">@packageFirst.Price</td>
-                                                    <td style="text-align: center;" class="discount discount_text color-red font-bold">@packageFirst.Discount  @(packageFirst.Percent > 0 ? $"({packageFirst.Percent}%)" : "")</td>
-                                                    <td style="text-align: center;" class="date_remain">0</td>
-                                                    <td class="date_remain_text"></td>
-                                                    <td style="text-align: center;" class="sub_total">@packageFirst.Discount</td>
-                                                </tr>
-                                            }
-
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        <br />
-                        <div class="row">
-                            <div class="col-md-12">
-                                <p>
-                                    Bạn hãy chuyển tiền tới tài khoản sau với nội dung chuyển khoản là:
-                                    <span class="color-red"><b>@(invoiceInfo.CodeBill)</b> <i data-toggle="tooltip" data-placement="top" title="" class="fa fa-copy color-green" onclick="copyText('iv')" data-original-title="Copy"></i></span>
-                                </p>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="row align-items-center">
-                                    <div class="col-md-2">
-                                        <div class="qr" id="img_bank" data-toggle="tooltip" data-placement="top" title="" data-original-title="Bấm vào để phóng to"></div>
-                                        @* <img data-toggle="tooltip" data-placement="top" title="" class="qr" src="/images/sang_qr2.jpg" data-original-title="Bấm vào để phóng to" />*@
+                                            </tbody>
+                                        </table>
                                     </div>
-                                    <div class="col-md-10">
-                                        <div class="row">
-                                            <div class="col-md-12 m-b-15"><span class="font-16 m-r-15">Số tài khoản</span> <span class="color-green font-18 font-bold">@setting.BankNumber</span></div>
-                                            <div class="col-md-12 m-b-15"><span class="font-16 m-r-15">Chủ tài khoản</span> <span class="color-green font-18 font-bold">@setting.BankAccountName</span></div>
-                                            <div class="col-md-12 m-b-15">
-                                                <span class="font-16 m-r-15">Ngân hàng  </span> <span>
-                                                    @setting.BankName
-                                                    @* <img style="height: 20px;" src="images/ACB.png" /></span>*@
+                                </div>
+                            </div>
+                            <br />
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <p>
+                                        Bạn hãy chuyển tiền tới tài khoản sau với nội dung chuyển khoản là:
+                                        <span class="color-red"><b>@(invoiceInfo.CodeBill)</b> <i data-toggle="tooltip" data-placement="top" title="" class="fa fa-copy color-green" onclick="copyText('iv')" data-original-title="Copy"></i></span>
+                                    </p>
+                                </div>
+                                <div class="col-md-12">
+                                    <div class="row align-items-center">
+                                        <div class="col-md-2">
+                                           @* <div class="qr" id="img_bank" data-toggle="tooltip" data-placement="top" title="" data-original-title="Bấm vào để phóng to"></div>*@
+                                            @* <img data-toggle="tooltip" data-placement="top" title="" class="qr" src="/images/sang_qr2.jpg" data-original-title="Bấm vào để phóng to" />*@
+                                        </div>
+                                        <div class="col-md-10">
+                                            <div class="row">
+                                                <div class="col-md-12 m-b-15">
+                                                    <span class="font-16 m-r-15">Số tài khoản</span>
+                                                    <span class="color-green font-18 font-bold">@setting.BankNumber</span>
+                                                </div>
+                                                <div class="col-md-12 m-b-15">
+                                                    <span class="font-16 m-r-15">Chủ tài khoản</span>
+                                                    <span class="color-green font-18 font-bold">@setting.BankAccountName</span>
+                                                </div>
+                                                <div class="col-md-12 m-b-15">
+                                                    <span class="font-16 m-r-15">Ngân hàng  </span> <span>
+                                                        @setting.BankName
+                                                        @* <img style="height: 20px;" src="images/ACB.png" /></span>*@
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-12 col-no-padding" style="overflow: auto;">
-                                <p class="text-muted well well-sm no-shadow color-red" style="margin-top: 10px; font-weight: bold; font-size: 16px;">
-                                    Lưu ý, sau khi chuyển tiền thành công thì mới ấn nút "Xác nhận chuyển tiền", nếu sau 10p mà chưa vào được hệ thống thì chụp ảnh Hóa đơn gửi facebook cho <a href="@(setting.LinkFBAdmin)">Admin</a>
-                                </p>
+                            <div class="row">
+                                <div class="col-md-12 col-no-padding" style="overflow: auto;">
+                                    <p class="text-muted well well-sm no-shadow color-red" style="margin-top: 10px; font-weight: bold; font-size: 16px;">
+                                        Lưu ý, sau khi chuyển tiền thành công thì mới ấn nút "Xác nhận chuyển tiền", nếu sau 10p mà chưa vào được hệ thống thì chụp ảnh Hóa đơn gửi facebook cho <a href="@(setting.LinkFBAdmin)">Admin</a>
+                                    </p>
+                                </div>
                             </div>
-                        </div>
-                        <div class="d-print-none">
-                            <div class="text-right">
-                                <a href="javascript:window.print()" class="btn btn-dark waves-effect waves-light"><i class="fa fa-print"></i></a>
+                            <div class="d-print-none">
+                                <div class="text-right">
+                                  @*  <a href="javascript:window.print()" class="btn btn-dark waves-effect waves-light"><i class="fa fa-print"></i></a>*@
 
-                                <button type="button" data-toggle="modal" data-target="#exampleModal" class="btn btn-primary waves-effect waves-light">Thanh toán</button>
+                                    <button type="button" data-toggle="modal" data-target="#exampleModal" class="btn btn-primary waves-effect waves-light">Thanh toán</button>
+                                </div>
                             </div>
+                            <form id="form-invoice">
+                                <input type="hidden" name="codebill" id="iv" value="@(invoiceInfo.CodeBill)" />
+                                <input type="hidden" name="month" value="@packageFirst?.Month" class="month" />
+                                <input type="hidden" name="packageName" value="@invoiceInfo.PackageName" />
+                                <button type="submit" id="btn_submit_hidden" class="btn btn-primary waves-effect waves-light" style="display:none">Thanh toán</button>
+                            </form>
                         </div>
-                        <form id="form-invoice">
-                            <input type="hidden" name="codebill" id="iv" value="@(invoiceInfo.CodeBill)" />
-                            <input type="hidden" name="month" value="@packageFirst?.Month" class="month" />
-                            <input type="hidden" name="packageName" value="@invoiceInfo.PackageName" />
-                            <button type="submit" id="btn_submit_hidden" class="btn btn-primary waves-effect waves-light" style="display:none">Thanh toán</button>
-                        </form>
                     </div>
                 </div>
+
             </div>
         </div>
 

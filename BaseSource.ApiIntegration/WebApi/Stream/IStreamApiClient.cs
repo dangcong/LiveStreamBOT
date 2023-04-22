@@ -1,11 +1,5 @@
 ﻿using BaseSouce.ViewModels.Common;
 using BaseSource.ViewModels.Stream;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
 namespace BaseSource.ApiIntegration.WebApi.Stream
 {
     public interface IStreamApiClient
@@ -14,6 +8,11 @@ namespace BaseSource.ApiIntegration.WebApi.Stream
         Task<ApiResult<string>> UpdateAsync(int id, StreamUpdateDto model);
         Task<ApiResult<string>> DeleteAsync(int id);
         Task<ApiResult<string>> StartStreamAsync(int id);
+        Task<ApiResult<string>> StopStreamAsync(int id);
         Task<ApiResult<PagedResult<StreamClientInfoDto>>> GetByFilterAsync(StreamClientRequestDto model);
+        Task<ApiResult<StreamClientInfoDto>> GetById(int id);
+        Task<ApiResult<StreamReportDto>> GetReport();
+        Task<ApiResult<string>> ValidateLink(StreamLinkDto model);
+        
     }
 }

@@ -11,6 +11,7 @@ using BaseSource.API.Cofigurations;
 using EFCore.UnitOfWork;
 using BaseSource.Shared.Helpers;
 using BaseSouce.Services.HubServices;
+using BaseSouce.Services.BackgroundServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -50,6 +51,8 @@ builder.Services.DIConfiguration();
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+builder.Services.AddHostedService<CheckConnectBotService>();
 //add autoMapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

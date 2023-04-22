@@ -1,55 +1,4 @@
-﻿@*<!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>@ViewData["Title"] - BaseSource.AppUI</title>
-        <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-        <link rel="stylesheet" href="~/BaseSource.AppUI.styles.css" asp-append-version="true" />
-    </head>
-    <body>
-        <header>
-            <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-                <div class="container-fluid">
-                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">BaseSource.AppUI</a>
-                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                            aria-expanded="false" aria-label="Toggle navigation">
-                        <span class="navbar-toggler-icon"></span>
-                    </button>
-                    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                        <ul class="navbar-nav flex-grow-1">
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </nav>
-        </header>
-        <div class="container">
-            <main role="main" class="pb-3">
-                @RenderBody()
-            </main>
-        </div>
-
-        <footer class="border-top footer text-muted">
-            <div class="container">
-                &copy; 2023 - BaseSource.AppUI - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-            </div>
-        </footer>
-        <script src="~/lib/jquery/dist/jquery.min.js"></script>
-        <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-        <script src="~/js/site.js" asp-append-version="true"></script>
-        @await RenderSectionAsync("Scripts", required: false)
-    </body>
-    </html>
-*@
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -100,7 +49,7 @@
                     <li class="dropdown">
                         <a href="#" data-toggle="dropdown" class="nav-link dropdown-toggle nav-link-lg nav-link-user">
                             <img alt="image" src="~/admin-themes/assets/img/avatar/avatar-1.png" class="rounded-circle mr-1">
-                            <div class="d-sm-none d-lg-inline-block">Hi, Admin</div>
+                            @await Component.InvokeAsync("UserInfo")
                         </a>
                         <div class="dropdown-menu dropdown-menu-right">
 
@@ -127,14 +76,12 @@
 
                                 <li><a class="nav-link" href="/live/pricing">Live</a></li>
                                 <li><a class="nav-link" href="/live-4k/pricing">Live 4k</a></li>
-
-
                             </ul>
                         </li>
                         <li><a class="nav-link" href="/stream/create"><i class="fas fa-columns"></i> <span>Live Stream</span></a></li>
-                        <li><a class="nav-link" href="/admin/Authenticator/EnableAuthenticator"><i class="fas fa-columns"></i> <span>Gói Cước</span></a></li>
+                       @* <li><a class="nav-link" href="/admin/Authenticator/EnableAuthenticator"><i class="fas fa-columns"></i> <span>Gói Cước</span></a></li>*@
                         <li><a class="nav-link" href="/account/profile"><i class="fas fa-columns"></i> <span>Cá nhân</span></a></li>
-                        <li><a class="nav-link" href="/admin/Setting/Index"><i class="fas fa-columns"></i> <span>Hướng dẫn</span></a></li>
+                       @await Component.InvokeAsync("LinkVideo")
 
                     </ul>
                 </aside>
@@ -142,29 +89,6 @@
             <!-- Main Content -->
             <div class="main-content">
                 @RenderBody()
-                @*<div class="modal fade" role="dialog" id="model2FA">
-                    <div class="modal-dialog" role="document">
-                    <div class="modal-content">
-                    <div class="modal-header">
-                    <h5 class="modal-title">Bào vệ 2FA</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                    </button>
-                    </div>
-                    <div class="modal-body">
-                    <form method="post" action="/admin/Authenticator/ValidateAuthenticator" id="ValidateAuthenticator">
-                    <p>Nhập mã xác thực 2FA để thực hiện thao tác</p>
-                    <input type="number" required name="code" id="code2FA" value="" placeholder="Nhập Mã 2FA" class="form-control" />
-                    <p class="text-danger text-error2FA"></p>
-                    <button type="submit" class="btn btn-primary mt-1">Xác nhận</button>
-                    </form>
-                    </div>
-                    <div class="modal-footer bg-whitesmoke br">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
-                    </div>
-                    </div>
-                    </div>
-                    </div>*@
             </div>
             <footer class="main-footer">
                 <div class="footer-left">

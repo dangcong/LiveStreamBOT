@@ -1,7 +1,81 @@
-﻿
+﻿@model List<StreamAdminInfoDto>
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Danh sách Luồng Stream";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
-<h1>Index</h1>
+<section class="section">
+    <div class="section-header">
+        <h1>@ViewData["Title"]</h1>
+        <div class="section-header-breadcrumb">
+            <div class="breadcrumb-item active"><a href="#">Home</a></div>
+            <div class="breadcrumb-item"><a href="#">Danh sách </a></div>
+            <div class="breadcrumb-item">Stream</div>
+        </div>
+    </div>
 
+    <div class="section-body">
+        <h2 class="section-title">@ViewData["Title"]</h2>
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>@ViewData["Title"]</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="tableAllStream">
+                                <thead>
+                                    <tr>
+                                        <th>Người dùng</th>
+                                        <th>BOTId</th>
+                                        <th>Tên</th>
+                                        <th>Loại</th>
+                                        <th>Nền tảng</th>
+                                        <th>Ngày tạo</th>
+                                        <th>Thời gian Live</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>
+                                                @item.UserName
+                                            </td>
+                                            <td>@item.BotId</td>
+                                            <th>@item.StreamName</th>
+                                            <td>
+                                                @switch (item.LiveType)
+                                                {
+                                                    case LiveType._1080:
+                                                        <span class="badge badge-success">1080</span>
+                                                        break;
+                                                    case LiveType._4K:
+                                                        <span class="badge badge-success">4k</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-primary">@item.PlatformType</span>
+                                            </td>
+                                            <td>@item.CreatedTime.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                            <td>@item.Updatedtime?.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+@section Scripts{
+    <script>
+        $("#tableAllStream").DataTable({
+
+        });
+    </script>
+}

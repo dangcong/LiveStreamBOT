@@ -91,7 +91,6 @@ namespace BaseSource.AppUI.Controllers
             {
                 return RedirectToLocal(returnUrl);
             }
-
             return RedirectToLocal("/");
         }
 
@@ -252,8 +251,6 @@ namespace BaseSource.AppUI.Controllers
             ViewBag.Orders = orders.ResultObj?.Items?.ToList();
             return View(result.ResultObj);
         }
-
-
 
         #region helper
         private ClaimsPrincipal ValidateToken(string jwtToken)

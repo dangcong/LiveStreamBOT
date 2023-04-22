@@ -40,7 +40,7 @@ namespace LiveStreamBOT.Services
             {
                 if (double.TryParse(obj["PercentProcessorTime"].ToString(), out double percent))
                 {
-                    return percent;
+                    return percent / 100;
                 }
             }
             return double.NaN;

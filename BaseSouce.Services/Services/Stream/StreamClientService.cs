@@ -48,12 +48,18 @@ namespace BaseSouce.Services.Services.Stream
         {
             try
             {
-
-                Uri uri = model.PlatformType switch
+                if (string.IsNullOrWhiteSpace(model.StreamKey))
                 {
-                    PlatformType.Youtube => new Uri($"rtmp://a.rtmp.youtube.com/live2/{model.StreamKey}"),
-                    _ => throw new NotSupportedException($"{model.PlatformType.GetType().Name}.{model.PlatformType}")
-                };
+                    return $"Chưa nhập {nameof(model.StreamKey)}";
+                }
+
+                if (!Uri.TryCreate(model.RTMP, UriKind.Absolute, out Uri? rtmp))
+                {
+                    return $"{nameof(model.RTMP)} sai định dạng";
+                }
+                string url = $"{rtmp.Scheme}://{rtmp.Host}{rtmp.AbsolutePath}/{model.StreamKey}";
+                if (!string.IsNullOrWhiteSpace(rtmp.Query)) url += rtmp.Query;
+                Uri uri = new Uri(url);
 
                 List<string> arguments = new List<string>();
                 arguments.Add("-y");

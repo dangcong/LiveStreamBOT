@@ -261,27 +261,20 @@ namespace BaseSouce.Services.Services.User
                 predicate: x => x.Id == userId,
                 selector: x => new PackageLiveUserDto
                 {
-                    PackageLive1080 = x.Orders.Where(i => i.ServicePack.Type == ServicePackType._1080
-                    && i.ExpiredTime > DateTime.Now && i.IsActive)
-                    .Select(i => new PackageLiveInfoDto
+                    PackageLive1080 = new PackageLiveInfoDto
                     {
-                        CreatedTime = i.CreatedTime,
-                        ExpiredTime = i.ExpiredTime,
+
                         NumberOfThreads = x.NumberOfThreads1080,
                         NumberOfThreadsCreated = x.NumberOfThreads1080Create,
-                        Name = i.ServicePack.Name
+                        Name = "Live 1080"
 
-                    }).FirstOrDefault(),
-                    PackageLive4k = x.Orders.Where(i => i.ServicePack.Type == ServicePackType._4K
-                    && i.ExpiredTime > DateTime.Now && i.IsActive)
-                    .Select(i => new PackageLiveInfoDto
+                    },
+                    PackageLive4k = new PackageLiveInfoDto
                     {
-                        CreatedTime = i.CreatedTime,
-                        ExpiredTime = i.ExpiredTime,
                         NumberOfThreads = x.NumberOfThreads4K,
                         NumberOfThreadsCreated = x.NumberOfThreads4KCreate,
-                        Name = i.ServicePack.Name
-                    }).FirstOrDefault(),
+                        Name = "Live 4k"
+                    },
                 });
             var streamHistorys = await _repositoryStream.Queryable()
                      .Where(x => x.UserId == userId)
@@ -324,50 +317,62 @@ namespace BaseSouce.Services.Services.User
                     UserName = x.UserName,
                     LinkFB = x.LinkFB,
                     Phone = x.PhoneNumber,
-                    PackageLive1080 = x.Orders.Where(i => i.ServicePack.Type == ServicePackType._1080
-                    && i.ExpiredTime > DateTime.Now && i.IsActive)
-                    .Select(i => new PackageLiveInfoDto
+                    PackageLive1080 = new PackageLiveInfoDto
                     {
-                        CreatedTime = i.CreatedTime,
-                        ExpiredTime = i.ExpiredTime,
                         NumberOfThreads = x.NumberOfThreads1080,
-                        NumberOfThreadsCreated = x.NumberOfThreads1080Create,
-
-                    }).FirstOrDefault(),
-                    PackageLive4k = x.Orders.Where(i => i.ServicePack.Type == ServicePackType._4K
-                    && i.ExpiredTime > DateTime.Now && i.IsActive)
-                    .Select(i => new PackageLiveInfoDto
+                        NumberOfThreadsInRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._1080 && i.Status == StreamStatus.Streaming).Count(),
+                        NumberOfThreadsCreated = x.StreamHistorys.Where(i => i.LiveType == LiveType._1080).Count(),
+                    },
+                    PackageLive4k = new PackageLiveInfoDto
                     {
-                        CreatedTime = i.CreatedTime,
-                        ExpiredTime = i.ExpiredTime,
-                        NumberOfThreads = x.NumberOfThreads4K,
-                        NumberOfThreadsCreated = x.NumberOfThreads4KCreate,
-                    }).FirstOrDefault(),
-                });
-            var streamHistorys = await _repositoryStream.Queryable()
-                     .Where(x => x.UserId == userId)
-                     .GroupBy(x => x.LiveType)
-                     .Select(x => new
-                     {
-                         Type = x.Key,
-                         NumberOfThreadsInRun = x.Where(i => i.Status == StreamStatus.Streaming).Count(),
-                         NumberOfThreadsInCreated = x.Count(),
-                     }).ToListAsync();
+                        NumberOfThreads = x.NumberOfThreads1080,
+                        NumberOfThreadsInRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._4K && i.Status == StreamStatus.Streaming).Count(),
+                        NumberOfThreadsCreated = x.StreamHistorys.Where(i => i.LiveType == LiveType._4K).Count(),
+                    },
+                    //PackageLive1080 = x.Orders.Where(i => i.ServicePack.Type == ServicePackType._1080
+                    //&& i.ExpiredTime > DateTime.Now && i.IsActive)
+                    //.Select(i => new PackageLiveInfoDto
+                    //{
+                    //    CreatedTime = i.CreatedTime,
+                    //    ExpiredTime = i.ExpiredTime,
+                    //    NumberOfThreads = x.NumberOfThreads1080,
+                    //    NumberOfThreadsCreated = x.NumberOfThreads1080Create,
 
-            if (profileInfo.PackageLive1080 != null)
-            {
-                profileInfo.PackageLive1080.NumberOfThreadsCreatedInRun = streamHistorys
-                    .Where(x => x.Type == LiveType._1080).Select(x => x.NumberOfThreadsInRun).FirstOrDefault();
-                profileInfo.PackageLive1080.NumberOfThreadsCreatedInRun = streamHistorys
-                    .Where(x => x.Type == LiveType._1080).Select(x => x.NumberOfThreadsInCreated).FirstOrDefault();
-            }
-            if (profileInfo.PackageLive4k != null)
-            {
-                profileInfo.PackageLive4k.NumberOfThreadsCreatedInRun = streamHistorys
-                    .Where(x => x.Type == LiveType._4K).Select(x => x.NumberOfThreadsInRun).FirstOrDefault();
-                profileInfo.PackageLive4k.NumberOfThreadsCreatedInRun = streamHistorys
-                    .Where(x => x.Type == LiveType._4K).Select(x => x.NumberOfThreadsInCreated).FirstOrDefault();
-            }
+                    //}).FirstOrDefault(),
+                    //PackageLive4k = x.Orders.Where(i => i.ServicePack.Type == ServicePackType._4K
+                    //&& i.ExpiredTime > DateTime.Now && i.IsActive)
+                    //.Select(i => new PackageLiveInfoDto
+                    //{
+                    //    CreatedTime = i.CreatedTime,
+                    //    ExpiredTime = i.ExpiredTime,
+                    //    NumberOfThreads = x.NumberOfThreads4K,
+                    //    NumberOfThreadsCreated = x.NumberOfThreads4KCreate,
+                    //}).FirstOrDefault(),
+                });
+            //var streamHistorys = await _repositoryStream.Queryable()
+            //         .Where(x => x.UserId == userId)
+            //         .GroupBy(x => x.LiveType)
+            //         .Select(x => new
+            //         {
+            //             Type = x.Key,
+            //             NumberOfThreadsInRun = x.Where(i => i.Status == StreamStatus.Streaming).Count(),
+            //             NumberOfThreadsInCreated = x.Count(),
+            //         }).ToListAsync();
+
+            //if (profileInfo.PackageLive1080 != null)
+            //{
+            //    profileInfo.PackageLive1080.NumberOfThreadsCreatedInRun = streamHistorys
+            //        .Where(x => x.Type == LiveType._1080).Select(x => x.NumberOfThreadsInRun).FirstOrDefault();
+            //    profileInfo.PackageLive1080.NumberOfThreadsCreatedInRun = streamHistorys
+            //        .Where(x => x.Type == LiveType._1080).Select(x => x.NumberOfThreadsInCreated).FirstOrDefault();
+            //}
+            //if (profileInfo.PackageLive4k != null)
+            //{
+            //    profileInfo.PackageLive4k.NumberOfThreadsCreatedInRun = streamHistorys
+            //        .Where(x => x.Type == LiveType._4K).Select(x => x.NumberOfThreadsInRun).FirstOrDefault();
+            //    profileInfo.PackageLive4k.NumberOfThreadsCreatedInRun = streamHistorys
+            //        .Where(x => x.Type == LiveType._4K).Select(x => x.NumberOfThreadsInCreated).FirstOrDefault();
+            //}
 
             return profileInfo;
         }

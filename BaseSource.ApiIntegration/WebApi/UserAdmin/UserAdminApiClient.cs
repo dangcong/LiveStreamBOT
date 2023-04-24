@@ -32,6 +32,12 @@ namespace BaseSource.ApiIntegration.WebApi.UserAdmin
             return await client.GetAsync<ApiResult<PagedResult<UserAdminInfoDto>>>($"/api/admin/users", model);
         }
 
+        public async Task<ApiResult<UserManagerBotDto>> GetUserManagerBot(string userId)
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            return await client.GetAsync<ApiResult<UserManagerBotDto>>($"/api/admin/user/managerBot?userId={userId}");
+        }
+
         public async Task<ApiResult<string>> ResetPassword(ResetPasswordAdminDto model)
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
@@ -48,6 +54,12 @@ namespace BaseSource.ApiIntegration.WebApi.UserAdmin
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
             return await client.PostAsync<ApiResult<string>>($"/api/admin/user/manager", model);
+        }
+
+        public async Task<ApiResult<string>> UpdateUserManagerBot(UserManagerBotDto model)
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            return await client.PostAsync<ApiResult<string>>($"/api/admin/user/managerBot/update", model);
         }
     }
 }

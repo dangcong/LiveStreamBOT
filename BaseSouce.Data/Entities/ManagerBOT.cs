@@ -25,5 +25,6 @@ namespace BaseSouce.Data.Entities
         
 
         public ICollection<StreamHistory > StreamHistorys { get; set; }
+        public ICollection<UserManagerBOT > UserManagerBOTs { get; set; }
     }
 }

@@ -104,6 +104,26 @@ namespace BaseSouce.Services.Services.UserAdmin
             return data.Items.ToList();
         }
 
+        public async Task<UserManagerBotDto> GetUserManagerBotAsync(string userId)
+        {
+            var _reposiory = _unitOfWork.GetRepository<AppUser>();
+
+            return await _reposiory.Queryable().AsNoTracking()
+                 .Where(x => x.Id == userId)
+                 .Include(x => x.UserManagerBOTs)
+                 .Select(x => new UserManagerBotDto
+                 {
+                     NumberOfThreads1080 = x.NumberOfThreads1080,
+                     NumberOfThreads4K = x.NumberOfThreads4K,
+                     Bot1080 = x.UserManagerBOTs.Where(i => i.LiveType == LiveType._1080)
+                         .Select(i => i.ManagerBOTId).FirstOrDefault(),
+                     Bot4K = x.UserManagerBOTs.Where(i => i.LiveType == LiveType._4K)
+                         .Select(i => i.ManagerBOTId).FirstOrDefault(),
+                 }).FirstOrDefaultAsync();
+        }
+
+
+
         public async Task<KeyValuePair<bool, string>> ResetPassowrdAsync(ResetPasswordAdminDto model)
         {
             try
@@ -205,6 +225,104 @@ namespace BaseSouce.Services.Services.UserAdmin
             }
             await _unitOfWork.SaveChangesAsync();
             return new KeyValuePair<bool, string>(true, string.Empty);
+        }
+
+        public async Task<KeyValuePair<bool, string>> UpdateUserManagerBotAsync(UserManagerBotDto model)
+        {
+            try
+            {
+                var _repositoryUser = _unitOfWork.GetRepository<AppUser>();
+
+                var _repositoryBot = _unitOfWork.GetRepository<ManagerBOT>();
+                var _repositoryUserBot = _unitOfWork.GetRepository<UserManagerBOT>();
+
+                var userCurrent = await _repositoryUser.GetFirstOrDefaultAsync(
+                    predicate: x => x.Id == model.UserId, disableTracking: false);
+
+                if (userCurrent == null)
+                {
+                    return new KeyValuePair<bool, string>(false, "Người dùng không tồn tại!");
+                }
+                userCurrent.NumberOfThreads1080 = model.NumberOfThreads1080;
+                userCurrent.NumberOfThreads4K = model.NumberOfThreads4K;
+
+
+                _repositoryUser.Update(userCurrent);
+
+                if (model.Bot1080 != null && model.Bot1080 > 0)
+                {
+                    var bot1080Current = await _repositoryUserBot.GetFirstOrDefaultAsync(
+                        predicate: x => x.LiveType == LiveType._1080, disableTracking: false);
+
+                    if (bot1080Current != null)
+                    {
+                        bot1080Current.ManagerBOTId = model.Bot1080.GetValueOrDefault();
+                        _repositoryUserBot.Update(bot1080Current);
+                    }
+                    else
+                    {
+                        _repositoryUserBot.Insert(new UserManagerBOT
+                        {
+                            CreatedTime = DateTime.Now,
+                            LiveType = LiveType._1080,
+                            ManagerBOTId = model.Bot1080.GetValueOrDefault(),
+                            UserId = model.UserId
+                        });
+                    }
+                }
+                else
+                {
+                    var bot1080Current = await _repositoryUserBot.GetFirstOrDefaultAsync(
+                        predicate: x => x.LiveType == LiveType._1080, disableTracking: false);
+
+                    if (bot1080Current != null)
+                    {
+                        _repositoryUserBot.Delete(bot1080Current);
+                    }
+
+                }
+                if (model.Bot4K != null  && model.Bot4K > 0)
+                {
+                    var bot4kCurrent = await _repositoryUserBot.GetFirstOrDefaultAsync(
+                        predicate: x => x.LiveType == LiveType._4K, disableTracking: false);
+
+                    if (bot4kCurrent != null)
+                    {
+                        bot4kCurrent.ManagerBOTId = model.Bot4K.GetValueOrDefault();
+                        _repositoryUserBot.Update(bot4kCurrent);
+                    }
+                    else
+                    {
+                        _repositoryUserBot.Insert(new UserManagerBOT
+                        {
+                            CreatedTime = DateTime.Now,
+                            LiveType = LiveType._4K,
+                            ManagerBOTId = model.Bot4K.GetValueOrDefault(),
+                            UserId = model.UserId
+                        });
+                    }
+                }
+                else
+                {
+                    var bot4kCurrent = await _repositoryUserBot.GetFirstOrDefaultAsync(
+                        predicate: x => x.LiveType == LiveType._4K, disableTracking: false);
+
+                    if (bot4kCurrent != null)
+                    {
+                        _repositoryUserBot.Delete(bot4kCurrent);
+                    }
+
+                }
+                await _unitOfWork.SaveChangesAsync();
+
+                return new KeyValuePair<bool, string>(true, string.Empty);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Update UserManagerBot failedd by error: [{ex}]");
+                return new KeyValuePair<bool, string>(false, "Cập nhật không thành công!");
+            }
         }
     }
 }

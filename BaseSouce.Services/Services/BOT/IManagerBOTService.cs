@@ -8,7 +8,7 @@ namespace BaseSouce.Services.Services.BOT
     {
         Task<KeyValuePair<bool, string>> CreateBOTAsync(ManagerBotCreateDto model);
         Task<KeyValuePair<bool, string>> UpdateBOTAsync(int id, ManagerBotUpdateDto model);
-        
+
         Task<KeyValuePair<bool, string>> DeleteAsync(int id);
         Task<KeyValuePair<bool, string>> UpdateStatusAsync(int id, ManagerBOTStatus Status);
         Task<IPagedList<ManagerBotInfoDto>> GetBOTByFilterAsync(ManagerBOTRequestDto model);
@@ -16,5 +16,6 @@ namespace BaseSouce.Services.Services.BOT
 
         Task<KeyValuePair<bool, string>> ChangeUsedAsync(int id);
         Task<ManagerBotInfoDto> GetBOTByIdAsync(int id);
+        Task<List<UserBotDto>> GetUserConnectBot(int id);
     }
 }

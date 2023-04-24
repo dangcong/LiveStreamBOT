@@ -58,7 +58,7 @@ namespace BaseSource.Data.Migrations
                         new
                         {
                             Id = "c1105ce5-9dbc-49a9-a7d5-c963b6daa62a",
-                            ConcurrencyStamp = "86d62c32-e1eb-4d19-b42b-b8fcdba2870b",
+                            ConcurrencyStamp = "4fbe5a3e-b58a-44ee-9e34-8b05040b61f0",
                             Description = "Administrator role",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -191,7 +191,7 @@ namespace BaseSource.Data.Migrations
                         {
                             Id = "ffded6b0-3769-4976-841b-69459049a62d",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "ccd146ee-fd2e-4883-8cdc-d5a3b3a7834a",
+                            ConcurrencyStamp = "3cd49e7d-0749-459d-82a9-e1059cf02981",
                             CreatedTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
@@ -202,7 +202,7 @@ namespace BaseSource.Data.Migrations
                             NumberOfThreads1080Create = 0,
                             NumberOfThreads4K = 0,
                             NumberOfThreads4KCreate = 0,
-                            PasswordHash = "AQAAAAEAACcQAAAAEJlTjhYpzsef5K5s5DYJB8Y9vNbLATavFQqTOik3ZfM3m2rELKgVtXMPGK0PGmTTZg==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEAeIw/JUCQftGx4g/D/t/WMbjOPCyH6BY9M4hNpM+2dLFJLV/suFCSEjVWkOaxn+PA==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -619,6 +619,35 @@ namespace BaseSource.Data.Migrations
                     b.ToTable("StreamHistorys", (string)null);
                 });
 
+            modelBuilder.Entity("BaseSource.Data.Entities.UserManagerBOT", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<byte>("LiveType")
+                        .HasColumnType("tinyint");
+
+                    b.Property<int>("ManagerBOTId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .HasColumnType("nvarchar(128)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ManagerBOTId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("UserManagerBOTs", (string)null);
+                });
+
             modelBuilder.Entity("Microsoft.EntityFrameworkCore.AutoHistory", b =>
                 {
                     b.Property<int>("Id")
@@ -772,6 +801,23 @@ namespace BaseSource.Data.Migrations
                     b.Navigation("ManagerBOT");
                 });
 
+            modelBuilder.Entity("BaseSource.Data.Entities.UserManagerBOT", b =>
+                {
+                    b.HasOne("BaseSouce.Data.Entities.ManagerBOT", "ManagerBOT")
+                        .WithMany("UserManagerBOTs")
+                        .HasForeignKey("ManagerBOTId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("BaseSouce.Data.Entities.AppUser", "User")
+                        .WithMany("UserManagerBOTs")
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("ManagerBOT");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("BaseSouce.Data.Entities.AppRole", b =>
                 {
                     b.Navigation("RoleClaims");
@@ -795,12 +841,16 @@ namespace BaseSource.Data.Migrations
 
                     b.Navigation("UserGroups");
 
+                    b.Navigation("UserManagerBOTs");
+
                     b.Navigation("UserRoles");
                 });
 
             modelBuilder.Entity("BaseSouce.Data.Entities.ManagerBOT", b =>
                 {
                     b.Navigation("StreamHistorys");
+
+                    b.Navigation("UserManagerBOTs");
                 });
 
             modelBuilder.Entity("BaseSouce.Data.Entities.ServicePack", b =>

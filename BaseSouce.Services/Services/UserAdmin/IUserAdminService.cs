@@ -16,6 +16,8 @@ namespace BaseSouce.Services.Services.UserAdmin
         Task<KeyValuePair<bool, string>> UpdateUserGroupAsync(UserGroupAddDto model);
         Task<List<UserGroupDto>> GetAllUserOfManagerAsync(string userId);
         Task<KeyValuePair<bool, string>> ResetPassowrdAsync(ResetPasswordAdminDto model);
+        Task<UserManagerBotDto> GetUserManagerBotAsync(string userId);
+        Task<KeyValuePair<bool, string>> UpdateUserManagerBotAsync( UserManagerBotDto model);
 
     }
 }

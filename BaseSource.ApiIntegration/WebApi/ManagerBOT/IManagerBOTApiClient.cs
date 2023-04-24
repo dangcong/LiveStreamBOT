@@ -14,5 +14,6 @@ namespace BaseSource.ApiIntegration.WebApi.ManagerBOT
 
         Task<ApiResult<string>> ChangeUsedAsync(int id);
         Task<ApiResult<ManagerBotInfoDto>> GetById(int id);
+        Task<ApiResult<List<UserBotDto>>> GetUserBot(int id);
     }
 }

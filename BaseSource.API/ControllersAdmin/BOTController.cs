@@ -54,5 +54,13 @@ namespace BaseSource.API.ControllersAdmin
             return Ok(new ApiErrorResult<string>(result.Value));
         }
 
+
+        [HttpGet]
+        [Route("group/{id:int:min(1)}")]
+        public async Task<IActionResult> Group(int id)
+        {
+            var result = await _managerBOTService.GetUserConnectBot(id);
+            return Ok(new ApiSuccessResult<object>(result));
+        }
     }
 }

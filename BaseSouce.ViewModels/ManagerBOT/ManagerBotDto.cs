@@ -47,4 +47,11 @@ namespace BaseSource.ViewModels.ManagerBOT
     {
 
     }
+
+    public class UserBotDto
+    {
+        public string BotName { get; set; }
+        public string UserName { get; set; }
+        public LiveType Type { get; set; }
+    }
 }

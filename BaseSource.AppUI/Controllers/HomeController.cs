@@ -38,7 +38,7 @@ namespace BaseSource.AppUI.Controllers
             {
                 return Redirect("/admin");
             }
-            return Redirect("/live/pricing");
+            return Redirect("/stream/create");
 
         }
 

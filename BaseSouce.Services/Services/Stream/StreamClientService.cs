@@ -183,6 +183,8 @@ namespace BaseSouce.Services.Services.Stream
             try
             {
 
+
+
                 //check link audio
                 var result = await ValidateLink(model.Video, model.Audio);
                 if (!result)
@@ -194,14 +196,72 @@ namespace BaseSouce.Services.Services.Stream
                 var _repositoryUser = _unitOfWork.GetRepository<AppUser>();
                 var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
 
-                var profileUser = await _userService.GetProfileInfoAsync(userId);
 
-                var packageCurrent = model.LiveType == LiveType._1080 ? profileUser.PackageLive1080 : profileUser.PackageLive4k;
+                var userCurrent = await _repositoryUser.GetFirstOrDefaultAsync(
+                    predicate: x => x.Id == userId,
+                    selector: x => new
+                    {
+                        NumberOfThreads1080 = x.NumberOfThreads1080,
+                        NumberOfThreads1080InRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._1080).Count(),
+                        NumberOfThreads4k = x.NumberOfThreads4K,
+                        NumberOfThreads4kInRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._4K).Count(),
+                        Bot1080Id = x.UserManagerBOTs.Where(i => i.LiveType == LiveType._1080).Select(i => new
+                        {
+                            Id = i.ManagerBOTId,
+                            BotId = i.ManagerBOT.BotId
+                        }).FirstOrDefault(),
+                        Bot4k0Id = x.UserManagerBOTs.Where(i => i.LiveType == LiveType._4K).Select(i => new
+                        {
+                            Id = i.ManagerBOTId,
+                            BotId = i.ManagerBOT.BotId
+                        }).FirstOrDefault()
+                    });
 
-                if (packageCurrent == null)
+                //var profileUser = await _userService.GetProfileInfoAsync(userId);
+
+                var botConnectCurrent = string.Empty;
+                var botIdCurrent = 0;
+
+                if (model.LiveType == LiveType._1080)
                 {
-                    return "Bạn chưa đăng ký gói cước để Livestream, vui lòng đăng ký để sử dụng!";
+                    if (userCurrent.NumberOfThreads1080 < userCurrent.NumberOfThreads1080InRun
+                        || userCurrent.NumberOfThreads1080 == 0)
+                    {
+                        return "Số luồng 1080 hiện tại đã đạt tối đa!";
+                    }
+                    if (userCurrent.Bot1080Id == null)
+                    {
+                        return "BOT không hoạt động hoặc chưa kết nối!";
+                    }
+                    botConnectCurrent = userCurrent.Bot1080Id?.BotId;
+                    botIdCurrent = userCurrent.Bot1080Id.Id;
                 }
+                if (model.LiveType == LiveType._4K)
+                {
+                    if (userCurrent.NumberOfThreads4k < userCurrent.NumberOfThreads4kInRun
+                        || userCurrent.NumberOfThreads4k == 0)
+                    {
+                        return "Số luồng 4k hiện tại đã đạt tối đa!";
+                    }
+                    if (userCurrent.Bot4k0Id == null)
+                    {
+                        return "BOT không hoạt động hoặc chưa kết nối!";
+                    }
+                    botConnectCurrent = userCurrent.Bot4k0Id?.BotId;
+                    botIdCurrent = userCurrent.Bot4k0Id.Id;
+                }
+
+                if (string.IsNullOrEmpty(botConnectCurrent))
+                {
+                    return "BOT không hoạt động hoặc chưa kết nối!";
+                }
+
+                //var packageCurrent = model.LiveType == LiveType._1080 ? profileUser.PackageLive1080 : profileUser.PackageLive4k;
+
+                //if (packageCurrent == null)
+                //{
+                //    return "Bạn chưa đăng ký gói cước để Livestream, vui lòng đăng ký để sử dụng!";
+                //}
 
                 //else if (packageCurrent.NumberOfThreadsCreatedInRun >= packageCurrent.NumberOfThreadsCreated)
                 //{
@@ -212,21 +272,21 @@ namespace BaseSouce.Services.Services.Stream
 
                 var _repositoryBOT = _unitOfWork.GetRepository<ManagerBOT>();
 
-                var botCurrent = await _repositoryBOT.GetFirstOrDefaultAsync(
-                    predicate: x => x.NumberOfThreads > 0 && x.Status == ManagerBOTStatus.Connected && x.IsUsed);
+                //var botCurrent = await _repositoryBOT.GetFirstOrDefaultAsync(
+                //    predicate: x => x.NumberOfThreads > 0 && x.Status == ManagerBOTStatus.Connected && x.IsUsed);
 
-                if (botCurrent == null)
-                {
-                    return "Không có BOT, vui lòng thử lại";
-                }
+                //if (botCurrent == null)
+                //{
+                //    return "Không có BOT, vui lòng thử lại";
+                //}
 
                 var streamEntityNew = new StreamHistory
                 {
                     Audio = model.Audio,
                     Video = model.Video,
                     StreamName = model.StreamName,
-                    BotId = botCurrent.BotId,
-                    ManagerBOTId = botCurrent.Id,
+                    BotId = botConnectCurrent,
+                    ManagerBOTId = botIdCurrent,
                     PlatformType = model.PlatformType,
                     RenderStatus = RenderStatus.Created,
                     CreatedTime = DateTime.Now,

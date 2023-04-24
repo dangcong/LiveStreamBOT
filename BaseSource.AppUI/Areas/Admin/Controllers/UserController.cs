@@ -1,5 +1,7 @@
-﻿using BaseSource.ApiIntegration.WebApi.UserAdmin;
+﻿using BaseSource.ApiIntegration.WebApi.ManagerBOT;
+using BaseSource.ApiIntegration.WebApi.UserAdmin;
 using BaseSource.Shared.Constants;
+using BaseSource.ViewModels.ManagerBOT;
 using BaseSource.ViewModels.UserAdmin;
 using Microsoft.AspNetCore.Mvc;
 
@@ -8,10 +10,13 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
     public class UserController : BaseAdminController
     {
         private readonly IUserAdminApiClient _userAdminApiClient;
-        public UserController(IUserAdminApiClient userAdminApiClient)
+        private readonly IManagerBOTApiClient _managerBOTApiClient;
+        public UserController(IUserAdminApiClient userAdminApiClient, IManagerBOTApiClient managerBOTApiClient)
         {
             _userAdminApiClient = userAdminApiClient;
+            _managerBOTApiClient = managerBOTApiClient;
         }
+
         [HttpGet]
         public IActionResult Index()
         {
@@ -69,10 +74,10 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             if (result == null || !result.IsSuccessed)
             {
                 return RedirectToAction("Manager");
-                 //return Json(new { code = ErrorCodeJson.ErrorMess, err = result?.Message ?? "Cập nhật không thành công!" });
+                //return Json(new { code = ErrorCodeJson.ErrorMess, err = result?.Message ?? "Cập nhật không thành công!" });
             }
-             return RedirectToAction("Manager");
-           // return Json(new { code = ErrorCodeJson.Success });
+            return RedirectToAction("Manager");
+            // return Json(new { code = ErrorCodeJson.Success });
         }
 
         [HttpPost]
@@ -83,6 +88,44 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             {
                 return RedirectToAction("Index");
                 //return Json(new { code = ErrorCodeJson.ErrorMess, err = result?.Message ?? "Cập nhật không thành công!" });
+            }
+            return RedirectToAction("Index");
+        }
+
+
+        public async Task<IActionResult> ManagerBot(string userId)
+        {
+            var result = await _userAdminApiClient.GetUserManagerBot(userId);
+            if (result == null || !result.IsSuccessed)
+            {
+                return NotFound();
+            }
+
+            var bots = await _managerBOTApiClient.GetBOTByFilterAsync(new ManagerBOTRequestDto
+            {
+                Page = 1,
+                PageSize = 1000
+            });
+
+            ViewBag.Bots = bots.ResultObj.Items.ToList();
+            return View(result.ResultObj);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ManagerBot(UserManagerBotDto model)
+        {
+            var result = await _userAdminApiClient.UpdateUserManagerBot(model);
+            if (result == null || !result.IsSuccessed)
+            {
+                var bots = await _managerBOTApiClient.GetBOTByFilterAsync(new ManagerBOTRequestDto
+                {
+                    Page = 1,
+                    PageSize = 1000
+                });
+
+                ViewBag.Bots = bots.ResultObj.Items.ToList();
+                ModelState.AddModelError("", result?.ResultObj ?? "Cập nhật không thành công!");
+                return View(model);
             }
             return RedirectToAction("Index");
         }

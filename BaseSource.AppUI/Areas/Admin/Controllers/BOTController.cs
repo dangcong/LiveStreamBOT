@@ -86,5 +86,17 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             }
             return View(result.ResultObj.Items);
         }
+
+        [HttpGet]
+        [Route("/admin/bot/group")]
+        public async Task<IActionResult> GroupBot(int id)
+        {
+            var result = await _managerBOTApiClient.GetUserBot(id);
+            if (result == null || !result.IsSuccessed)
+            {
+                return NotFound();
+            }
+            return View(result.ResultObj);
+        }
     }
 }

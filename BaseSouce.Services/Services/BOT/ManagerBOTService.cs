@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using BaseSouce.Data.EF;
+using BaseSouce.Data.Entities;
 using BaseSouce.Shared.Enums;
 using BaseSouce.SharedSignalrData.BotClient;
+using BaseSource.Data.Entities;
 using BaseSource.ViewModels.ManagerBOT;
 using EFCore.UnitOfWork;
 using EFCore.UnitOfWork.PageList;
@@ -157,6 +159,20 @@ namespace BaseSouce.Services.Services.BOT
 
             return await _repository.Queryable()
                  .Where(x => x.StreamHistorys.Any(i => i.Status == StreamStatus.Streaming)).CountAsync();
+        }
+
+        public async Task<List<UserBotDto>> GetUserConnectBot(int id)
+        {
+            var _repository = _unitOfWork.GetRepository<UserManagerBOT>();
+
+            return await _repository.Queryable().AsNoTracking()
+                .Where(x => x.Id == id).Include(x => x.ManagerBOT).Include(i => i.User)
+                .Select(x => new UserBotDto
+                {
+                    BotName = x.ManagerBOT.Name,
+                    UserName = x.User.UserName,
+                    Type = x.LiveType
+                }).ToListAsync();
         }
 
         public async Task<KeyValuePair<bool, string>> UpdateBOTAsync(int id, ManagerBotUpdateDto model)

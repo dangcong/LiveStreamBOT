@@ -73,5 +73,25 @@ namespace BaseSource.API.ControllersAdmin
             }
             return Ok(new ApiErrorResult<string>(result.Value));
         }
+
+        [HttpGet]
+        [Route("/api/admin/user/managerBot")]
+        public async Task<IActionResult> GetUserManagerBot([FromQuery] string userId)
+        {
+            var result = await _userAdminService.GetUserManagerBotAsync(userId);
+            return Ok(new ApiSuccessResult<object>(result));
+        }
+
+        [HttpPost]
+        [Route("/api/admin/user/managerBot/update")]
+        public async Task<IActionResult> UpdateUserManagerBot([FromBody] UserManagerBotDto model)
+        {
+            var result = await _userAdminService.UpdateUserManagerBotAsync(model);
+            if (result.Key)
+            {
+                return Ok(new ApiSuccessResult<string>(string.Empty));
+            }
+            return Ok(new ApiErrorResult<string>(result.Value));
+        }
     }
 }

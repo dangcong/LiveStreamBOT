@@ -26,5 +26,7 @@ namespace BaseSouce.Data.Entities
 
         public ICollection<ManagerGroup> ManagerGroups { get; set; }
         public ICollection<ManagerGroup> UserGroups { get; set; }
+
+        public ICollection<UserManagerBOT> UserManagerBOTs { get; set; }
     }
 }

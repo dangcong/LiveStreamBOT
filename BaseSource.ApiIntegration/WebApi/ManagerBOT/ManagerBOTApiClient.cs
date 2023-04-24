@@ -50,10 +50,17 @@ namespace BaseSource.ApiIntegration.WebApi.ManagerBOT
             return await client.GetAsync<ApiResult<int>>("/api/admin/bot/total/run");
         }
 
+        public async Task<ApiResult<List<UserBotDto>>> GetUserBot(int id)
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            return await client.GetAsync<ApiResult<List<UserBotDto>>>($"/api/admin/bot/group/{id}");
+        }
+
         public async Task<ApiResult<string>> UpdateBOTAsync(int id, ManagerBotUpdateDto model)
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
             return await client.PutAsync<ApiResult<string>>($"/api/admin/bot/{id}", model);
         }
+        
     }
 }

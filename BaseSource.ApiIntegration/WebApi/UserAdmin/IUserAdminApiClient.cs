@@ -11,5 +11,7 @@ namespace BaseSource.ApiIntegration.WebApi.UserAdmin
         Task<ApiResult<List<UserAdminInfoDto>>> GetAllManager();
         Task<ApiResult<string>> UpdateRoleManager(string userName);
         Task<ApiResult<string>> ResetPassword(ResetPasswordAdminDto model);
+        Task<ApiResult<UserManagerBotDto>> GetUserManagerBot(string userId);
+        Task<ApiResult<string>> UpdateUserManagerBot(UserManagerBotDto model);
     }
 }

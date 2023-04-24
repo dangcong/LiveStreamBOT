@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Thông tin người dùng";
     var orders = ViewBag.Orders as List<OrderInfoDto>;
+    
 }
 
 <section class="section">
@@ -40,7 +41,7 @@
                                     <strong>Link FB: </strong>
                                     <span><a href="@Model.LinkFB">linkFB</a></span>
                                 </p>
-                                <h2 class="section-title">Gói LIVE-1080</h2>
+                               @* <h2 class="section-title">Gói LIVE-1080</h2>
                                 <p>
                                     <strong>Gói đang sử dụng: </strong>
                                     <span>LIVE</span>
@@ -70,15 +71,15 @@
                                 <p>
                                     <strong>Số luồng chạy đồng thời: </strong>
                                     <span>5 luồng live</span>
-                                </p>
-                                <p>
+                                </p>*@
+                               @* <p>
                                     <strong>Ngày đăng ký LIVE-4K: </strong>
                                     <span>@(Model.PackageLive4k?.CreatedTime?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")</span>
                                 </p>
                                 <p>
                                     <strong>Ngày hết hạn LIVE-4K: </strong>
                                     <span>@(Model.PackageLive4k?.ExpiredTime?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")</span>
-                                </p>
+                                </p>*@
 
                             </div>
                             <a href="#" class="btn btn-social-icon btn-facebook mr-1">
@@ -104,9 +105,9 @@
 
                                 </div>
                                 <div class="media-progressbar">
-                                    <div class="progress-text">30%</div>
+                                    <div class="progress-text">@(Model.PackageLive1080.NumberOfThreadsInRun)/@(Model.PackageLive1080.NumberOfThreads)</div>
                                     <div class="progress" data-height="6">
-                                        <div class="progress-bar bg-primary" data-width="30%"></div>
+                                        <div class="progress-bar bg-primary" data-width="@(Model.PackageLive1080.PercentNumberOfThreads)%"></div>
                                     </div>
                                 </div>
 
@@ -118,9 +119,9 @@
 
                                 </div>
                                 <div class="media-progressbar">
-                                    <div class="progress-text">67%</div>
+                                    <div class="progress-text">@(Model.PackageLive1080.NumberOfThreadsCreatedInRun)/@(Model.PackageLive1080.NumberOfThreadsCreated)</div>
                                     <div class="progress" data-height="6">
-                                        <div class="progress-bar bg-primary" data-width="67%"></div>
+                                        <div class="progress-bar bg-primary" data-width="@(Model.PackageLive1080.PercentNumberOfThreadsCreated)%"></div>
                                     </div>
                                 </div>
 
@@ -132,9 +133,9 @@
 
                                 </div>
                                 <div class="media-progressbar">
-                                    <div class="progress-text">45%</div>
+                                    <div class="progress-text">@(Model.PackageLive4k.NumberOfThreadsInRun)/@(Model.PackageLive4k.NumberOfThreads)</div>
                                     <div class="progress" data-height="6">
-                                        <div class="progress-bar bg-primary" data-width="45%"></div>
+                                        <div class="progress-bar bg-primary" data-width="@(Model.PackageLive4k.PercentNumberOfThreads)%"></div>
                                     </div>
                                 </div>
 
@@ -146,9 +147,9 @@
 
                                 </div>
                                 <div class="media-progressbar">
-                                    <div class="progress-text">45%</div>
+                                    <div class="progress-text">@(Model.PackageLive4k.NumberOfThreadsCreatedInRun)/@(Model.PackageLive4k.NumberOfThreadsCreated)</div>
                                     <div class="progress" data-height="6">
-                                        <div class="progress-bar bg-primary" data-width="45%"></div>
+                                        <div class="progress-bar bg-primary" data-width="@(Model.PackageLive4k.PercentNumberOfThreadsCreated)%"></div>
                                     </div>
                                 </div>
 

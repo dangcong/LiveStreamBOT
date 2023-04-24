@@ -98,6 +98,7 @@
                         "render": function (data, row, type) {
                             return `<a class="btn btn-primary" href="/admin/order/user?userId=${type.id}">DS Gói</a>
                                      <a class="btn btn-success" href="/admin/stream/user?userId=${type.id}">DS Stream</a>
+                                     <a class="btn btn-success" href="/admin/user/managerBot?userId=${type.id}">Cập nhật BOT</a>
                                      <button class="btn btn-danger btnReset" data-id="${type.id}"  data-toggle="modal" data-target="#resetPassModal">Reset MK</button>`;
                         }
                     },

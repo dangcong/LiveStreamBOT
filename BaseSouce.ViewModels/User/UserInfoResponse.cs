@@ -16,7 +16,7 @@ namespace BaseSouce.ViewModels.User
         public string Email { get; set; }
         public string PhoneNumber { get; set; }
         public List<string> Roles { get; set; }
-        
+
     }
 
     public class ProfifleInfoDto
@@ -37,6 +37,36 @@ namespace BaseSouce.ViewModels.User
         public int NumberOfThreadsCreatedInRun { get; set; }
         public DateTime? CreatedTime { get; set; }
         public DateTime? ExpiredTime { get; set; }
+        public int PercentNumberOfThreads
+        {
+            get
+            {
+                if (NumberOfThreads == 0)
+                {
+                    return 0;
+                }
+                return (int)(NumberOfThreadsInRun / NumberOfThreads * 100);
+            }
+            //get
+            //{
+            //    return 40;
+            //}
+        }
+        public int PercentNumberOfThreadsCreated
+        {
+            //get
+            //{
+            //    return 30;
+            //}
+            get
+            {
+                if (NumberOfThreadsCreated == 0)
+                {
+                    return 0;
+                }
+                return (int)(NumberOfThreadsCreatedInRun / NumberOfThreadsCreated * 100);
+            }
+        }
     }
 
     public class PackageLiveUserDto

@@ -60,9 +60,19 @@ namespace BaseSouce.Services.BackgroundServices
                 if (bot.UpdatedTime == null || timeCurrent > bot.UpdatedTime)
                 {
                     bot.Status = ManagerBOTStatus.Disconnected;
+
+                    var streamsCurrents = _db.StreamHistorys.Where(x => x.ManagerBOTId == bot.Id).ToList();
+                    if (streamsCurrents != null && streamsCurrents.Any())
+                    {
+                        foreach (var item in streamsCurrents)
+                        {
+                            item.Status = StreamStatus.Stop;
+                        }
+                    }
+                    await _db.SaveChangesAsync();
                 }
             }
-            await _db.SaveChangesAsync();
+
         }
 
     }

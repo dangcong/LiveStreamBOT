@@ -1,5 +1,6 @@
 ﻿using BaseSouce.Data.Entities;
 using BaseSouce.Data.Extensions;
+using BaseSource.Data.Entities;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,5 +34,6 @@ namespace BaseSouce.Data.EF
         }
         
        public DbSet<ManagerBOT> ManagerBOTs { get; set; }
+        public DbSet<StreamHistory> StreamHistorys { get; set; }
     }
 }

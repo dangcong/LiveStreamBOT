@@ -23,6 +23,7 @@ namespace BaseSource.ViewModels.ManagerBOT
         public ManagerBOTStatus Status { get; set; }
         public int NumberOfThreads { get; set; }
         public int Retry { get; set; }
+         public LiveType? LiveType { get; set; }
     }
 
     public class ManagerBotInfoDto
@@ -42,6 +43,7 @@ namespace BaseSource.ViewModels.ManagerBOT
         public double RAM { get; set; }
         public double Bandwidth { get; set; }
         public bool IsUsed { get; set; }
+        public LiveType? LiveType { get; set; }
     }
     public class ManagerBOTRequestDto : PageQuery
     {
@@ -52,6 +54,10 @@ namespace BaseSource.ViewModels.ManagerBOT
     {
         public string BotName { get; set; }
         public string UserName { get; set; }
-        public LiveType Type { get; set; }
+        public LiveType? Type { get; set; }
+        public int BotId { get; set; }
+        public int NumberOfThreads { get; set; }
+        public int NumberOfThreadsInRun { get; set; }
+        public string UserId { get; set; }
     }
 }

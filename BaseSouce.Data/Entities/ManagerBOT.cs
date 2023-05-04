@@ -20,6 +20,7 @@ namespace BaseSouce.Data.Entities
         public double RAM { get; set; }
         public double Bandwidth { get; set; }
         public DateTime? UpdatedTime { get; set; }
+        public LiveType? LiveType { get; set; }
 
         public bool IsUsed { get; set; }
         

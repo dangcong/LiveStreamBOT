@@ -93,5 +93,29 @@ namespace BaseSource.API.ControllersAdmin
             }
             return Ok(new ApiErrorResult<string>(result.Value));
         }
+
+
+        [HttpPost]
+        [Route("/api/admin/user/delete")]
+        public async Task<IActionResult> DeleteUser(string userId)
+        {
+            var result = await _userAdminService.DeleteAsync(userId);
+            if (result.Key)
+            {
+                return Ok(new ApiSuccessResult<string>(string.Empty));
+            }
+            return Ok(new ApiErrorResult<string>(result.Value));
+        }
+        [HttpPost]
+        [Route("/api/admin/user/create")]
+        public async Task<IActionResult> CreateUser([FromBody] UserCreateAdminDto model)
+        {
+            var result = await _userAdminService.CreateUserAsync(model);
+            if (result.Key)
+            {
+                return Ok(new ApiSuccessResult<string>(string.Empty));
+            }
+            return Ok(new ApiErrorResult<string>(result.Value));
+        }
     }
 }

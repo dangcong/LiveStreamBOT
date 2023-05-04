@@ -54,7 +54,7 @@ namespace BaseSouce.Services.BackgroundServices
             using var _db = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<BaseSourceDbContext>();
 
             var bots = await _db.ManagerBOTs.ToListAsync();
-            var timeCurrent = DateTime.UtcNow.AddSeconds(-15);
+            var timeCurrent = DateTime.Now.AddSeconds(-30);
             foreach (var bot in bots)
             {
                 if (bot.UpdatedTime == null || timeCurrent > bot.UpdatedTime)

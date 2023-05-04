@@ -36,5 +36,14 @@ namespace BaseSource.API.ControllersAdmin
             var result = await _streamAdminService.GetAllByUserIdAsync(userId);
             return Ok(new ApiSuccessResult<object>(result));
         }
+
+        [HttpGet]
+        [Route("report")]
+        public async Task<IActionResult> GetReportStream()
+        {
+            var result = await _streamAdminService.GetReportStreamAsync();
+            return Ok(new ApiSuccessResult<object>(result));
+
+        }
     }
 }

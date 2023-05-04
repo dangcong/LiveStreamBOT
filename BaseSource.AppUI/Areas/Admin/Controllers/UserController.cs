@@ -129,5 +129,31 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             }
             return RedirectToAction("Index");
         }
+
+        [HttpPost]
+        public async Task<IActionResult>Delete(string userId)
+        {
+            var result = await _userAdminApiClient.Delete(userId);
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public  IActionResult Create()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Create(UserCreateAdminDto model)
+        {
+            var result = await _userAdminApiClient.Create(model);
+            if (result == null || !result.IsSuccessed)
+            {
+                
+                ModelState.AddModelError("", result?.ResultObj ?? "Tạo mới tài khoản không thành công");
+                return View(model);
+            }
+            return RedirectToAction("Index");
+        }
     }
 }

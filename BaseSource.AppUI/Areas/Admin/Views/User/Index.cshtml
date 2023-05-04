@@ -15,11 +15,13 @@
 
     <div class="section-body">
         <h2 class="section-title">Danh sách người dùng</h2>
+
         <div class="row">
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
                         <h4>Danh sách người dùng</h4>
+                        <a class="btn btn-success" href="/admin/user/create">Tạo mới</a>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -28,9 +30,9 @@
                                     <tr>
                                         <th>Người dùng</th>
                                         <th>Mật khẩu</th>
-                                        <th>Email</th>
-                                        <th>LinkFB</th>
-                                        <th>LinkTelegram</th>
+                                        <th>Luồng 1080(Đang chạy/Tổng)</th>
+                                        <th>Luồng 4K(Đang chạy/Tổng)</th>
+                                        <th>Telegram</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -42,18 +44,75 @@
         </div>
     </div>
 </section>
-<div class="modal fade" tabindex="-1" role="dialog" id="resetPassModal">
+
+<div class="modal fade" tabindex="-1" role="dialog" id="createUserModal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form method="post" id="formResetPassword" action="/admin/User/ResetPassword">
+            <form method="post" id="formcreateUser" action="/admin/User/Create">
                 <div class="modal-header">
-                    <h5 class="modal-title">Reset mật khẩu của người dùng</h5>
+                    <h5 class="modal-title">Thêm mới người dùng</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
                 <div class="modal-body">
-                    <p>Bạn có muốn Reset mật khẩu của người dùng?</p>
+                    <div class="form-group mb-4">
+                        <label class="">UserName</label>
+                        <div class="">
+                            <input name="UserName" placeholder="Nhập username người dùng" class="form-control" />
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label class="">Mật khẩu</label>
+                        <div class="">
+                            <input name="Password" placeholder="Nhập mật khẩu người dùng" class="form-control" />
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label class="">Nhập số luồng 1080</label>
+                        <div class="">
+                            <input type="number" name="NumberOfThreads1080" placeholder="Nhập số luồng 1080 tối đa" class="form-control" />
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label class="">Nhập số luồng 4k</label>
+                        <div class="">
+                            <input type="number" name="NumberOfThreads1080" placeholder="Nhập số luồng 4k tối đa" class="form-control" />
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label class="">Link telegram</label>
+                        <div class="">
+                            <input type="number" name="LinkTelegram" placeholder="Nhập link telegram" class="form-control" />
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Tạo mới</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="deleteUserModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" id="formDeleteUser" action="/admin/User/Delete">
+                <div class="modal-header">
+                    <h5 class="modal-title">Xóa người dùng?</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Bạn có muốn xóa người dùng này?</p>
                     <input class="form-control" name="userId" type="hidden" />
                 </div>
                 <div class="modal-footer bg-whitesmoke br">
@@ -89,26 +148,44 @@
                 "columns": [
                     { "data": "userName", "name": "UserName", "autoWidth": true },
                     { "data": "password", "name": "Password", "autoWidth": true },
-                    { "data": "email", "name": "Email", "autoWidth": true },
-                    { "data": "linkFB", "name": "LinkFB", "autoWidth": true },
+                    {
+                        "data": "userName", "name": "userName", "autoWidth": true,
+                        "render": function (data, row, type) {
+                            return `<span class="badge badge-primary" >${type.numberOfThreads1080InRun}/${type.numberOfThreads1080}</span>`;
+                        }
+                    },
+                    {
+                        "data": "userName", "name": "userName", "autoWidth": true,
+                        "render": function (data, row, type) {
+                            return `<span class="badge badge-primary" >${type.numberOfThreads4KInRun}/${type.numberOfThreads4K}</span>`;
+                        }
+                    },
                     { "data": "linkTelegram", "name": "LinkTelegram", "autoWidth": true },
 
                     {
                         "data": "userName", "name": "userName", "autoWidth": true,
                         "render": function (data, row, type) {
-                            return `<a class="btn btn-primary" href="/admin/order/user?userId=${type.id}">DS Gói</a>
-                                     <a class="btn btn-success" href="/admin/stream/user?userId=${type.id}">DS Stream</a>
-                                     <a class="btn btn-success" href="/admin/user/managerBot?userId=${type.id}">Cập nhật BOT</a>
-                                     <button class="btn btn-danger btnReset" data-id="${type.id}"  data-toggle="modal" data-target="#resetPassModal">Reset MK</button>`;
+                            return `
+
+                                                     <a class="btn btn-success" href="/admin/stream/user?userId=${type.id}">DS Stream</a>
+                                                     <a class="btn btn-success" href="/admin/user/managerBot?userId=${type.id}">Cập nhật BOT</a>
+                                                     <button class="btn btn-warning btnReset" data-id="${type.id}"  data-toggle="modal" data-target="#resetPassModal">Reset MK</button>
+                                                     <button class="btn btn-danger btnDelete" data-id="${type.id}"  data-toggle="modal" data-target="#deleteUserModal">Delete</button>`;
                         }
                     },
+                    //<a class="btn btn-primary" href="/admin/order/user?userId=${type.id}">DS Gói</a>
                 ]
             });
         });
         $('body').on('click', '.btnReset', function () {
             let id = $(this).attr('data-id');
             $('#formResetPassword input[name="userId"]').val(id);
-        })
+        });
+        $('body').on('click', '.btnDelete', function () {
+            let id = $(this).attr('data-id');
+            $('#formDeleteUser input[name="userId"]').val(id);
+        });
+        
     </script>
 }
 

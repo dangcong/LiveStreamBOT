@@ -31,5 +31,11 @@ namespace BaseSource.ApiIntegration.WebApi.StreamAdmin
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
             return await client.GetAsync<ApiResult<PagedResult<StreamAdminInfoDto>>>("/api/admin/streams", model);
         }
+
+        public async Task<ApiResult<StreamReportAdminDto>> GetReportStream()
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            return await client.GetAsync<ApiResult<StreamReportAdminDto>>("/api/admin/stream/report");
+        }
     }
 }

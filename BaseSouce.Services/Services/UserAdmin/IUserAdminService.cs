@@ -18,6 +18,8 @@ namespace BaseSouce.Services.Services.UserAdmin
         Task<KeyValuePair<bool, string>> ResetPassowrdAsync(ResetPasswordAdminDto model);
         Task<UserManagerBotDto> GetUserManagerBotAsync(string userId);
         Task<KeyValuePair<bool, string>> UpdateUserManagerBotAsync( UserManagerBotDto model);
+        Task<KeyValuePair<bool,string>> DeleteAsync(string userId);
+        Task<KeyValuePair<bool, string>> CreateUserAsync(UserCreateAdminDto model);
 
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BaseSouce.Data.EF;
+using BaseSouce.Data.Entities;
 using BaseSouce.Shared.Enums;
 using BaseSource.Data.Entities;
 using BaseSource.ViewModels.Stream;
@@ -78,6 +79,39 @@ namespace BaseSouce.Services.Services.StreamAdmin
                orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                pageIndex: model.Page, pageSize: model.PageSize
                 );
+        }
+
+        public async Task<StreamReportAdminDto> GetReportStreamAsync()
+        {
+            var _repositoryUser = _unitOfWork.GetRepository<AppUser>();
+            var _repositoryBOT = _unitOfWork.GetRepository<ManagerBOT>();
+            var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
+
+            var data = new StreamReportAdminDto();
+
+            data.TotalBOT = await _repositoryBOT.Queryable().AsNoTracking()
+                .Where(x => x.DeletedTime == null).CountAsync();
+
+            var streamData =await _repositoryStream.Queryable().AsNoTracking()
+                .Select(x => new
+                {
+                    Type = x.LiveType,
+                    Status = x.Status
+                }).ToListAsync();
+
+            data.NumberOfThreads1080=streamData.Where(x=>x.Type==LiveType._1080).Count();
+            data.NumberOfThreads1080InRun = streamData
+                .Where(x => x.Type == LiveType._1080 && x.Status == StreamStatus.Streaming).Count();
+            data.NumberOfThreads4K = streamData.Where(x => x.Type == LiveType._4K).Count();
+            data.NumberOfThreads4KInRun = streamData
+                .Where(x => x.Type == LiveType._4K && x.Status == StreamStatus.Streaming).Count();
+
+            data.TotalUser =await _repositoryUser.Queryable().AsNoTracking()
+                .Where(x => !x.UserRoles.Any()).CountAsync();
+            data.TotalManager = await _repositoryUser.Queryable().AsNoTracking()
+                .Where(x => x.UserRoles.Any(x=>x.RoleId=="baea9405-c706-46ea-9f52-6cfa8c83d65f")).CountAsync();
+
+            return data;
         }
     }
 }

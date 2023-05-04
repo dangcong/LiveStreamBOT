@@ -58,7 +58,7 @@ namespace BaseSource.Data.Migrations
                         new
                         {
                             Id = "c1105ce5-9dbc-49a9-a7d5-c963b6daa62a",
-                            ConcurrencyStamp = "4fbe5a3e-b58a-44ee-9e34-8b05040b61f0",
+                            ConcurrencyStamp = "fdb66ee7-0e54-4a79-805a-ef480bdd8e7e",
                             Description = "Administrator role",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -105,6 +105,9 @@ namespace BaseSource.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Email")
@@ -191,7 +194,7 @@ namespace BaseSource.Data.Migrations
                         {
                             Id = "ffded6b0-3769-4976-841b-69459049a62d",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "3cd49e7d-0749-459d-82a9-e1059cf02981",
+                            ConcurrencyStamp = "ad8402a0-0b7b-49c9-b5b9-63d823891c11",
                             CreatedTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
@@ -202,7 +205,7 @@ namespace BaseSource.Data.Migrations
                             NumberOfThreads1080Create = 0,
                             NumberOfThreads4K = 0,
                             NumberOfThreads4KCreate = 0,
-                            PasswordHash = "AQAAAAEAACcQAAAAEAeIw/JUCQftGx4g/D/t/WMbjOPCyH6BY9M4hNpM+2dLFJLV/suFCSEjVWkOaxn+PA==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEE0BzDAkuCOXymVXsZxng19/+sykFsZTrlLDRjLdho1U4uHlPP6TA7nqYFxURYoWgg==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -329,6 +332,9 @@ namespace BaseSource.Data.Migrations
 
                     b.Property<bool>("IsUsed")
                         .HasColumnType("bit");
+
+                    b.Property<byte?>("LiveType")
+                        .HasColumnType("tinyint");
 
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");

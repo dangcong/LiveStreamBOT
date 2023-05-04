@@ -1,8 +1,10 @@
 ﻿@model UserManagerBotDto
 @{
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = "ManagerBot";
+    ViewData["Title"] = "Cập nhật BOT cho người dùng";
     var bots = ViewBag.Bots as List<ManagerBotInfoDto>;
+    var bot1080 = bots.Where(x => x.LiveType == LiveType._1080).ToList();
+    var bot4k = bots.Where(x => x.LiveType == LiveType._4K).ToList();
 }
 
 <section class="section">
@@ -12,7 +14,7 @@
             <div class="breadcrumb-item active"><a href="#">Home</a></div>
             <div class="breadcrumb-item"><a href="#">Chỉnh sửa</a></div>
             <div class="breadcrumb-item">
-                BOT
+                @ViewData["Title"]
             </div>
         </div>
     </div>
@@ -30,7 +32,7 @@
                                 <div class="col-12">
                                     <h6>@ViewData["Title"]</h6>
                                     <div class="form-group mb-4">
-                                        <label class="">Số luồng 1080 tối đa</label>
+                                        <label class="">Số luồng 1080 cho phép</label>
                                         <div class="">
                                             <input asp-for="UserId" style="display:none;" />
                                             <input asp-for="NumberOfThreads1080" min="0" placeholder="Nhập số luồng 1080 cho phép" class="form-control" />
@@ -42,9 +44,9 @@
                                         <div class="">
                                             <select class="form-control" asp-for="Bot1080">
                                                 <option value="0">-- Chọn bot --</option>
-                                                @foreach (var item in bots)
+                                                @foreach (var item in bot1080)
                                                 {
-                                                    <option value="@item.Id">@item.Name</option>
+                                                    <option value="@item.Id">@item.Name (@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads))</option>
                                                 }
 
                                             </select>
@@ -54,7 +56,7 @@
                                     </div>
 
                                     <div class="form-group mb-4">
-                                        <label class="">Số luồng 4K tối đa</label>
+                                        <label class="">Số luồng 4K cho phép</label>
                                         <div class="">
                                             <input asp-for="NumberOfThreads4K" min="0" placeholder="Nhập số luồng 4k cho phép" class="form-control" />
                                             <span asp-validation-for="NumberOfThreads4K" class="text-danger"></span>
@@ -66,9 +68,9 @@
                                         <div class="">
                                             <select class="form-control" asp-for="Bot4K">
                                                 <option value="0">-- Chọn bot --</option>
-                                                @foreach (var item in bots)
+                                                @foreach (var item in bot4k)
                                                 {
-                                                    <option value="@item.Id">@item.Name</option>
+                                                    <option value="@item.Id">@item.Name (@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads))</option>
                                                 }
 
                                             </select>

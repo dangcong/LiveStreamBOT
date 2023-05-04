@@ -27,6 +27,78 @@ namespace BaseSouce.Services.Services.UserAdmin
 
         }
 
+        public async Task<KeyValuePair<bool, string>> CreateUserAsync(UserCreateAdminDto model)
+        {
+            try
+            {
+                var _repository = _unitOfWork.GetRepository<AppUser>();
+
+                var existUser = await _repository.ExistsAsync(x => x.UserName.ToLower() == model.UserName.ToLower());
+                if (existUser)
+                {
+                    return new KeyValuePair<bool, string>(false, "Tài khoản đã tồn tại!");
+                }
+
+
+                var userIdParent = string.Empty;
+
+                var hasher = new PasswordHasher<AppUser>();
+
+                var user = new AppUser
+                {
+                    Email = model.UserName,
+                    UserName = model.UserName,
+                    SecurityStamp = Guid.NewGuid().ToString(),
+                    PhoneNumber = "123456789",
+                    PasswordHash = hasher.HashPassword(null, model.Password),
+                    Password = model.Password,
+                    CreatedTime = DateTime.Now,
+                    NormalizedEmail = model.UserName,
+                    NormalizedUserName = model.UserName,
+                    LinkFB = string.Empty,
+                    TelegramAPI = model.LinkTelegram,
+                    NumberOfThreads1080 = model.NumberOfThreads1080,
+                    NumberOfThreads4K = model.NumberOfThreads4K
+
+                };
+                await _unitOfWork.GetRepository<AppUser>().InsertAsync(user);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new KeyValuePair<bool, string>(true, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Create account failed by error:[{ex}]");
+                return new KeyValuePair<bool, string>(true, "Create account failed");
+            }
+        }
+
+
+        public async Task<KeyValuePair<bool, string>> DeleteAsync(string userId)
+        {
+            try
+            {
+                var _repository = _unitOfWork.GetRepository<AppUser>();
+
+                var userCurrent = await _repository.GetFirstOrDefaultAsync(
+                    predicate: x => x.Id == userId, disableTracking: false);
+                if (userCurrent == null)
+                {
+                    return new KeyValuePair<bool, string>(false, "Người dùng không tồn tại!");
+                }
+                userCurrent.DeletedTime = DateTime.Now;
+                _repository.Update(userCurrent);
+
+                await _unitOfWork.SaveChangesAsync();
+                return new KeyValuePair<bool, string>(true, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Delete User failed by error:[{ex}]");
+                return new KeyValuePair<bool, string>(false, $"Xóa người dùng không thành công:[{ex.Message}]");
+            }
+        }
+
         public async Task<List<UserGroupDto>> GetAllUserOfManagerAsync(string userId)
         {
             var _repository = _unitOfWork.GetRepository<AppUser>();
@@ -50,6 +122,7 @@ namespace BaseSouce.Services.Services.UserAdmin
             var _repository = _unitOfWork.GetRepository<AppUser>();
 
             var query = _repository.Queryable().AsNoTracking();
+            query = query.Where(x => x.DeletedTime == null);
             if (!string.IsNullOrEmpty(model.UserName))
             {
                 query = query.Where(x => x.UserName.Contains(model.UserName) || x.Email.Contains(model.UserName));
@@ -281,7 +354,7 @@ namespace BaseSouce.Services.Services.UserAdmin
                     }
 
                 }
-                if (model.Bot4K != null  && model.Bot4K > 0)
+                if (model.Bot4K != null && model.Bot4K > 0)
                 {
                     var bot4kCurrent = await _repositoryUserBot.GetFirstOrDefaultAsync(
                         predicate: x => x.LiveType == LiveType._4K, disableTracking: false);

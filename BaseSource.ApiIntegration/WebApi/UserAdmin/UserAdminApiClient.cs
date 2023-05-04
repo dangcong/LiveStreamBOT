@@ -14,6 +14,18 @@ namespace BaseSource.ApiIntegration.WebApi.UserAdmin
             _httpClientFactory = httpClientFactory;
         }
 
+        public async Task<ApiResult<string>> Create(UserCreateAdminDto model)
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            return await client.PostAsync<ApiResult<string>>($"/api/admin/user/create", model);
+        }
+
+        public async Task<ApiResult<string>> Delete(string userId)
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            return await client.PostAsync<ApiResult<string>>($"/api/admin/user/delete?userId={userId}");
+        }
+
         public async Task<ApiResult<List<UserAdminInfoDto>>> GetAllManager()
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);

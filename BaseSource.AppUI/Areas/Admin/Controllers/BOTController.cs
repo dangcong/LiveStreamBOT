@@ -52,14 +52,17 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             return RedirectToAction("Index");
         }
 
+        [HttpPost]
+        [Route("/admin/bot/delete")]
         public async Task<IActionResult> Deleate(int id)
         {
             var result = await _managerBOTApiClient.DeleteAsync(id);
-            if (result == null || !result.IsSuccessed)
-            {
-                return Json(new { code = ErrorCodeJson.ErrorMess, err = result?.Message ?? "Xóa không thành công!" });
-            }
-            return Json(new { code = ErrorCodeJson.Success });
+            return RedirectToAction("Index");
+            //if (result == null || !result.IsSuccessed)
+            //{
+            //    return Json(new { code = ErrorCodeJson.ErrorMess, err = result?.Message ?? "Xóa không thành công!" });
+            //}
+            //return Json(new { code = ErrorCodeJson.Success });
         }
 
         [HttpPost]

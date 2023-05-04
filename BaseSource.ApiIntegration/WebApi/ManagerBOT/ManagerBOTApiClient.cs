@@ -29,7 +29,7 @@ namespace BaseSource.ApiIntegration.WebApi.ManagerBOT
         public async Task<ApiResult<string>> DeleteAsync(int id)
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
-            return await client.DeleteAsync<ApiResult<string>>($"/api/admin/bot/{id}");
+            return await client.PostAsync<ApiResult<string>>($"/api/admin/bot/{id}/delete");
         }
 
         public async Task<ApiResult<PagedResult<ManagerBotInfoDto>>> GetBOTByFilterAsync(ManagerBOTRequestDto model)

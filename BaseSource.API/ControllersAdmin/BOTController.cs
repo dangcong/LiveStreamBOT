@@ -62,5 +62,16 @@ namespace BaseSource.API.ControllersAdmin
             var result = await _managerBOTService.GetUserConnectBot(id);
             return Ok(new ApiSuccessResult<object>(result));
         }
+        [HttpPost]
+        [Route("{id:int:min(1)}/delete")]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var result = await _managerBOTService.DeleteAsync(id);
+            if (result.Key)
+            {
+                 return Ok(new ApiSuccessResult<string>(string.Empty));
+            }
+           return Ok(new ApiErrorResult<string>(string.Empty));
+        }
     }
 }

@@ -77,6 +77,8 @@ namespace BaseSource.ViewModels.Stream
         public string Email { get; set; }
         public int ManagerBOTId { get; set; }
         public string BotId { get; set; }
+        public string BotName { get; set; }
+        public string BotGroup { get; set; }
         public string StreamKey { get; set; }
         public string RTMP { get; set; }
         public string StreamName { get; set; }
@@ -127,5 +129,16 @@ namespace BaseSource.ViewModels.Stream
     public class StreamLinkDto
     {
         public string Link { get; set; }
+    }
+
+    public class StreamReportAdminDto
+    {
+        public int NumberOfThreads1080 { get; set; }
+        public int NumberOfThreads1080InRun { get; set; }
+        public int NumberOfThreads4K { get; set; }
+        public int NumberOfThreads4KInRun { get; set; }
+        public int TotalBOT { get; set; }
+        public int TotalUser { get; set; }
+        public int TotalManager { get; set; }
     }
 }

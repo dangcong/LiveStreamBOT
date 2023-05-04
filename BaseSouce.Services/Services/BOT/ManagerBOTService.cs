@@ -106,6 +106,14 @@ namespace BaseSouce.Services.Services.BOT
         {
             try
             {
+                var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
+                var existStream = await _repositoryStream.ExistsAsync(
+                    x => x.Id == id);
+                if (existStream)
+                {
+                    return new KeyValuePair<bool, string>(false, "Đang có luồng Stream, không thể xóa!");
+                }
+
                 var _repository = _unitOfWork.GetRepository<Data.Entities.ManagerBOT>();
 
                 var botCurrent = await _repository.GetFirstOrDefaultAsync(
@@ -133,15 +141,45 @@ namespace BaseSouce.Services.Services.BOT
 
         public async Task<IPagedList<ManagerBotInfoDto>> GetBOTByFilterAsync(ManagerBOTRequestDto model)
         {
+            var _repositoryUserBot = _unitOfWork.GetRepository<UserManagerBOT>();
+
             var _repository = _unitOfWork.GetRepository<Data.Entities.ManagerBOT>();
             var query = _repository.Queryable().AsNoTracking();
-
-            return await _repository.GetStagesPagedListAsync(
+            query = query.Where(x => x.DeletedTime == null);
+            var data = await _repository.GetStagesPagedListAsync(
                 stages: query,
                 selector: x => _mapper.Map<ManagerBotInfoDto>(x),
                 include: x => x.Include(i => i.StreamHistorys),
                 orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                 pageIndex: model.Page, pageSize: model.PageSize);
+
+            if (data.Items.Any())
+            {
+                foreach (var item in data.Items)
+                {
+
+                    var dataThread = await _repositoryUserBot.Queryable()
+                        .AsNoTracking()
+                        .Include(x => x.User)
+                        .Where(x => x.ManagerBOTId == item.Id)
+                        .Select(x => new
+                        {
+                            thread1080 = x.User.NumberOfThreads1080,
+                            thread4k = x.User.NumberOfThreads4K
+                        }).ToListAsync();
+
+                    switch (item.LiveType)
+                    {
+                        case LiveType._1080:
+                            item.NumberOfThreads = dataThread.Sum(x => x.thread1080);
+                            break;
+                        case LiveType._4K:
+                            item.NumberOfThreads = dataThread.Sum(x => x.thread4k);
+                            break;
+                    }
+                }
+            }
+            return data;
         }
 
         public async Task<ManagerBotInfoDto> GetBOTByIdAsync(int id)
@@ -165,14 +203,41 @@ namespace BaseSouce.Services.Services.BOT
         {
             var _repository = _unitOfWork.GetRepository<UserManagerBOT>();
 
-            return await _repository.Queryable().AsNoTracking()
+            var _repositoryUser = _unitOfWork.GetRepository<AppUser>();
+            var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
+
+            var data = await _repository.Queryable().AsNoTracking()
                 .Where(x => x.Id == id).Include(x => x.ManagerBOT).Include(i => i.User)
                 .Select(x => new UserBotDto
                 {
                     BotName = x.ManagerBOT.Name,
                     UserName = x.User.UserName,
-                    Type = x.LiveType
+                    Type = x.LiveType,
+                    UserId = x.UserId,
+                    BotId = x.ManagerBOTId
                 }).ToListAsync();
+            if (data != null && data.Any())
+            {
+                foreach (var item in data)
+                {
+                    var userCurrent = await _repositoryUser.GetFirstOrDefaultAsync(
+                        predicate: x => x.Id == item.UserId,
+                        include: x => x.Include(x => x.StreamHistorys),
+                        selector: x => new
+                        {
+                            NumberOfThreads = item.Type == LiveType._1080 ? x.NumberOfThreads1080 : x.NumberOfThreads4K,
+                            NumberOfThreadsInRun = x.StreamHistorys
+                            .Where(i => i.Status == StreamStatus.Streaming && i.ManagerBOTId == item.BotId).Count()
+                        });
+                    if (userCurrent != null)
+                    {
+                        item.NumberOfThreads = userCurrent.NumberOfThreads;
+                        item.NumberOfThreadsInRun = userCurrent.NumberOfThreadsInRun;
+                    }
+                }
+            };
+            return data;
+
         }
 
         public async Task<KeyValuePair<bool, string>> UpdateBOTAsync(int id, ManagerBotUpdateDto model)
@@ -198,6 +263,7 @@ namespace BaseSouce.Services.Services.BOT
                 botCurrent.Group = model.Group;
                 botCurrent.NumberOfThreads = model.NumberOfThreads;
                 botCurrent.UpdatedTime = DateTime.Now;
+                botCurrent.LiveType = model.LiveType;
 
                 _repository.Update(botCurrent);
 

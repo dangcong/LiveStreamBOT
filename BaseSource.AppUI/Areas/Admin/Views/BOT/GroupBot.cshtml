@@ -21,7 +21,11 @@
                 <div class="card">
                     <div class="card-header">
                         <h4>@ViewData["Title"]</h4>
-
+                        <hr />
+                        <h4>
+                            Tổng luồng đang chạy/ luồng cấp phép
+                            <strong class="badge badge-primary">@(Model.Sum(x => x.NumberOfThreadsInRun))/@(Model.Sum(x=>x.NumberOfThreads))</strong>
+                        </h4>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -30,8 +34,9 @@
                                     <tr>
                                         <th>Tên Bot</th>
                                         <th>Người dùng</th>
+                                        <th>Luồng(Đang chạy/Cấp phép)</th>
                                         <th>Loại</th>
-                                       
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -40,6 +45,7 @@
                                         <tr>
                                             <td> @item.BotName></td>
                                             <td>@item.UserName</td>
+                                            <td>@(item.NumberOfThreadsInRun)/(@item.NumberOfThreads)</td>
                                             <td>@item.Type</td>
                                         </tr>
                                     }
@@ -57,6 +63,6 @@
     <script>
 
         $("#table-groupBot").DataTable({});
-       
+
     </script>
 }

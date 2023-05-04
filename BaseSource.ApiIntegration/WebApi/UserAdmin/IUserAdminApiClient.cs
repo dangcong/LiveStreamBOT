@@ -13,5 +13,7 @@ namespace BaseSource.ApiIntegration.WebApi.UserAdmin
         Task<ApiResult<string>> ResetPassword(ResetPasswordAdminDto model);
         Task<ApiResult<UserManagerBotDto>> GetUserManagerBot(string userId);
         Task<ApiResult<string>> UpdateUserManagerBot(UserManagerBotDto model);
+        Task<ApiResult<string>> Delete(string userId);
+        Task<ApiResult<string>> Create(UserCreateAdminDto model);
     }
 }

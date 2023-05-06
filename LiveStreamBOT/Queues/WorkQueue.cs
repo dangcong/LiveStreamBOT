@@ -112,8 +112,8 @@ namespace LiveStreamBOT.Queues
             }
             catch (Exception ex)
             {
-                if (ex is AggregateException ae) await SendErrorAsync(ae.InnerException);
-                else await SendErrorAsync(ex.InnerException);
+                if (ex is AggregateException ae) ex = ae.InnerException ?? ex;
+                await SendErrorAsync(ex);
             }
             finally
             {

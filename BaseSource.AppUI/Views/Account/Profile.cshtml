@@ -2,7 +2,7 @@
 @{
     ViewData["Title"] = "Thông tin người dùng";
     var orders = ViewBag.Orders as List<OrderInfoDto>;
-    
+
 }
 
 <section class="section">
@@ -24,7 +24,8 @@
                         <div class="author-box-left">
                             <img alt="image" src="/admin-themes/assets/img/avatar/avatar-1.png" class="rounded-circle author-box-picture">
                             <div class="clearfix"></div>
-                            <a href="#" class="btn btn-danger mt-3 follow-btn" data-follow-action="alert('follow clicked');" data-unfollow-action="alert('unfollow clicked');">Đổi mật khẩu</a>
+                            <button class="mt-3 btn btn-success " data-toggle="modal" data-target="#updateModal">Cập nhật Telegram</button>
+                            <a href="/account/changePassword" class="btn btn-danger mt-3 " >Đổi mật khẩu</a>
                         </div>
                         <div class="author-box-details">
                             <div class="author-box-name">
@@ -33,52 +34,52 @@
                             <div class="author-box-job">Người dùng</div>
                             <div class="author-box-description">
 
+                                @* <p>
+                                <strong>Số điện thoại: </strong>
+                                <span>@Model.Phone</span>
+                                </p>*@
                                 <p>
-                                    <strong>Số điện thoại: </strong>
-                                    <span>@Model.Phone</span>
+                                    <strong>Telegram: </strong>
+                                    <span><a href="#">@Model.TelegramAPI</a></span>
                                 </p>
+                                @* <h2 class="section-title">Gói LIVE-1080</h2>
                                 <p>
-                                    <strong>Link FB: </strong>
-                                    <span><a href="@Model.LinkFB">linkFB</a></span>
-                                </p>
-                               @* <h2 class="section-title">Gói LIVE-1080</h2>
-                                <p>
-                                    <strong>Gói đang sử dụng: </strong>
-                                    <span>LIVE</span>
+                                <strong>Gói đang sử dụng: </strong>
+                                <span>LIVE</span>
 
                                 </p>
                                 <p>
-                                    <strong>Được tạo: </strong>
-                                    <span>5 luồng live</span>
+                                <strong>Được tạo: </strong>
+                                <span>5 luồng live</span>
                                 </p>
                                 <p>
-                                    <strong>Số luồng chạy đồng thời: </strong>
-                                    <span>5 luồng live</span>
+                                <strong>Số luồng chạy đồng thời: </strong>
+                                <span>5 luồng live</span>
                                 </p>
                                 <p>
-                                    <strong>Ngày đăng ký LIVE-1080: </strong>
-                                    <span>@(Model.PackageLive1080?.CreatedTime?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")</span>
+                                <strong>Ngày đăng ký LIVE-1080: </strong>
+                                <span>@(Model.PackageLive1080?.CreatedTime?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")</span>
                                 </p>
                                 <p>
-                                    <strong>Ngày hết hạn LIVE-1080: </strong>
-                                    <span>@(Model.PackageLive1080?.ExpiredTime?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")</span>
+                                <strong>Ngày hết hạn LIVE-1080: </strong>
+                                <span>@(Model.PackageLive1080?.ExpiredTime?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")</span>
                                 </p>
                                 <h2 class="section-title">Gói LIVE-4K</h2>
                                 <p>
-                                    <strong>Được tạo: </strong>
-                                    <span>5 luồng live</span>
+                                <strong>Được tạo: </strong>
+                                <span>5 luồng live</span>
                                 </p>
                                 <p>
-                                    <strong>Số luồng chạy đồng thời: </strong>
-                                    <span>5 luồng live</span>
+                                <strong>Số luồng chạy đồng thời: </strong>
+                                <span>5 luồng live</span>
                                 </p>*@
-                               @* <p>
-                                    <strong>Ngày đăng ký LIVE-4K: </strong>
-                                    <span>@(Model.PackageLive4k?.CreatedTime?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")</span>
+                                @* <p>
+                                <strong>Ngày đăng ký LIVE-4K: </strong>
+                                <span>@(Model.PackageLive4k?.CreatedTime?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")</span>
                                 </p>
                                 <p>
-                                    <strong>Ngày hết hạn LIVE-4K: </strong>
-                                    <span>@(Model.PackageLive4k?.ExpiredTime?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")</span>
+                                <strong>Ngày hết hạn LIVE-4K: </strong>
+                                <span>@(Model.PackageLive4k?.ExpiredTime?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")</span>
                                 </p>*@
 
                             </div>
@@ -162,73 +163,96 @@
             </div>
         </div>
 
-        <div class="row">
-            <div class="col-12 col-sm-12 col-lg-12">
-                <div class="card mt-4">
-                    <div class="card-header">
-                        <h4>Lịch sử giao dịch</h4>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-12">
-                                <div class="card">
-                                    <div class="card-body">
-                                        <div class="table-responsive">
-                                            <table class="table table-striped" id="table-1">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Mã hóa đơn</th>
-                                                        <th>Số tháng</th>
-                                                        <th>Ngày tạo</th>
-                                                        <th>Số tiền</th>
-                                                        <th>Trạng thái</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @if (orders != null)
-                                                    {
-                                                        foreach (var item in orders)
-                                                        {
-                                                            <tr>
-                                                                <td>
-                                                                    @item.OrderId
-                                                                </td>
-                                                                <td>@item.Month</td>
-
-                                                                <td>@item.CreatedTime.ToString("dd/MM/yyyy HH:mm:ss")</td>
-                                                                <td>@item.Price</td>
-                                                                @switch (item.Status)
-                                                                {
-                                                                    case OrderStatus.Success:
-                                                                        <td>
-                                                                            <div class="badge badge-success">Thành công</div>
-                                                                        </td>
-                                                                        break;
-                                                                    case OrderStatus.Waiting:
-                                                                        <td>
-                                                                            <div class="badge badge-waring">Chờ xử lý</div>
-                                                                        </td>
-                                                                        break;
-                                                                    case OrderStatus.Cancel:
-                                                                        <td>
-                                                                            <div class="badge badge-danger">Đã hủy</div>
-                                                                        </td>
-                                                                        break;
-
-                                                                }
-                                                            </tr>
-                                                        }
-                                                    }
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        @* <div class="row">
+        <div class="col-12 col-sm-12 col-lg-12">
+        <div class="card mt-4">
+        <div class="card-header">
+        <h4>Lịch sử giao dịch</h4>
         </div>
+        <div class="card-body">
+        <div class="row">
+        <div class="col-12">
+        <div class="card">
+        <div class="card-body">
+        <div class="table-responsive">
+        <table class="table table-striped" id="table-1">
+        <thead>
+        <tr>
+        <th>Mã hóa đơn</th>
+        <th>Số tháng</th>
+        <th>Ngày tạo</th>
+        <th>Số tiền</th>
+        <th>Trạng thái</th>
+        </tr>
+        </thead>
+        <tbody>
+        @if (orders != null)
+        {
+        foreach (var item in orders)
+        {
+        <tr>
+        <td>
+        @item.OrderId
+        </td>
+        <td>@item.Month</td>
+
+        <td>@item.CreatedTime.ToString("dd/MM/yyyy HH:mm:ss")</td>
+        <td>@item.Price</td>
+        @switch (item.Status)
+        {
+        case OrderStatus.Success:
+        <td>
+        <div class="badge badge-success">Thành công</div>
+        </td>
+        break;
+        case OrderStatus.Waiting:
+        <td>
+        <div class="badge badge-waring">Chờ xử lý</div>
+        </td>
+        break;
+        case OrderStatus.Cancel:
+        <td>
+        <div class="badge badge-danger">Đã hủy</div>
+        </td>
+        break;
+
+        }
+        </tr>
+        }
+        }
+        </tbody>
+        </table>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>
+        </div>*@
     </div>
 </section>
+<div class="modal fade" tabindex="-1" role="dialog" id="updateModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cập nhật Telegram </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="updateForm" method="post" action="/account/update">
+                <div class="modal-body">
+                    <p>Cập nhật thông tin Telegram API</p>
+                    <input name="TelegramAPI" value="@Model.TelegramAPI" class="form-control" />
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+                    
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger">Xác nhận </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

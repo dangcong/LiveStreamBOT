@@ -24,6 +24,7 @@ namespace BaseSouce.ViewModels.User
         public string UserName { get; set; }
         public string Phone { get; set; }
         public string LinkFB { get; set; }
+        public string TelegramAPI { get; set; }
         public PackageLiveInfoDto? PackageLive1080 { get; set; } = new PackageLiveInfoDto();
         public PackageLiveInfoDto? PackageLive4k { get; set; } = new PackageLiveInfoDto();
     }

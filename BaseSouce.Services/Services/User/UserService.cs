@@ -54,7 +54,8 @@ namespace BaseSouce.Services.Services.User
                 //_logger.LogError("Authentication");
                 model.UserName = model.UserName.ToLower();
                 var existingUser = await _unitOfWork.GetRepository<AppUser>()
-                    .GetFirstOrDefaultAsync(predicate: x => x.UserName.ToLower() == model.UserName || x.Email.ToLower() == model.UserName.ToLower(), disableTracking: true);
+                    .GetFirstOrDefaultAsync(predicate: x => (x.UserName.ToLower() == model.UserName
+                    || x.Email.ToLower() == model.UserName.ToLower()) && x.DeletedTime == null, disableTracking: true);
                 if (existingUser == null)
                 {
                     return new KeyValuePair<bool, string>(false, "Tài khoản không tồn tại");
@@ -119,7 +120,7 @@ namespace BaseSouce.Services.Services.User
                     await _unitOfWork.SaveChangesAsync();
                     return new KeyValuePair<bool, string>(true, string.Empty);
                 }
-                return new KeyValuePair<bool, string>(false, "Password update failed, please try again");
+                return new KeyValuePair<bool, string>(false, "Mật khẩu cũ không chính xác, hoặc mật khẩu mới không hợp lệ!");
             }
             catch (Exception ex)
             {
@@ -317,6 +318,7 @@ namespace BaseSouce.Services.Services.User
                     UserName = x.UserName,
                     LinkFB = x.LinkFB,
                     Phone = x.PhoneNumber,
+                    TelegramAPI = x.TelegramAPI,
                     PackageLive1080 = new PackageLiveInfoDto
                     {
                         NumberOfThreads = x.NumberOfThreads1080,
@@ -426,9 +428,10 @@ namespace BaseSouce.Services.Services.User
                 {
                     return new KeyValuePair<bool, string>(false, "Người dùng không tồn tại!");
                 }
-                userCurrent.PhoneNumber = model.Phone;
-                userCurrent.LinkFB = model.LinkFB;
-                userCurrent.LinkTelegram = model.LinkTelegram;
+                //userCurrent.PhoneNumber = model.Phone;
+                //userCurrent.LinkFB = model.LinkFB;
+                //userCurrent.LinkTelegram = model.LinkTelegram;
+                userCurrent.TelegramAPI = model.TelegramAPI;
                 _repository.Update(userCurrent);
                 await _unitOfWork.SaveChangesAsync();
                 return new KeyValuePair<bool, string>(true, string.Empty);

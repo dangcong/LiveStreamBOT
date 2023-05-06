@@ -304,6 +304,18 @@ namespace BaseSouce.Services.Services.Stream
                     return "BOT không hoạt động hoặc chưa kết nối!";
                 }
 
+                //check role live
+
+                if (model.IsLiveNow)
+                {
+                    model.StartTimeLive = null;
+                    model.EndTimeLive = null;
+                }
+                else if (model.StartTimeLive != null)
+                {
+                    model.IsLiveNow = false;
+                }
+
                 //var packageCurrent = model.LiveType == LiveType._1080 ? profileUser.PackageLive1080 : profileUser.PackageLive4k;
 
                 //if (packageCurrent == null)
@@ -398,7 +410,7 @@ namespace BaseSouce.Services.Services.Stream
             return await _repository.GetStagesPagedListAsync(
                 stages: query,
                 selector: x => _mapper.Map<StreamClientInfoDto>(x),
-                include: x => x.Include(i => i.AppUser),
+                include: x => x.Include(i => i.AppUser).Include(i => i.ManagerBOT),
                orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                pageIndex: model.Page, pageSize: model.PageSize
                 );
@@ -473,6 +485,15 @@ namespace BaseSouce.Services.Services.Stream
                 if (streamEntity == null)
                 {
                     return new KeyValuePair<bool, string>(false, "Luồng không tồn tại, vui lòng thử lại!");
+                }
+                if (model.IsLiveNow)
+                {
+                    model.StartTimeLive = null;
+                    model.EndTimeLive = null;
+                }
+                else if (model.StartTimeLive != null)
+                {
+                    model.IsLiveNow = false;
                 }
                 //update data
                 streamEntity.StreamName = model.StreamName;
@@ -591,11 +612,12 @@ namespace BaseSouce.Services.Services.Stream
 
             return await _repository.GetFirstOrDefaultAsync(
                 predicate: x => x.Id == userId,
+                include: x => x.Include(i => i.StreamHistorys),
                 selector: x => new StreamReportDto
                 {
                     Total = x.StreamHistorys.Count(),
                     TotalStop = x.StreamHistorys.Where(i => i.Status == StreamStatus.Stop).Count(),
-                    TotalStreaning = x.StreamHistorys.Where(i => i.Status == StreamStatus.Streaming).Count()
+                    TotalStreaming = x.StreamHistorys.Where(i => i.Status == StreamStatus.Streaming).Count()
                 });
         }
 

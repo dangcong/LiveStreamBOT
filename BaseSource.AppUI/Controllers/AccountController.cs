@@ -252,6 +252,39 @@ namespace BaseSource.AppUI.Controllers
             return View(result.ResultObj);
         }
 
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> Update(UserUpdateDto model)
+        {
+            var result = await _userApiClient.Update(model);
+            return RedirectToAction("Profile");
+        }
+
+        [Authorize]
+        public async Task<IActionResult> ChangePassword()
+        {
+
+            return View();
+        }
+
+        [Authorize]
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(ChangePasswordVm model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+
+            }
+            var result = await _userApiClient.ChangePassword(model);
+            if (result == null || !result.IsSuccessed)
+            {
+                ModelState.AddModelError("", result?.Message ?? "Đổi mật khẩu không thành công!");
+                return View(model);
+            }
+            return RedirectToAction("Profile");
+        }
+
         #region helper
         private ClaimsPrincipal ValidateToken(string jwtToken)
         {

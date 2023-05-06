@@ -61,14 +61,14 @@ namespace BaseSouce.Services.BackgroundServices
                 {
                     bot.Status = ManagerBOTStatus.Disconnected;
 
-                    var streamsCurrents = _db.StreamHistorys.Where(x => x.ManagerBOTId == bot.Id).ToList();
-                    if (streamsCurrents != null && streamsCurrents.Any())
-                    {
-                        foreach (var item in streamsCurrents)
-                        {
-                            item.Status = StreamStatus.Stop;
-                        }
-                    }
+                    //var streamsCurrents = _db.StreamHistorys.Where(x => x.ManagerBOTId == bot.Id).ToList();
+                    //if (streamsCurrents != null && streamsCurrents.Any())
+                    //{
+                    //    foreach (var item in streamsCurrents)
+                    //    {
+                    //        item.Status = StreamStatus.Stop;
+                    //    }
+                    //}
                     await _db.SaveChangesAsync();
                 }
             }

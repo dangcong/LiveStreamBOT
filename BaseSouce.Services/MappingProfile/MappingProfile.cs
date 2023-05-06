@@ -42,7 +42,8 @@ namespace BaseSouce.Services.MappingProfile
 
             #region Stream History
 
-            CreateMap<StreamHistory, StreamClientInfoDto>();
+            CreateMap<StreamHistory, StreamClientInfoDto>()
+                .ForMember(dest => dest.BotName, options => options.MapFrom(source => source.ManagerBOT.Name));
 
 
             CreateMap<StreamHistory, StreamAdminInfoDto>()

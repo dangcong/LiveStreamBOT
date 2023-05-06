@@ -3,8 +3,8 @@
     ViewData["Title"] = "Cài đặt LIVE";
     var packageInfo = ViewBag.PackageInfo as PackageLiveUserDto;
     var streamData = ViewBag.StreamData as List<StreamClientInfoDto>;
-    var  report = ViewBag.Report as StreamReportDto;
-   
+    var report = ViewBag.Report as StreamReportDto;
+
 }
 <section class="section">
     <div class="section-header">
@@ -32,14 +32,14 @@
                                     <div class="card-stats-item-count text-success">
                                         <strong>@(packageInfo.PackageLive1080.NumberOfThreadsInRun)/@(packageInfo.PackageLive1080.NumberOfThreads)</strong>
                                     </div>
-                                    <div class="card-stats-item-label text-danger"> <strong>Số luồng 1080 đang chạy</strong></div>
+                                    <div class="card-stats-item-label text-danger"> <strong>Số luồng 1080 đang chạy / Số luồng cấp phép</strong></div>
                                 </div>
-                                <div class="card-stats-item">
-                                    <div class="card-stats-item-count text-danger">
-                                        <strong>N/A</strong>
-                                    </div>
-                                    <div class="card-stats-item-label text-danger"><strong>Thời hạn</strong></div>
-                                </div>
+                                @*<div class="card-stats-item">
+                            <div class="card-stats-item-count text-danger">
+                            <strong>N/A</strong>
+                            </div>
+                            <div class="card-stats-item-label text-danger"><strong>Thời hạn</strong></div>
+                            </div>*@
                                 <div class="card-stats-item">
                                     <div class="card-stats-item-count text-primary">
                                         <strong>@packageInfo.PackageLive1080.NumberOfThreadsCreatedInRun</strong>
@@ -53,12 +53,12 @@
                             <div class="card-stats-items">
                                 <div class="card-stats-item">
                                     <div class="card-stats-item-count text-success"><strong>N/A</strong></div>
-                                    <div class="card-stats-item-label text-danger"> <strong>Số luồng 1080 đang chạy</strong></div>
+                                    <div class="card-stats-item-label text-danger"> <strong>Số luồng 1080 đang chạy / Số luồng cấp phép</strong></div>
                                 </div>
-                                <div class="card-stats-item">
-                                    <div class="card-stats-item-count text-danger"><strong>N/A</strong></div>
-                                    <div class="card-stats-item-label text-danger"><strong>Thời hạn</strong></div>
-                                </div>
+                                @*<div class="card-stats-item">
+                            <div class="card-stats-item-count text-danger"><strong>N/A</strong></div>
+                            <div class="card-stats-item-label text-danger"><strong>Thời hạn</strong></div>
+                            </div>*@
                                 <div class="card-stats-item">
                                     <div class="card-stats-item-count text-primary"><strong>N/A</strong></div>
                                     <div class="card-stats-item-label text-danger"><strong>Số luồng đã tạo</strong></div>
@@ -82,14 +82,14 @@
                                     <div class="card-stats-item-count text-success">
                                         <strong>@(packageInfo.PackageLive4k.NumberOfThreadsInRun)/@(packageInfo.PackageLive4k.NumberOfThreads)</strong>
                                     </div>
-                                    <div class="card-stats-item-label text-danger"> <strong>Số luồng 4K đang chạy</strong></div>
+                                    <div class="card-stats-item-label text-danger"> <strong>Số luồng 4K đang chạy / Số luồng cấp phép</strong></div>
                                 </div>
-                                <div class="card-stats-item">
-                                    <div class="card-stats-item-count text-danger">
-                                        <strong>N/A</strong>
-                                    </div>
-                                    <div class="card-stats-item-label text-danger"><strong>Thời hạn</strong></div>
-                                </div>
+                                @* <div class="card-stats-item">
+                            <div class="card-stats-item-count text-danger">
+                            <strong>N/A</strong>
+                            </div>
+                            <div class="card-stats-item-label text-danger"><strong>Thời hạn</strong></div>
+                            </div>*@
                                 <div class="card-stats-item">
                                     <div class="card-stats-item-count text-primary">
                                         <strong>@packageInfo.PackageLive4k.NumberOfThreadsCreatedInRun</strong>
@@ -103,12 +103,12 @@
                             <div class="card-stats-items">
                                 <div class="card-stats-item">
                                     <div class="card-stats-item-count text-success"><strong>N/A</strong></div>
-                                    <div class="card-stats-item-label text-danger"> <strong>Số luồng 4K đang chạy</strong></div>
+                                    <div class="card-stats-item-label text-danger"> <strong>Số luồng 4K đang chạy / Số luồng cấp phép</strong></div>
                                 </div>
-                                <div class="card-stats-item">
-                                    <div class="card-stats-item-count text-danger"><strong>N/A</strong></div>
-                                    <div class="card-stats-item-label text-danger"><strong>Thời hạn</strong></div>
-                                </div>
+                                @*  <div class="card-stats-item">
+                            <div class="card-stats-item-count text-danger"><strong>N/A</strong></div>
+                            <div class="card-stats-item-label text-danger"><strong>Thời hạn</strong></div>
+                            </div>*@
                                 <div class="card-stats-item">
                                     <div class="card-stats-item-count text-primary"><strong>N/A</strong></div>
                                     <div class="card-stats-item-label text-danger"><strong>Số luồng đã tạo</strong></div>
@@ -136,29 +136,31 @@
                         <div class="card-body">
                             <div class="section-title">Cấu hình</div>
 
-                           
+
                             <div class="custom-control custom-radio custom-control-inline">
                                 <input type="radio" id="live1080" value="1" checked name="LiveType" class="custom-control-input">
                                 <label class="custom-control-label" for="live1080">Live 1080</label>
                             </div>
                             <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" id="live4k"  value="2" name="LiveType" class="custom-control-input">
+                                <input type="radio" id="live4k" value="2" name="LiveType" class="custom-control-input">
                                 <label class="custom-control-label" for="live4k">Live 4k</label>
                             </div>
                             <div class="form-group">
                                 <label>Tên luồng live</label>
-                                <input  asp-for="StreamName" placeholder="Đặt tên để gợi nhớ" class="form-control" required="">
+                                <input asp-for="StreamName" placeholder="Đặt tên để gợi nhớ" class="form-control" required="">
                                 <span asp-validation-for="StreamName" class="text-danger"></span>
                             </div>
-
-                            <div class="section-title">Nền tảng</div>
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" value="1" id="youtube" checked name="PlatformType" class="custom-control-input">
-                                <label class="custom-control-label" for="youtube">Youtube</label>
+                            <div style="display:none">
+                                <div class="section-title">Nền tảng</div>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" value="1" id="youtube" checked name="PlatformType" class="custom-control-input">
+                                    <label class="custom-control-label" for="youtube">Youtube</label>
+                                </div>
                             </div>
-                           @* <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" id="facebook" name="PlatformType" class="custom-control-input">
-                                <label class="custom-control-label" for="facebook">Facebook</label>
+
+                            @* <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="facebook" name="PlatformType" class="custom-control-input">
+                            <label class="custom-control-label" for="facebook">Facebook</label>
                             </div>*@
                             <div class="form-group">
                                 <label>Khóa luồng</label>
@@ -174,13 +176,13 @@
 
                             <div class="form-group">
                                 <label>Link Video</label>
-                                <input class="form-control" name="Video" asp-for="Video" id="linkVideo" required   />
+                                <input class="form-control" name="Video" asp-for="Video" id="linkVideo" required />
                                 <span asp-validation-for="Video" class="text-danger"></span>
                                 <span class="text-danger checkLinkVideo"></span>
                             </div>
                             <div class="form-group">
                                 <label>Link Audio</label>
-                                <input class="form-control" id="linkAudio"  asp-for="Audio"  />
+                                <input class="form-control" id="linkAudio" asp-for="Audio" />
                                 <span asp-validation-for="Audio" class="text-danger"></span>
                                 <span class="text-danger checkLinkAudio"></span>
                             </div>
@@ -240,7 +242,7 @@
                                 <div class="mt-2 font-weight-bold badge badge-success">Đang live</div>
                                 <div class="text-muted ">
                                     <span class="text-primary">
-                                        @report?.TotalStreaning
+                                        @report?.TotalStreaming
                                     </span>
                                 </div>
                             </div>
@@ -263,7 +265,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>DANH SÁCH CẤU HÌNH <span class="text-success">(NẾU BỊ LỖI THÌ COPY ID (CHỮ SỐ MÀU ĐỎ) GỬI CHO ADMIN)</span> </h4>
+                        <h4>DANH SÁCH CẤU HÌNH <span class="text-success">(NẾU BỊ LỖI THÌ COPY BotName (CHỮ SỐ MÀU ĐỎ) GỬI CHO ADMIN)</span> </h4>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -271,7 +273,7 @@
                                 <thead>
                                     <tr>
                                         <th class="text-center">
-                                            ID
+                                            BotName
                                         </th>
                                         <th>Live</th>
                                         <th>Tên luồng</th>
@@ -293,7 +295,7 @@
                                         {
                                             <tr>
                                                 <td>
-                                                    @item.Id
+                                                    <span class="text-danger">@item.BotName</span>
                                                 </td>
                                                 <td>
                                                     @switch (item.LiveType)
@@ -579,11 +581,8 @@
             });
 
             $("body").on('change keyup paste', '#linkVideo', function (e) {
-               
                 let value = $(this).val();
-                if (!isCheck) {
-                    isCheck = true;
-                    setTimeout(function () {
+                setTimeout(function () {
                         $.ajax({
                             type: "POST",
                             url: "/stream/ValidateLink",
@@ -606,29 +605,53 @@
 
                             }
                         });
-                    }, 1000);
-                }
+                    }, 500);
+                
+                //if (!isCheck) {
+                //    isCheck = true;
+                //    setTimeout(function () {
+                //        $.ajax({
+                //            type: "POST",
+                //            url: "/stream/ValidateLink",
+                //            data: { link: value },
+                //            success: function (response) {
+                //                isCheck = false;
+                //                switch (response.code) {
+                //                    case 1:
+                //                        $('.checkLinkVideo').removeClass('text-danger').addClass('text-success').html("Link hoạt động");
+                //                        break;
+                //                    case -2:
+                //                        $('.checkLinkVideo').removeClass('text-success').addClass('text-danger').html("Link không hoạt động");
+                //                        //iziToast.error({
+                //                        //    title: 'Lỗi!',
+                //                        //    message: response.err,
+                //                        //    position: 'topRight'
+                //                        //});
+                //                        break;
+                //                }
+
+                //            }
+                //        });
+                //    }, 1000);
+                //}
 
 
             });
             $("body").on('change keyup paste', '#linkAudio', function (e) {
-              
                 let value = $(this).val();
-                if (!isCheck) {
-                    isCheck = true;
-                    setTimeout(function () {
+                setTimeout(function () {
                         $.ajax({
                             type: "POST",
                             url: "/stream/ValidateLink",
                             data: { link: value },
                             success: function (response) {
-                                isCheck = false;
+                               // isCheck = false;
                                 switch (response.code) {
                                     case 1:
-                                         $('.checkLinkAudio').removeClass('text-danger').addClass('text-success').html("Link hoạt động");
+                                        $('.checkLinkAudio').removeClass('text-danger').addClass('text-success').html("Link hoạt động");
                                         break;
                                     case -2:
-                                         $('.checkLinkAudio').removeClass('text-success').addClass('text-danger').html("Link không hoạt động");
+                                        $('.checkLinkAudio').removeClass('text-success').addClass('text-danger').html("Link không hoạt động");
                                         //iziToast.error({
                                         //    title: 'Lỗi!',
                                         //    message: response.err,
@@ -639,8 +662,12 @@
 
                             }
                         });
-                    }, 1000);
-                }
+                    }, 500);
+                //let value = $(this).val();
+                //if (!isCheck) {
+                //    isCheck = true;
+                    
+                //}
             });
         });
     </script>

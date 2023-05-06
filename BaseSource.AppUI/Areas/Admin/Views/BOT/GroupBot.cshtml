@@ -24,7 +24,7 @@
                         <hr />
                         <h4>
                             Tổng luồng đang chạy/ luồng cấp phép
-                            <strong class="badge badge-primary">@(Model.Sum(x => x.NumberOfThreadsInRun))/@(Model.Sum(x=>x.NumberOfThreads))</strong>
+                            <strong class="badge badge-primary">@(Model.Sum(x => x.NumberOfThreadsInRun))/@(Model.Sum(x => x.NumberOfThreads))</strong>
                         </h4>
                     </div>
                     <div class="card-body">
@@ -43,9 +43,9 @@
                                     @foreach (var item in Model)
                                     {
                                         <tr>
-                                            <td> @item.BotName></td>
-                                            <td>@item.UserName</td>
-                                            <td>@(item.NumberOfThreadsInRun)/(@item.NumberOfThreads)</td>
+                                            <td> @item.BotName</td>
+                                            <td> <a href="/admin/user/managerbot?userId=@item.UserId" class="">@item.UserName</a></td>
+                                            <td>@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads)</td>
                                             <td>@item.Type</td>
                                         </tr>
                                     }

@@ -65,6 +65,7 @@ namespace LiveStreamBOT.Queues
                     case FileType.File:
                         {
                             await DownloadFileAsync();
+                            await PreRenderAsync();
                             await WaitTimeAsync();
                             await LiveStreamAsync();
 
@@ -151,6 +152,40 @@ namespace LiveStreamBOT.Queues
         Task<Stream> GetLivestreamAsync()
         {
             throw new NotSupportedException();
+        }
+
+        async Task PreRenderAsync()
+        {
+            if (!string.IsNullOrWhiteSpace(RenderCommand.RenderArguments))
+            {
+                FFmpegRender preRender = FFmpegRender.FromArguments(RenderCommand.RenderArguments, new FFmpegRenderConfig()
+                {
+                    WorkingDirectory = _workingDir,
+                });
+                preRender.OnEncodingProgress += PreRender_OnEncodingProgress;
+                var renderResult = await preRender.ExecuteAsync(CancellationToken);
+                renderResult.EnsureSuccess();
+            }
+        }
+
+        private async void PreRender_OnEncodingProgress(RenderProgress obj)
+        {
+            if (obj is not null)
+            {
+                await RenderUpdateAsync(new RenderMessage()
+                {
+                    ItemId = RenderCommand.ItemId,
+                    WorkId = RenderCommand.WorkId,
+                    RenderStatus = RenderStatus.Rendering,
+                    RenderInfo = new RenderInfo()
+                    {
+                        Bitrate = obj.Bitrate,
+                        Fps = obj.Fps,
+                        Size = obj.Size,
+                        Time = obj.Time
+                    }
+                });
+            }
         }
 
 

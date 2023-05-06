@@ -173,7 +173,7 @@ namespace LiveStreamBOT.Queues
 
         async Task LiveStreamAsync(Stream stream = null)
         {
-            FFmpegRender render = FFmpegRender.FromArguments(RenderCommand.Arguments, new FFmpegRenderConfig()
+            FFmpegRender render = FFmpegRender.FromArguments(RenderCommand.LiveStreamArguments, new FFmpegRenderConfig()
             {
                 WorkingDirectory = _workingDir,
             });

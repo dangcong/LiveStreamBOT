@@ -90,7 +90,7 @@ namespace BaseSouce.Services.Services.Stream
 
                 RenderCommand renderCommand = new RenderCommand()
                 {
-                    Arguments = string.Join(" ", arguments),
+                    LiveStreamArguments = string.Join(" ", arguments),
                     Command = Command.Start,
                     UtcStartTime = model.StartTimeLive?.ToUniversalTime(),
                     WorkId = 0,//quan trọng, cần để cancel/update/tạo thư mục

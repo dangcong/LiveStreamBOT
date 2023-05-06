@@ -120,6 +120,7 @@ namespace BaseSource.ViewModels.Stream
         public int Total { get; set; }
         public int TotalCreated { get; set; }
         public int TotalStreaming { get; set; }
+        public int TotalTimer { get; set; }
         public int TotalStop { get; set; }
     }
     public class StreamReportInfo

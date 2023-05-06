@@ -1,16 +1,7 @@
-﻿using BaseSource.Shared.Constants;
-using BaseSource.AppUI.Models;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using BaseSource.AppUI.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Logging;
-using Microsoft.IdentityModel.Tokens;
 using System.Diagnostics;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Policy;
-using System.Text;
 using BaseSource.ApiIntegration.WebApi.SerivePackage;
 
 namespace BaseSource.AppUI.Controllers

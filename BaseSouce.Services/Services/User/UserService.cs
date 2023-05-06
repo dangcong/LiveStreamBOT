@@ -289,14 +289,14 @@ namespace BaseSouce.Services.Services.User
 
             if (packageInfo.PackageLive1080 != null)
             {
-                packageInfo.PackageLive1080.NumberOfThreadsCreatedInRun = streamHistorys
+                packageInfo.PackageLive1080.NumberOfThreadsInRun = streamHistorys
                     .Where(x => x.Type == LiveType._1080).Select(x => x.NumberOfThreadsInRun).FirstOrDefault();
                 packageInfo.PackageLive1080.NumberOfThreadsCreatedInRun = streamHistorys
                     .Where(x => x.Type == LiveType._1080).Select(x => x.NumberOfThreadsInCreated).FirstOrDefault();
             }
             if (packageInfo.PackageLive4k != null)
             {
-                packageInfo.PackageLive4k.NumberOfThreadsCreatedInRun = streamHistorys
+                packageInfo.PackageLive4k.NumberOfThreadsInRun = streamHistorys
                     .Where(x => x.Type == LiveType._4K).Select(x => x.NumberOfThreadsInRun).FirstOrDefault();
                 packageInfo.PackageLive4k.NumberOfThreadsCreatedInRun = streamHistorys
                     .Where(x => x.Type == LiveType._4K).Select(x => x.NumberOfThreadsInCreated).FirstOrDefault();

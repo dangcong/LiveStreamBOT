@@ -617,7 +617,8 @@ namespace BaseSouce.Services.Services.Stream
                 {
                     Total = x.StreamHistorys.Count(),
                     TotalStop = x.StreamHistorys.Where(i => i.Status == StreamStatus.Stop).Count(),
-                    TotalStreaming = x.StreamHistorys.Where(i => i.Status == StreamStatus.Streaming).Count()
+                    TotalStreaming = x.StreamHistorys.Where(i => i.Status == StreamStatus.Streaming).Count(),
+                    TotalTimer = x.StreamHistorys.Where(x => x.StartTimeLive != null || x.EndTimeLive != null).Count()
                 });
         }
 

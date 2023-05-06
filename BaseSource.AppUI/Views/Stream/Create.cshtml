@@ -201,14 +201,14 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="section-title">Hẹn lịch -  Chọn thời gian bắt đầu và thời gian kết thúc (Nếu không hẹn lịch thì để mặc định)</div>
+                            <div class="section-title">Hẹn lịch -  <span class="text-danger"> Chọn thời gian bắt đầu và thời gian kết thúc (Nếu không hẹn lịch thì để mặc định)</span></div>
                             <div class="form-group">
                                 <label>Thời gian bắt đầu</label>
-                                <input type="datetime-local" asp-for="StartTimeLive" class="form-control" placeholder="Thời gian bắt đầu">
+                                <input type="datetime-local" asp-for="StartTimeLive" class="form-control col-2" placeholder="Thời gian bắt đầu">
                             </div>
                             <div class="form-group">
                                 <label>Thời gian kết thúc</label>
-                                <input type="datetime-local" asp-for="EndTimeLive" class="form-control" placeholder="Thời gian kết thúc">
+                                <input type="datetime-local" asp-for="EndTimeLive" class="form-control col-2" placeholder="Thời gian kết thúc">
                             </div>
                         </div>
                         <div class="card-footer text-left">
@@ -243,6 +243,15 @@
                                 <div class="text-muted ">
                                     <span class="text-primary">
                                         @report?.TotalStreaming
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="col text-center">
+
+                                <div class="mt-2 font-weight-bold badge badge-success">Live hẹn giờ</div>
+                                <div class="text-muted ">
+                                    <span class="text-primary">
+                                        @report?.TotalTimer
                                     </span>
                                 </div>
                             </div>
@@ -338,6 +347,7 @@
                                                     @if (item.EndTimeLive != null)
                                                     {
                                                         <span>@item.EndTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")</span>
+                                                        <span>@(item.EndTimeLive - item.StartTimeLive)</span>
                                                     }
                                                     else
                                                     {
@@ -583,30 +593,30 @@
             $("body").on('change keyup paste', '#linkVideo', function (e) {
                 let value = $(this).val();
                 setTimeout(function () {
-                        $.ajax({
-                            type: "POST",
-                            url: "/stream/ValidateLink",
-                            data: { link: value },
-                            success: function (response) {
-                                isCheck = false;
-                                switch (response.code) {
-                                    case 1:
-                                        $('.checkLinkVideo').removeClass('text-danger').addClass('text-success').html("Link hoạt động");
-                                        break;
-                                    case -2:
-                                        $('.checkLinkVideo').removeClass('text-success').addClass('text-danger').html("Link không hoạt động");
-                                        //iziToast.error({
-                                        //    title: 'Lỗi!',
-                                        //    message: response.err,
-                                        //    position: 'topRight'
-                                        //});
-                                        break;
-                                }
-
+                    $.ajax({
+                        type: "POST",
+                        url: "/stream/ValidateLink",
+                        data: { link: value },
+                        success: function (response) {
+                            isCheck = false;
+                            switch (response.code) {
+                                case 1:
+                                    $('.checkLinkVideo').removeClass('text-danger').addClass('text-success').html("Link hoạt động");
+                                    break;
+                                case -2:
+                                    $('.checkLinkVideo').removeClass('text-success').addClass('text-danger').html("Link không hoạt động");
+                                    //iziToast.error({
+                                    //    title: 'Lỗi!',
+                                    //    message: response.err,
+                                    //    position: 'topRight'
+                                    //});
+                                    break;
                             }
-                        });
-                    }, 500);
-                
+
+                        }
+                    });
+                }, 500);
+
                 //if (!isCheck) {
                 //    isCheck = true;
                 //    setTimeout(function () {
@@ -640,33 +650,33 @@
             $("body").on('change keyup paste', '#linkAudio', function (e) {
                 let value = $(this).val();
                 setTimeout(function () {
-                        $.ajax({
-                            type: "POST",
-                            url: "/stream/ValidateLink",
-                            data: { link: value },
-                            success: function (response) {
-                               // isCheck = false;
-                                switch (response.code) {
-                                    case 1:
-                                        $('.checkLinkAudio').removeClass('text-danger').addClass('text-success').html("Link hoạt động");
-                                        break;
-                                    case -2:
-                                        $('.checkLinkAudio').removeClass('text-success').addClass('text-danger').html("Link không hoạt động");
-                                        //iziToast.error({
-                                        //    title: 'Lỗi!',
-                                        //    message: response.err,
-                                        //    position: 'topRight'
-                                        //});
-                                        break;
-                                }
-
+                    $.ajax({
+                        type: "POST",
+                        url: "/stream/ValidateLink",
+                        data: { link: value },
+                        success: function (response) {
+                            // isCheck = false;
+                            switch (response.code) {
+                                case 1:
+                                    $('.checkLinkAudio').removeClass('text-danger').addClass('text-success').html("Link hoạt động");
+                                    break;
+                                case -2:
+                                    $('.checkLinkAudio').removeClass('text-success').addClass('text-danger').html("Link không hoạt động");
+                                    //iziToast.error({
+                                    //    title: 'Lỗi!',
+                                    //    message: response.err,
+                                    //    position: 'topRight'
+                                    //});
+                                    break;
                             }
-                        });
-                    }, 500);
+
+                        }
+                    });
+                }, 500);
                 //let value = $(this).val();
                 //if (!isCheck) {
                 //    isCheck = true;
-                    
+
                 //}
             });
         });

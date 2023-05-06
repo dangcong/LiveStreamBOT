@@ -168,7 +168,7 @@ namespace LiveStreamBOT.Queues
             }
         }
 
-        private async void PreRender_OnEncodingProgress(RenderProgress obj)
+        async void PreRender_OnEncodingProgress(RenderProgress obj)
         {
             if (obj is not null)
             {
@@ -188,23 +188,32 @@ namespace LiveStreamBOT.Queues
             }
         }
 
-
-        Task SendErrorAsync(Exception exception)
+        async Task WaitTimeAsync()
         {
-            return RenderUpdateAsync(new RenderMessage()
+            if (RenderCommand.UtcStartTime.HasValue)
             {
-                ItemId = RenderCommand.ItemId,
-                WorkId = RenderCommand.WorkId,
-                RenderStatus = RenderStatus.Error,
-                ExceptionInfo = new ExceptionInfo()
+                while (true)
                 {
-                    Message = exception.Message,
-                    Name = exception.GetType().FullName,
-                    StackTrace = exception.StackTrace,
+                    var utc_current = DateTime.UtcNow;
+                    TimeSpan diff = RenderCommand.UtcStartTime.Value - utc_current;
+                    if (diff > TimeSpan.Zero)
+                    {
+                        await Task.Delay(5000, CancellationToken);
+                        await RenderUpdateAsync(new RenderMessage()
+                        {
+                            ItemId = RenderCommand.ItemId,
+                            WorkId = RenderCommand.WorkId,
+                            RenderStatus = RenderStatus.Waitting,
+                        });
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
-            });
-        }
 
+            }
+        }
 
         async Task LiveStreamAsync(Stream stream = null)
         {
@@ -212,7 +221,7 @@ namespace LiveStreamBOT.Queues
             {
                 WorkingDirectory = _workingDir,
             });
-            liveStream.OnEncodingProgress += LiveStream_OnEncodingProgress; ;
+            liveStream.OnEncodingProgress += LiveStream_OnEncodingProgress;
             if (stream != null) liveStream.WithStdInStream(stream);
             await RenderUpdateAsync(new RenderMessage()
             {
@@ -257,33 +266,26 @@ namespace LiveStreamBOT.Queues
         }
 
 
-        async Task WaitTimeAsync()
+
+
+
+
+
+        Task SendErrorAsync(Exception exception)
         {
-            if (RenderCommand.UtcStartTime.HasValue)
+            return RenderUpdateAsync(new RenderMessage()
             {
-                while (true)
+                ItemId = RenderCommand.ItemId,
+                WorkId = RenderCommand.WorkId,
+                RenderStatus = RenderStatus.Error,
+                ExceptionInfo = new ExceptionInfo()
                 {
-                    var utc_current = DateTime.UtcNow;
-                    TimeSpan diff = RenderCommand.UtcStartTime.Value - utc_current;
-                    if (diff > TimeSpan.Zero)
-                    {
-                        await Task.Delay(5000, CancellationToken);
-                        await RenderUpdateAsync(new RenderMessage()
-                        {
-                            ItemId = RenderCommand.ItemId,
-                            WorkId = RenderCommand.WorkId,
-                            RenderStatus = RenderStatus.Waitting,
-                        });
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    Message = exception.Message,
+                    Name = exception.GetType().FullName,
+                    StackTrace = exception.StackTrace,
                 }
-
-            }
+            });
         }
-
         Task RenderUpdateAsync(RenderMessage renderMessage)
         {
             string log = $"[{renderMessage.ItemId} - {renderMessage.WorkId}] {renderMessage.RenderStatus}";

@@ -173,12 +173,12 @@ namespace LiveStreamBOT.Queues
 
         async Task LiveStreamAsync(Stream stream = null)
         {
-            FFmpegRender render = FFmpegRender.FromArguments(RenderCommand.LiveStreamArguments, new FFmpegRenderConfig()
+            FFmpegRender liveStream = FFmpegRender.FromArguments(RenderCommand.LiveStreamArguments, new FFmpegRenderConfig()
             {
                 WorkingDirectory = _workingDir,
             });
-            render.OnEncodingProgress += Render_OnEncodingProgress;
-            if (stream != null) render.WithStdInStream(stream);
+            liveStream.OnEncodingProgress += LiveStream_OnEncodingProgress; ;
+            if (stream != null) liveStream.WithStdInStream(stream);
             await RenderUpdateAsync(new RenderMessage()
             {
                 ItemId = RenderCommand.ItemId,
@@ -192,11 +192,10 @@ namespace LiveStreamBOT.Queues
                     Time = TimeSpan.Zero
                 }
             });
-            await render.ExecuteAsync(CancellationToken);
+            await liveStream.ExecuteAsync(CancellationToken);
         }
 
-
-        async void Render_OnEncodingProgress(RenderProgress obj)
+        async void LiveStream_OnEncodingProgress(RenderProgress obj)
         {
             if (obj is not null)
             {

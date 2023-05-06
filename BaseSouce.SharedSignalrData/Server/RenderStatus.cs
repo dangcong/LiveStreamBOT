@@ -5,6 +5,7 @@
         Created,
         Waitting,
         Downloading,
+        Rendering,
         LiveStreaming,
         Ended,
         Cancelled,

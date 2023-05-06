@@ -20,6 +20,7 @@ namespace LiveStreamBOT.Queues
         readonly IServerHub _serverHub;
         readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         readonly string _workingDir;
+        bool _isCancelledByEndTime = false;
         CancellationToken CancellationToken { get { return _cancellationTokenSource.Token; } }
         public WorkQueue(RenderCommand renderCommand, IServerHub serverHub)
         {
@@ -65,6 +66,7 @@ namespace LiveStreamBOT.Queues
                     case FileType.File:
                         {
                             await DownloadFileAsync();
+                            await PreRenderAsync();
                             await WaitTimeAsync();
                             await LiveStreamAsync();
 
@@ -89,17 +91,29 @@ namespace LiveStreamBOT.Queues
             }
             catch (OperationCanceledException)
             {
-                await RenderUpdateAsync(new RenderMessage()
+                if (_isCancelledByEndTime)
                 {
-                    ItemId = RenderCommand.ItemId,
-                    WorkId = RenderCommand.WorkId,
-                    RenderStatus = RenderStatus.Cancelled,
-                });
+                    await RenderUpdateAsync(new RenderMessage()
+                    {
+                        ItemId = RenderCommand.ItemId,
+                        WorkId = RenderCommand.WorkId,
+                        RenderStatus = RenderStatus.Ended,
+                    });
+                }
+                else
+                {
+                    await RenderUpdateAsync(new RenderMessage()
+                    {
+                        ItemId = RenderCommand.ItemId,
+                        WorkId = RenderCommand.WorkId,
+                        RenderStatus = RenderStatus.Cancelled,
+                    });
+                }
             }
             catch (Exception ex)
             {
-                if (ex is AggregateException ae) await SendErrorAsync(ae.InnerException);
-                else await SendErrorAsync(ex.InnerException);
+                if (ex is AggregateException ae) ex = ae.InnerException ?? ex;
+                await SendErrorAsync(ex);
             }
             finally
             {
@@ -137,6 +151,7 @@ namespace LiveStreamBOT.Queues
                         });
                     }
                 }, CancellationToken);
+                CheckEndTime();
             }
 
             await RenderUpdateAsync(new RenderMessage()
@@ -153,50 +168,21 @@ namespace LiveStreamBOT.Queues
             throw new NotSupportedException();
         }
 
-
-        Task SendErrorAsync(Exception exception)
+        async Task PreRenderAsync()
         {
-            return RenderUpdateAsync(new RenderMessage()
+            if (!string.IsNullOrWhiteSpace(RenderCommand.RenderArguments))
             {
-                ItemId = RenderCommand.ItemId,
-                WorkId = RenderCommand.WorkId,
-                RenderStatus = RenderStatus.Error,
-                ExceptionInfo = new ExceptionInfo()
+                FFmpegRender preRender = FFmpegRender.FromArguments(RenderCommand.RenderArguments, new FFmpegRenderConfig()
                 {
-                    Message = exception.Message,
-                    Name = exception.GetType().FullName,
-                    StackTrace = exception.StackTrace,
-                }
-            });
+                    WorkingDirectory = _workingDir,
+                });
+                preRender.OnEncodingProgress += PreRender_OnEncodingProgress;
+                var renderResult = await preRender.ExecuteAsync(CancellationToken);
+                renderResult.EnsureSuccess();
+            }
         }
 
-
-        async Task LiveStreamAsync(Stream stream = null)
-        {
-            FFmpegRender render = FFmpegRender.FromArguments(RenderCommand.Arguments, new FFmpegRenderConfig()
-            {
-                WorkingDirectory = _workingDir,
-            });
-            render.OnEncodingProgress += Render_OnEncodingProgress;
-            if (stream != null) render.WithStdInStream(stream);
-            await RenderUpdateAsync(new RenderMessage()
-            {
-                ItemId = RenderCommand.ItemId,
-                WorkId = RenderCommand.WorkId,
-                RenderStatus = RenderStatus.LiveStreaming,
-                RenderInfo = new RenderInfo()
-                {
-                    Bitrate = 0,
-                    Fps = 0,
-                    Size = 0,
-                    Time = TimeSpan.Zero
-                }
-            });
-            await render.ExecuteAsync(CancellationToken);
-        }
-
-
-        async void Render_OnEncodingProgress(RenderProgress obj)
+        async void PreRender_OnEncodingProgress(RenderProgress obj)
         {
             if (obj is not null)
             {
@@ -204,7 +190,7 @@ namespace LiveStreamBOT.Queues
                 {
                     ItemId = RenderCommand.ItemId,
                     WorkId = RenderCommand.WorkId,
-                    RenderStatus = RenderStatus.LiveStreaming,
+                    RenderStatus = RenderStatus.Rendering,
                     RenderInfo = new RenderInfo()
                     {
                         Bitrate = obj.Bitrate,
@@ -213,15 +199,9 @@ namespace LiveStreamBOT.Queues
                         Time = obj.Time
                     }
                 });
-                if (RenderCommand?.UtcEndTime.HasValue == true &&
-                    DateTime.UtcNow >= RenderCommand.UtcEndTime.Value)
-                {
-                    Console.WriteLine($"[{RenderCommand.ItemId} - {RenderCommand.WorkId}] UtcEndTime: {RenderCommand.UtcEndTime}");
-                    try { _cancellationTokenSource.Cancel(); } catch { }
-                }
+                CheckEndTime();
             }
         }
-
 
         async Task WaitTimeAsync()
         {
@@ -233,6 +213,7 @@ namespace LiveStreamBOT.Queues
                     TimeSpan diff = RenderCommand.UtcStartTime.Value - utc_current;
                     if (diff > TimeSpan.Zero)
                     {
+                        CheckEndTime();
                         await Task.Delay(5000, CancellationToken);
                         await RenderUpdateAsync(new RenderMessage()
                         {
@@ -250,6 +231,81 @@ namespace LiveStreamBOT.Queues
             }
         }
 
+        async Task LiveStreamAsync(Stream stream = null)
+        {
+            FFmpegRender liveStream = FFmpegRender.FromArguments(RenderCommand.LiveStreamArguments, new FFmpegRenderConfig()
+            {
+                WorkingDirectory = _workingDir,
+            });
+            liveStream.OnEncodingProgress += LiveStream_OnEncodingProgress;
+            if (stream != null) liveStream.WithStdInStream(stream);
+            await RenderUpdateAsync(new RenderMessage()
+            {
+                ItemId = RenderCommand.ItemId,
+                WorkId = RenderCommand.WorkId,
+                RenderStatus = RenderStatus.LiveStreaming,
+                RenderInfo = new RenderInfo()
+                {
+                    Bitrate = 0,
+                    Fps = 0,
+                    Size = 0,
+                    Time = TimeSpan.Zero
+                }
+            });
+            await liveStream.ExecuteAsync(CancellationToken);
+        }
+
+        async void LiveStream_OnEncodingProgress(RenderProgress obj)
+        {
+            if (obj is not null)
+            {
+                await RenderUpdateAsync(new RenderMessage()
+                {
+                    ItemId = RenderCommand.ItemId,
+                    WorkId = RenderCommand.WorkId,
+                    RenderStatus = RenderStatus.LiveStreaming,
+                    RenderInfo = new RenderInfo()
+                    {
+                        Bitrate = obj.Bitrate,
+                        Fps = obj.Fps,
+                        Size = obj.Size,
+                        Time = obj.Time
+                    }
+                });
+                CheckEndTime();
+            }
+        }
+
+
+
+
+        void CheckEndTime()
+        {
+            if (
+                RenderCommand?.UtcEndTime.HasValue == true &&
+                DateTime.UtcNow >= RenderCommand.UtcEndTime.Value
+                )
+            {
+                Console.WriteLine($"[{RenderCommand.ItemId} - {RenderCommand.WorkId}] UtcEndTime: {RenderCommand.UtcEndTime}");
+                try { _cancellationTokenSource.Cancel(); _isCancelledByEndTime = true; } catch { }
+            }
+        }
+
+        Task SendErrorAsync(Exception exception)
+        {
+            return RenderUpdateAsync(new RenderMessage()
+            {
+                ItemId = RenderCommand.ItemId,
+                WorkId = RenderCommand.WorkId,
+                RenderStatus = RenderStatus.Error,
+                ExceptionInfo = new ExceptionInfo()
+                {
+                    Message = exception.Message,
+                    Name = exception.GetType().FullName,
+                    StackTrace = exception.StackTrace,
+                }
+            });
+        }
         Task RenderUpdateAsync(RenderMessage renderMessage)
         {
             string log = $"[{renderMessage.ItemId} - {renderMessage.WorkId}] {renderMessage.RenderStatus}";

@@ -1,7 +1,7 @@
 ﻿@model UserManagerBotDto
 @{
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = "Cập nhật BOT cho người dùng";
+    ViewData["Title"] = $"Cập nhật BOT cho người dùng {Model.UserName}";
     var bots = ViewBag.Bots as List<ManagerBotInfoDto>;
     var bot1080 = bots.Where(x => x.LiveType == LiveType._1080).ToList();
     var bot4k = bots.Where(x => x.LiveType == LiveType._4K).ToList();

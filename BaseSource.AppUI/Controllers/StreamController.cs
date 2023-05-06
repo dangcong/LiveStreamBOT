@@ -61,6 +61,8 @@ namespace BaseSource.AppUI.Controllers
                 return View(model);
 
             }
+
+
             var result = await _streamApiClient.Create(model);
             if (result == null || !result.IsSuccessed)
             {

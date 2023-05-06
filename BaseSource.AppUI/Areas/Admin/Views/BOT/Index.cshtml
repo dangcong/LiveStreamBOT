@@ -29,6 +29,7 @@
                                 <thead>
                                     <tr>
                                         <th>BotID</th>
+                                        <th>Loại</th>
                                         <th>Name</th>
                                         <th>Group</th>
                                         <th>Status</th>
@@ -45,11 +46,22 @@
                                     {
                                         <tr>
                                             <td> <span class="text-sm" style="font-size:10px">@item.BotId</span></td>
+                                            <td>
+                                                @switch (item.LiveType)
+                                                {
+                                                    case LiveType._1080:
+                                                    <span class="badge badge-primary" >1080</span>
+                                                        break;
+                                                     case LiveType._4K:
+                                                     <span class="badge badge-success">4k</span>
+                                                        break;
+                                                }
+                                            </td>
                                             <td>@item.Name</td>
                                             <td>@item.Group</td>
                                             <td>@item.Status</td>
                                             <td>@item.CreatedTime.ToString("dd/MM/yyyy HH:mm:ss")</td>
-                                            <td><a href="/amdin/bot/stream?id=@item.Id">@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads)</a> </td>
+                                            <td><a href="#">@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads)</a> </td>
                                             <td>@((item.CPU * 100).ToString("n2"))%</td>
                                             <td>@((item.RAM * 100).ToString("n2"))%</td>
                                             <td>@item.Bandwidth.ToString("n2") mb/s</td>
@@ -94,7 +106,7 @@
                 <form id="deleteForm" method="post" action="/admin/bot/delete">
                     <input name="Id" type="hidden" />
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit"  class="btn btn-danger">Xác nhận </button>
+                    <button type="submit" class="btn btn-danger">Xác nhận </button>
                 </form>
 
             </div>
@@ -157,10 +169,10 @@
             $('#stopForm input[name="Id"]').val(id);
             $('#startForm input[name="Id"]').val(id);
         });
-         $('body').on('click', '.btn-Delete', function () {
+        $('body').on('click', '.btn-Delete', function () {
             let id = $(this).attr('data-id');
             $('#deleteForm input[name="Id"]').val(id);
-            
+
         });
     </script>
 }

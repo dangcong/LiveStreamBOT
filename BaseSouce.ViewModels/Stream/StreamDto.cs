@@ -39,6 +39,7 @@ namespace BaseSource.ViewModels.Stream
         public string UserId { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
+        public string BotName { get; set; }
         public int ManagerBOTId { get; set; }
         public string BotId { get; set; }
         public string StreamKey { get; set; }
@@ -118,7 +119,7 @@ namespace BaseSource.ViewModels.Stream
     {
         public int Total { get; set; }
         public int TotalCreated { get; set; }
-        public int TotalStreaning { get; set; }
+        public int TotalStreaming { get; set; }
         public int TotalStop { get; set; }
     }
     public class StreamReportInfo

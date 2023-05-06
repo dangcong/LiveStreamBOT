@@ -114,6 +114,17 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> ManagerBot(UserManagerBotDto model)
         {
+            if (model.Bot1080 == null && model.NumberOfThreads1080 > 0)
+            {
+                ModelState.AddModelError("", "Chưa chọn BOT 1080");
+                return View(model);
+            }
+            if (model.Bot4K == null && model.NumberOfThreads4K > 0)
+            {
+                ModelState.AddModelError("", "Chưa chọn BOT 4k");
+                return View(model);
+            }
+
             var result = await _userAdminApiClient.UpdateUserManagerBot(model);
             if (result == null || !result.IsSuccessed)
             {
@@ -131,14 +142,14 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult>Delete(string userId)
+        public async Task<IActionResult> Delete(string userId)
         {
             var result = await _userAdminApiClient.Delete(userId);
             return RedirectToAction("Index");
         }
 
         [HttpGet]
-        public  IActionResult Create()
+        public IActionResult Create()
         {
             return View();
         }
@@ -149,7 +160,7 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             var result = await _userAdminApiClient.Create(model);
             if (result == null || !result.IsSuccessed)
             {
-                
+
                 ModelState.AddModelError("", result?.ResultObj ?? "Tạo mới tài khoản không thành công");
                 return View(model);
             }

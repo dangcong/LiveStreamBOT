@@ -47,5 +47,12 @@ namespace BaseSouce.Services.HubServices
         {
             await _streamClientService.UpdateStreamAsync(renderMessage);
         }
+        public override async Task OnDisconnectedAsync(Exception? exception)
+        {
+            //  Trace.WriteLine(Context.ConnectionId + ' - disconnected');
+
+            _ = _managerBOTService.DisconnectBotAsync(Context.ConnectionId);
+            await base.OnDisconnectedAsync(exception);
+        }
     }
 }

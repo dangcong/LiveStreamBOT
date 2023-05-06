@@ -17,5 +17,6 @@ namespace BaseSouce.Services.Services.BOT
         Task<KeyValuePair<bool, string>> ChangeUsedAsync(int id);
         Task<ManagerBotInfoDto> GetBOTByIdAsync(int id);
         Task<List<UserBotDto>> GetUserConnectBot(int id);
+        Task<KeyValuePair<bool, string>> DisconnectBotAsync(string connectionId);
     }
 }

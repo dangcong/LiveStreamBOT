@@ -87,6 +87,9 @@ namespace BaseSouce.Services.Services.UserAdmin
                     return new KeyValuePair<bool, string>(false, "Người dùng không tồn tại!");
                 }
                 userCurrent.DeletedTime = DateTime.Now;
+                userCurrent.NumberOfThreads1080 = 0;
+                userCurrent.NumberOfThreads4K = 0;
+                userCurrent.UserManagerBOTs = null;
                 _repository.Update(userCurrent);
 
                 await _unitOfWork.SaveChangesAsync();
@@ -152,7 +155,7 @@ namespace BaseSouce.Services.Services.UserAdmin
         public async Task<List<UserAdminInfoDto>> GetUserManagerAsync()
         {
             var _repository = _unitOfWork.GetRepository<AppUser>();
-            var roleManager = await _roleManager.FindByNameAsync("Manager");
+            var roleManager = await _roleManager.FindByNameAsync("Admin");
 
             var query = _repository.Queryable().AsNoTracking();
 
@@ -192,6 +195,7 @@ namespace BaseSouce.Services.Services.UserAdmin
                          .Select(i => i.ManagerBOTId).FirstOrDefault(),
                      Bot4K = x.UserManagerBOTs.Where(i => i.LiveType == LiveType._4K)
                          .Select(i => i.ManagerBOTId).FirstOrDefault(),
+                     UserName = x.UserName
                  }).FirstOrDefaultAsync();
         }
 
@@ -240,7 +244,7 @@ namespace BaseSouce.Services.Services.UserAdmin
 
 
 
-            var roleManager = await _roleManager.FindByNameAsync("Manager");
+            var roleManager = await _roleManager.FindByNameAsync("Admin");
 
             var userCurrent = await _repository.GetFirstOrDefaultAsync(
                 predicate: x => x.UserName == userName,
@@ -325,7 +329,7 @@ namespace BaseSouce.Services.Services.UserAdmin
                 if (model.Bot1080 != null && model.Bot1080 > 0)
                 {
                     var bot1080Current = await _repositoryUserBot.GetFirstOrDefaultAsync(
-                        predicate: x => x.LiveType == LiveType._1080, disableTracking: false);
+                        predicate: x => x.LiveType == LiveType._1080 && x.UserId == model.UserId, disableTracking: false);
 
                     if (bot1080Current != null)
                     {
@@ -346,7 +350,7 @@ namespace BaseSouce.Services.Services.UserAdmin
                 else
                 {
                     var bot1080Current = await _repositoryUserBot.GetFirstOrDefaultAsync(
-                        predicate: x => x.LiveType == LiveType._1080, disableTracking: false);
+                        predicate: x => x.LiveType == LiveType._1080 && x.UserId == model.UserId, disableTracking: false);
 
                     if (bot1080Current != null)
                     {
@@ -357,7 +361,7 @@ namespace BaseSouce.Services.Services.UserAdmin
                 if (model.Bot4K != null && model.Bot4K > 0)
                 {
                     var bot4kCurrent = await _repositoryUserBot.GetFirstOrDefaultAsync(
-                        predicate: x => x.LiveType == LiveType._4K, disableTracking: false);
+                        predicate: x => x.LiveType == LiveType._4K && x.UserId == model.UserId, disableTracking: false);
 
                     if (bot4kCurrent != null)
                     {
@@ -378,7 +382,7 @@ namespace BaseSouce.Services.Services.UserAdmin
                 else
                 {
                     var bot4kCurrent = await _repositoryUserBot.GetFirstOrDefaultAsync(
-                        predicate: x => x.LiveType == LiveType._4K, disableTracking: false);
+                        predicate: x => x.LiveType == LiveType._4K && x.UserId == model.UserId, disableTracking: false);
 
                     if (bot4kCurrent != null)
                     {

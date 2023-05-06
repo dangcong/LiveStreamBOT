@@ -139,6 +139,42 @@ namespace BaseSouce.Services.Services.BOT
             }
         }
 
+        public async Task<KeyValuePair<bool, string>> DisconnectBotAsync(string connectionId)
+        {
+            try
+            {
+                var _repositoryBot = _unitOfWork.GetRepository<ManagerBOT>();
+                var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
+
+                var botCurrent = await _repositoryBot.GetFirstOrDefaultAsync(
+                    predicate: x => x.ConnectionId == connectionId, disableTracking: false);
+                if (botCurrent != null)
+                {
+                    botCurrent.Status= ManagerBOTStatus.Disconnected;
+
+                    var streamsCurrents =await _repositoryStream.Queryable()
+                        .Where(x => x.ManagerBOTId == botCurrent.Id && x.Status == StreamStatus.Streaming).ToListAsync();
+
+                    if (streamsCurrents.Any())
+                    {
+                        foreach (var item in streamsCurrents)
+                        {
+                            item.Status = StreamStatus.Stop;
+                        }
+                        _repositoryStream.Update(streamsCurrents);
+                    }
+                    _repositoryBot.Update(botCurrent);
+                   await _unitOfWork.SaveChangesAsync();
+                }
+                return new KeyValuePair<bool, string>(true, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Disconnect BOT failed by error:[{ex}]");
+                return new KeyValuePair<bool, string>(false, ex.Message);
+            }
+        }
+
         public async Task<IPagedList<ManagerBotInfoDto>> GetBOTByFilterAsync(ManagerBOTRequestDto model)
         {
             var _repositoryUserBot = _unitOfWork.GetRepository<UserManagerBOT>();
@@ -207,7 +243,7 @@ namespace BaseSouce.Services.Services.BOT
             var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
 
             var data = await _repository.Queryable().AsNoTracking()
-                .Where(x => x.Id == id).Include(x => x.ManagerBOT).Include(i => i.User)
+                .Where(x => x.ManagerBOTId == id).Include(x => x.ManagerBOT).Include(i => i.User)
                 .Select(x => new UserBotDto
                 {
                     BotName = x.ManagerBOT.Name,

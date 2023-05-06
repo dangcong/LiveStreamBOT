@@ -54,6 +54,7 @@ namespace BaseSource.ViewModels.UserAdmin
         public int NumberOfThreads4K { get; set; }
         public int? Bot1080 { get; set; }
         public int? Bot4K { get; set; }
+        public string UserName { get; set; }
     }
     public class UserCreateAdminDto
     {

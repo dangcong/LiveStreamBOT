@@ -2,7 +2,6 @@
     ViewData["Title"] = "Danh sách người dùng";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
-
 <section class="section">
     <div class="section-header">
         <h1>Danh sách người dùng</h1>
@@ -169,7 +168,7 @@
 
                                                      <a class="btn btn-success" href="/admin/stream/user?userId=${type.id}">DS Stream</a>
                                                      <a class="btn btn-success" href="/admin/user/managerBot?userId=${type.id}">Cập nhật BOT</a>
-                                                     <button class="btn btn-warning btnReset" data-id="${type.id}"  data-toggle="modal" data-target="#resetPassModal">Reset MK</button>
+                                                     
                                                      <button class="btn btn-danger btnDelete" data-id="${type.id}"  data-toggle="modal" data-target="#deleteUserModal">Delete</button>`;
                         }
                     },

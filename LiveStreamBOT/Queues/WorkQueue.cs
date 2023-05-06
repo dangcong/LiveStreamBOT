@@ -199,6 +199,12 @@ namespace LiveStreamBOT.Queues
                         Time = obj.Time
                     }
                 });
+                if (RenderCommand?.UtcEndTime.HasValue == true &&
+                    DateTime.UtcNow >= RenderCommand.UtcEndTime.Value)
+                {
+                    Console.WriteLine($"[{RenderCommand.ItemId} - {RenderCommand.WorkId}] UtcEndTime: {RenderCommand.UtcEndTime}");
+                    try { _cancellationTokenSource.Cancel(); } catch { }
+                }
             }
         }
 

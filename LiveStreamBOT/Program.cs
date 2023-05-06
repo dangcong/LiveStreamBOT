@@ -33,7 +33,7 @@ if (Uri.TryCreate(args.FirstOrDefault(), UriKind.Absolute, out Uri uri))
         Singleton.Setting.Save();
         using ISystemInfoReader systemInfoReader = GetSystemInfoReader();
 
-        Console.WriteLine("Started");
+        Console.WriteLine($"Started {Singleton.Setting.Setting.BotId}");
         while (true)
         {
             await Task.Delay(Singleton.Setting.Setting.PingInterval);
@@ -78,22 +78,30 @@ ISystemInfoReader GetSystemInfoReader()
 
 void SignalrClient_OnRenderCommand(RenderCommand obj)
 {
-    switch (obj.Command)
+    try
     {
-        case Command.Start:
-            {
-                if (!taskQueue.Runnings.Any(x => x.RenderCommand.ItemId == obj.ItemId))
+        Console.WriteLine($"{nameof(RenderCommand)}: [{obj.ItemId} - {obj.WorkId}] {obj?.Command}");
+        switch (obj.Command)
+        {
+            case Command.Start:
                 {
-                    taskQueue.Add(new WorkQueue(obj, ServerHub));
+                    if (!taskQueue.Runnings.Any(x => x.RenderCommand.ItemId == obj.ItemId))
+                    {
+                        taskQueue.Add(new WorkQueue(obj, ServerHub));
+                    }
+                    break;
                 }
-                break;
-            }
 
-        case Command.Cancel:
-            {
-                taskQueue.Cancel(x => x.RenderCommand.ItemId.Equals(obj.ItemId));
-                break;
-            }
+            case Command.Cancel:
+                {
+                    taskQueue.Cancel(x => x.RenderCommand.ItemId.Equals(obj.ItemId));
+                    break;
+                }
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"{ex.GetType().FullName}: {ex.Message}, {ex.StackTrace}");
     }
 }
 

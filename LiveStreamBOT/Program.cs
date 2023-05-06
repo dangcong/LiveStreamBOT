@@ -33,7 +33,7 @@ if (Uri.TryCreate(args.FirstOrDefault(), UriKind.Absolute, out Uri uri))
         Singleton.Setting.Save();
         using ISystemInfoReader systemInfoReader = GetSystemInfoReader();
 
-        Console.WriteLine("Started");
+        Console.WriteLine($"Started {Singleton.Setting.Setting.BotId}");
         while (true)
         {
             await Task.Delay(Singleton.Setting.Setting.PingInterval);

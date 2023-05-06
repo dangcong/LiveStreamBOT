@@ -18,9 +18,15 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult>  Index()
         {
-            return View();
+             var result = await _userAdminApiClient.GetUserByFilter(new UserAdminRequestDto
+            {
+                Page = 1,
+                PageSize = 500,
+                //UserName = searchValue
+            });
+            return View(result.ResultObj.Items);
         }
 
         [HttpPost]

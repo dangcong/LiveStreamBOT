@@ -1,4 +1,5 @@
-﻿@{
+﻿@model List<UserAdminInfoDto>
+@{
     ViewData["Title"] = "Danh sách người dùng";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
@@ -35,6 +36,24 @@
                                         <th>Action</th>
                                     </tr>
                                 </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td>@item.UserName</td>
+                                            <td>@item.Password</td>
+                                            <td><span class="badge badge-primary">@(item.NumberOfThreads1080InRun)/@(item.NumberOfThreads1080)</span> </td>
+                                            <td><span class="badge badge-primary">@(item.NumberOfThreads4KInRun)/@(item.NumberOfThreads4K)</span>)</td>
+                                            <td><span class="badge badge-primary">@item.TelegramAPI</span></td>
+                                            <td>
+                                                <a class="btn btn-success" href="/admin/stream/user?userId=@item.Id">DS Stream</a>
+                                                <a class="btn btn-success" href="/admin/user/managerBot?userId=@item.Id">Cập nhật BOT</a>
+                                                <button class="btn btn-danger btnDelete" data-id="@item.Id" data-toggle="modal" data-target="#deleteUserModal">Delete</button>
+                                            </td>
+
+                                        </tr>
+                                    }
+                                </tbody>
                             </table>
                         </div>
                     </div>
@@ -126,55 +145,56 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $("#tableAllUser").DataTable({
-                "processing": true,
-                "serverSide": true,
-                "filter": true,
-                "ajax": {
-                    "url": "/admin/user/GetAll",
-                    "type": "POST",
-                    "datatype": "json"
-                },
-                //"language": {
-                //    "url": "/language/language.json"
-                //},
-                "columnDefs": [
-                    {
-                        "targets": [1],
-                        "searchable": false,
-                        "orderable": false
-                    }],
-                "columns": [
-                    { "data": "userName", "name": "UserName", "autoWidth": true },
-                    { "data": "password", "name": "Password", "autoWidth": true },
-                    {
-                        "data": "userName", "name": "userName", "autoWidth": true,
-                        "render": function (data, row, type) {
-                            return `<span class="badge badge-primary" >${type.numberOfThreads1080InRun}/${type.numberOfThreads1080}</span>`;
-                        }
-                    },
-                    {
-                        "data": "userName", "name": "userName", "autoWidth": true,
-                        "render": function (data, row, type) {
-                            return `<span class="badge badge-primary" >${type.numberOfThreads4KInRun}/${type.numberOfThreads4K}</span>`;
-                        }
-                    },
-                    { "data": "linkTelegram", "name": "LinkTelegram", "autoWidth": true },
+            $("#tableAllUser").DataTable({});
+            //$("#tableAllUser").DataTable({
+            //    "processing": true,
+            //    "serverSide": true,
+            //    "filter": true,
+            //    "ajax": {
+            //        "url": "/admin/user/GetAll",
+            //        "type": "POST",
+            //        "datatype": "json"
+            //    },
+            //    //"language": {
+            //    //    "url": "/language/language.json"
+            //    //},
+            //    "columnDefs": [
+            //        {
+            //            "targets": [1],
+            //            "searchable": false,
+            //            "orderable": false
+            //        }],
+            //    "columns": [
+            //        { "data": "userName", "name": "UserName", "autoWidth": true },
+            //        { "data": "password", "name": "Password", "autoWidth": true },
+            //        {
+            //            "data": "userName", "name": "userName", "autoWidth": true,
+            //            "render": function (data, row, type) {
+            //                return `<span class="badge badge-primary" >${type.numberOfThreads1080InRun}/${type.numberOfThreads1080}</span>`;
+            //            }
+            //        },
+            //        {
+            //            "data": "userName", "name": "userName", "autoWidth": true,
+            //            "render": function (data, row, type) {
+            //                return `<span class="badge badge-primary" >${type.numberOfThreads4KInRun}/${type.numberOfThreads4K}</span>`;
+            //            }
+            //        },
+            //        { "data": "linkTelegram", "name": "LinkTelegram", "autoWidth": true },
 
-                    {
-                        "data": "userName", "name": "userName", "autoWidth": true,
-                        "render": function (data, row, type) {
-                            return `
+            //        {
+            //            "data": "userName", "name": "userName", "autoWidth": true,
+            //            "render": function (data, row, type) {
+            //                return `
 
-                                                     <a class="btn btn-success" href="/admin/stream/user?userId=${type.id}">DS Stream</a>
-                                                     <a class="btn btn-success" href="/admin/user/managerBot?userId=${type.id}">Cập nhật BOT</a>
-                                                     
-                                                     <button class="btn btn-danger btnDelete" data-id="${type.id}"  data-toggle="modal" data-target="#deleteUserModal">Delete</button>`;
-                        }
-                    },
-                    //<a class="btn btn-primary" href="/admin/order/user?userId=${type.id}">DS Gói</a>
-                ]
-            });
+            //                                         <a class="btn btn-success" href="/admin/stream/user?userId=${type.id}">DS Stream</a>
+            //                                         <a class="btn btn-success" href="/admin/user/managerBot?userId=${type.id}">Cập nhật BOT</a>
+
+            //                                         <button class="btn btn-danger btnDelete" data-id="${type.id}"  data-toggle="modal" data-target="#deleteUserModal">Delete</button>`;
+            //            }
+            //        },
+            //        //<a class="btn btn-primary" href="/admin/order/user?userId=${type.id}">DS Gói</a>
+            //    ]
+            //});
         });
         $('body').on('click', '.btnReset', function () {
             let id = $(this).attr('data-id');
@@ -184,7 +204,7 @@
             let id = $(this).attr('data-id');
             $('#formDeleteUser input[name="userId"]').val(id);
         });
-        
+
     </script>
 }
 

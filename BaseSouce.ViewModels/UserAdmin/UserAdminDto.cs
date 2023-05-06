@@ -23,9 +23,10 @@ namespace BaseSource.ViewModels.UserAdmin
         public int NumberOfThreads4KInRun { get; set; }
         public string Password { get; set; }
     }
-    public class UserAdminRequestDto:PageQuery
+    public class UserAdminRequestDto : PageQuery
     {
         public string UserName { get; set; }
+        public bool IsOrder { get; set; }
     }
     public class UserGroupDto
     {

@@ -35,28 +35,30 @@
                             </div>
                             <div class="form-group">
                                 <label>Tên luồng live</label>
-                                <input  asp-for="StreamName" placeholder="Đặt tên để gợi nhớ" class="form-control" required="">
+                                <input asp-for="StreamName" placeholder="Đặt tên để gợi nhớ" class="form-control" required="">
                                 <span asp-validation-for="StreamName" class="text-danger"></span>
                             </div>
-
-                            <div class="section-title">Nền tảng</div>
-                            <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" id="youtube" value="1" checked="@(Model.PlatformType==PlatformType.Youtube)" name="PlatformType" class="custom-control-input">
-                                <label class="custom-control-label" for="youtube">Youtube</label>
+                            <div style="display:none">
+                                <div class="section-title">Nền tảng</div>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" id="youtube" value="1" checked="@(Model.PlatformType==PlatformType.Youtube)" name="PlatformType" class="custom-control-input">
+                                    <label class="custom-control-label" for="youtube">Youtube</label>
+                                </div>
                             </div>
-                           @* <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" id="facebook" checked="@(Model.PlatformType==PlatformType.Facebook) name="PlatformType" class="custom-control-input">
-                                <label class="custom-control-label" for="facebook">Facebook</label>
+
+                            @* <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="facebook" checked="@(Model.PlatformType==PlatformType.Facebook) name="PlatformType" class="custom-control-input">
+                            <label class="custom-control-label" for="facebook">Facebook</label>
                             </div>*@
                             <div class="form-group">
                                 <label>Khóa luồng</label>
-                                <input class="form-control" required asp-for="StreamKey"  />
+                                <input class="form-control" required asp-for="StreamKey" />
                                 <span asp-validation-for="StreamKey" class="text-danger"></span>
                             </div>
 
                             <div class="form-group">
                                 <label>RTMP</label>
-                                <input class="form-control" required asp-for="RTMP"  />
+                                <input class="form-control" required asp-for="RTMP" />
                                 <span asp-validation-for="RTMP" class="text-danger"></span>
                             </div>
 
@@ -85,7 +87,7 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="section-title">Hẹn lịch(Nếu không hẹn lịch thì để mặc định)</div>
+                            <div class="section-title">Hẹn lịch - Vui lòng chọn thời gian bắt đầu và thời gian kết thúc (Nếu không hẹn lịch thì để mặc định)</div>
                             <div class="form-group">
                                 <label>Thời gian bắt đầu</label>
                                 <input type="datetime-local" asp-for="StartTimeLive" class="form-control" placeholder="Thời gian bắt đầu">
@@ -108,7 +110,7 @@
 </section>
 @section Scripts{
     <script>
-       
+
     </script>
 }
 

@@ -165,7 +165,7 @@ namespace BaseSource.AppUI.Controllers
             var result = await _streamApiClient.UpdateAsync(id, model);
             if (result == null || !result.IsSuccessed)
             {
-                ModelState.AddModelError("", result?.Message ?? "Không thể tạo luồng stream!");
+                ModelState.AddModelError("", result?.Message ?? "Không thể sửa luồng stream!");
                 return View(model);
             }
             return RedirectToAction("Create");

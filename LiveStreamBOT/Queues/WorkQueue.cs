@@ -46,6 +46,20 @@ namespace LiveStreamBOT.Queues
         {
             try
             {
+                if (
+                    RenderCommand.UtcStartTime.HasValue &&
+                    RenderCommand.UtcEndTime.HasValue &&
+                    RenderCommand.UtcEndTime.Value <= RenderCommand.UtcStartTime.Value
+                    )
+                {
+                    await RenderUpdateAsync(new RenderMessage()
+                    {
+                        ItemId = RenderCommand.ItemId,
+                        WorkId = RenderCommand.WorkId,
+                        RenderStatus = RenderStatus.Ended,
+                    });
+                    return;
+                }
                 switch (RenderCommand.FileType)
                 {
                     case FileType.File:

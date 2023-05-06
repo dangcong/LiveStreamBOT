@@ -13,5 +13,6 @@ namespace BaseSouce.SharedSignalrData.Server
         public Command Command { get; set; }
         public FileType FileType { get; set; }
         public DateTime? UtcStartTime { get; set; }
+        public DateTime? UtcEndTime { get; set; }
     }
 }

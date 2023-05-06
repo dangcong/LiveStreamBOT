@@ -54,7 +54,7 @@ namespace LiveStreamBOT.Queues
                             await WaitTimeAsync();
                             await LiveStreamAsync();
 
-                            await _serverHub.RenderUpdateAsync(new RenderMessage()
+                            await RenderUpdateAsync(new RenderMessage()
                             {
                                 ItemId = RenderCommand.ItemId,
                                 WorkId = RenderCommand.WorkId,
@@ -75,7 +75,7 @@ namespace LiveStreamBOT.Queues
             }
             catch (OperationCanceledException)
             {
-                await _serverHub.RenderUpdateAsync(new RenderMessage()
+                await RenderUpdateAsync(new RenderMessage()
                 {
                     ItemId = RenderCommand.ItemId,
                     WorkId = RenderCommand.WorkId,
@@ -114,7 +114,7 @@ namespace LiveStreamBOT.Queues
                     {
                         dateTime = DateTime.Now.AddSeconds(1);
 
-                        await _serverHub.RenderUpdateAsync(new RenderMessage()
+                        await RenderUpdateAsync(new RenderMessage()
                         {
                             ItemId = RenderCommand.ItemId,
                             WorkId = RenderCommand.WorkId,
@@ -125,7 +125,7 @@ namespace LiveStreamBOT.Queues
                 }, CancellationToken);
             }
 
-            await _serverHub.RenderUpdateAsync(new RenderMessage()
+            await RenderUpdateAsync(new RenderMessage()
             {
                 ItemId = RenderCommand.ItemId,
                 WorkId = RenderCommand.WorkId,
@@ -142,7 +142,7 @@ namespace LiveStreamBOT.Queues
 
         Task SendErrorAsync(Exception exception)
         {
-            return _serverHub.RenderUpdateAsync(new RenderMessage()
+            return RenderUpdateAsync(new RenderMessage()
             {
                 ItemId = RenderCommand.ItemId,
                 WorkId = RenderCommand.WorkId,
@@ -165,7 +165,7 @@ namespace LiveStreamBOT.Queues
             });
             render.OnEncodingProgress += Render_OnEncodingProgress;
             if (stream != null) render.WithStdInStream(stream);
-            await _serverHub.RenderUpdateAsync(new RenderMessage()
+            await RenderUpdateAsync(new RenderMessage()
             {
                 ItemId = RenderCommand.ItemId,
                 WorkId = RenderCommand.WorkId,
@@ -186,7 +186,7 @@ namespace LiveStreamBOT.Queues
         {
             if (obj is not null)
             {
-                await _serverHub.RenderUpdateAsync(new RenderMessage()
+                await RenderUpdateAsync(new RenderMessage()
                 {
                     ItemId = RenderCommand.ItemId,
                     WorkId = RenderCommand.WorkId,
@@ -214,7 +214,7 @@ namespace LiveStreamBOT.Queues
                     if (diff > TimeSpan.Zero)
                     {
                         await Task.Delay(5000, CancellationToken);
-                        await _serverHub.RenderUpdateAsync(new RenderMessage()
+                        await RenderUpdateAsync(new RenderMessage()
                         {
                             ItemId = RenderCommand.ItemId,
                             WorkId = RenderCommand.WorkId,
@@ -228,6 +228,23 @@ namespace LiveStreamBOT.Queues
                 }
 
             }
+        }
+
+        Task RenderUpdateAsync(RenderMessage renderMessage)
+        {
+            string log = $"[{renderMessage.ItemId} - {renderMessage.WorkId}] {renderMessage.RenderStatus}";
+            switch (renderMessage?.RenderStatus)
+            {
+                case RenderStatus.LiveStreaming:
+                    log += $" {renderMessage.RenderInfo?.Time}";
+                    break;
+
+                case RenderStatus.Downloading:
+                    log += $" {renderMessage.DownloadPercentage}";
+                    break;
+            }
+            Console.WriteLine(log);
+            return _serverHub.RenderUpdateAsync(renderMessage);
         }
     }
 }

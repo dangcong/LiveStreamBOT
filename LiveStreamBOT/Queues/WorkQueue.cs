@@ -20,6 +20,7 @@ namespace LiveStreamBOT.Queues
         readonly IServerHub _serverHub;
         readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         readonly string _workingDir;
+        bool _isCancelledByEndTime = false;
         CancellationToken CancellationToken { get { return _cancellationTokenSource.Token; } }
         public WorkQueue(RenderCommand renderCommand, IServerHub serverHub)
         {
@@ -90,12 +91,24 @@ namespace LiveStreamBOT.Queues
             }
             catch (OperationCanceledException)
             {
-                await RenderUpdateAsync(new RenderMessage()
+                if (_isCancelledByEndTime)
                 {
-                    ItemId = RenderCommand.ItemId,
-                    WorkId = RenderCommand.WorkId,
-                    RenderStatus = RenderStatus.Cancelled,
-                });
+                    await RenderUpdateAsync(new RenderMessage()
+                    {
+                        ItemId = RenderCommand.ItemId,
+                        WorkId = RenderCommand.WorkId,
+                        RenderStatus = RenderStatus.Ended,
+                    });
+                }
+                else
+                {
+                    await RenderUpdateAsync(new RenderMessage()
+                    {
+                        ItemId = RenderCommand.ItemId,
+                        WorkId = RenderCommand.WorkId,
+                        RenderStatus = RenderStatus.Cancelled,
+                    });
+                }
             }
             catch (Exception ex)
             {
@@ -138,6 +151,7 @@ namespace LiveStreamBOT.Queues
                         });
                     }
                 }, CancellationToken);
+                CheckEndTime();
             }
 
             await RenderUpdateAsync(new RenderMessage()
@@ -185,6 +199,7 @@ namespace LiveStreamBOT.Queues
                         Time = obj.Time
                     }
                 });
+                CheckEndTime();
             }
         }
 
@@ -198,6 +213,7 @@ namespace LiveStreamBOT.Queues
                     TimeSpan diff = RenderCommand.UtcStartTime.Value - utc_current;
                     if (diff > TimeSpan.Zero)
                     {
+                        CheckEndTime();
                         await Task.Delay(5000, CancellationToken);
                         await RenderUpdateAsync(new RenderMessage()
                         {
@@ -256,20 +272,24 @@ namespace LiveStreamBOT.Queues
                         Time = obj.Time
                     }
                 });
-                if (RenderCommand?.UtcEndTime.HasValue == true &&
-                    DateTime.UtcNow >= RenderCommand.UtcEndTime.Value)
-                {
-                    Console.WriteLine($"[{RenderCommand.ItemId} - {RenderCommand.WorkId}] UtcEndTime: {RenderCommand.UtcEndTime}");
-                    try { _cancellationTokenSource.Cancel(); } catch { }
-                }
+                CheckEndTime();
             }
         }
 
 
 
 
-
-
+        void CheckEndTime()
+        {
+            if (
+                RenderCommand?.UtcEndTime.HasValue == true &&
+                DateTime.UtcNow >= RenderCommand.UtcEndTime.Value
+                )
+            {
+                Console.WriteLine($"[{RenderCommand.ItemId} - {RenderCommand.WorkId}] UtcEndTime: {RenderCommand.UtcEndTime}");
+                try { _cancellationTokenSource.Cancel(); _isCancelledByEndTime = true; } catch { }
+            }
+        }
 
         Task SendErrorAsync(Exception exception)
         {

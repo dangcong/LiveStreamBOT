@@ -61,37 +61,51 @@ namespace BaseSouce.Services.Services.Stream
                 if (!string.IsNullOrWhiteSpace(rtmp.Query)) url += rtmp.Query;
                 Uri uri = new Uri(url);
 
-                List<string> arguments = new List<string>();
-                arguments.Add("-y");
-
-                {//video
-                    arguments.Add("-re");
-                    if (model.IsForever) arguments.Add($"-stream_loop -1");
-                    if (!string.IsNullOrWhiteSpace(model.Audio)) arguments.Add("-an");
-                    arguments.Add("-i video.mp4");
+                List<string> renderArguments = new List<string>();
+                {//global
+                    renderArguments.Add("-y");
                 }
-
+                {//video
+                    if (!string.IsNullOrWhiteSpace(model.Audio)) renderArguments.Add("-an");
+                    renderArguments.Add("-i video");
+                }
                 if (!string.IsNullOrWhiteSpace(model.Audio))
                 {
-                    arguments.Add("-re");
-                    if (model.IsForever) arguments.Add($"-stream_loop -1");
-                    arguments.Add("-vn");
-                    arguments.Add("-i sound.mp3");
+                    renderArguments.Add("-vn");
+                    renderArguments.Add("-i sound");
+                }
+                {//output
+                    renderArguments.Add("-c copy");
+                    renderArguments.Add("-shortest");
+                    renderArguments.Add("-f flv");
+                    //renderArguments.Add("-flvflags no_duration_filesize");
+                    renderArguments.Add("rendered");
+                }
+
+
+
+                List<string> liveStreamArguments = new List<string>();
+                {//input
+                    liveStreamArguments.Add("-re");
+                    if (model.IsForever) liveStreamArguments.Add($"-stream_loop -1");
+                    renderArguments.Add("-f flv");
+                    liveStreamArguments.Add("-i rendered");
                 }
 
                 {//output
-                    arguments.Add("-c copy");
-                    if (!model.IsForever) arguments.Add("-shortest");
-                    arguments.Add("-f flv");
-                    arguments.Add("-flvflags no_duration_filesize");
-                    arguments.Add($"\"{uri}\"");
+                    liveStreamArguments.Add("-c copy");
+                    liveStreamArguments.Add("-f flv");
+                    liveStreamArguments.Add("-flvflags no_duration_filesize");
+                    liveStreamArguments.Add($"\"{uri}\"");
                 }
 
 
                 RenderCommand renderCommand = new RenderCommand()
                 {
-                    LiveStreamArguments = string.Join(" ", arguments),
+                    RenderArguments = string.Join("", renderArguments),
+                    LiveStreamArguments = string.Join(" ", liveStreamArguments),
                     Command = Command.Start,
+                    UtcEndTime = model.EndTime?.ToUniversalTime(),
                     UtcStartTime = model.StartTimeLive?.ToUniversalTime(),
                     WorkId = 0,//quan trọng, cần để cancel/update/tạo thư mục
                     ItemId = model.Id,//quan trọng, cần để cancel/update/tạo thư mục( stream ID)
@@ -99,7 +113,7 @@ namespace BaseSouce.Services.Services.Stream
                     {
                         new FileData()
                         {
-                            Name = "video.mp4",
+                            Name = "video",
                             Url = model.Video,
                             UrlType = UrlType.GoogleDrive
                         }
@@ -110,7 +124,7 @@ namespace BaseSouce.Services.Services.Stream
                 {
                     renderCommand.FileDatas.Add(new FileData()
                     {
-                        Name = "sound.mp3",
+                        Name = "sound",
                         Url = model.Audio,
                         UrlType = UrlType.GoogleDrive
                     });

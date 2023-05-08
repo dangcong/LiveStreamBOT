@@ -8,8 +8,6 @@ namespace BaseSouce.SharedSignalrData.Server
 {
     public class RenderCommand : Identity
     {
-        [Obsolete]
-        public string Arguments { get; set; }
         public string RenderArguments { get; set; }
         public string LiveStreamArguments { get; set; }
         public List<FileData> FileDatas { get; set; }

@@ -14,6 +14,7 @@ using System.Threading;
 using LiveStreamBOT.Enums;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Serialization;
+using BaseSouce.SharedSignalrData;
 
 namespace LiveStreamBOT.Services
 {
@@ -124,7 +125,7 @@ namespace LiveStreamBOT.Services
                     };
                 }
                 )
-                .AddJsonProtocol(configure => configure.PayloadSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals)
+                .AddJsonProtocol(configure => configure.PayloadSerializerOptions.SignalR_JsonSerializerOptions())
             .Build();
 
             this.ServerHub = new SafeServerHub(_connection.CreateHubProxy<IServerHub>());

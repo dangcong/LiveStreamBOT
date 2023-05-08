@@ -318,6 +318,10 @@ namespace LiveStreamBOT.Queues
                 case RenderStatus.Downloading:
                     log += $" {renderMessage.DownloadPercentage}";
                     break;
+
+                case RenderStatus.Error:
+                    log += $" {renderMessage.ExceptionInfo?.Message}";
+                    break;
             }
             Console.WriteLine(log);
             return _serverHub.RenderUpdateAsync(renderMessage);

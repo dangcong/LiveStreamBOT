@@ -147,7 +147,7 @@ namespace LiveStreamBOT.Queues
                             ItemId = RenderCommand.ItemId,
                             WorkId = RenderCommand.WorkId,
                             RenderStatus = RenderStatus.Downloading,
-                            DownloadPercentage = sizeDownloaded,
+                            DownloadPercentage = sizeDownloaded * 100.0 / totalSize,
                         });
                     }
                 }, CancellationToken);
@@ -159,7 +159,7 @@ namespace LiveStreamBOT.Queues
                 ItemId = RenderCommand.ItemId,
                 WorkId = RenderCommand.WorkId,
                 RenderStatus = RenderStatus.Downloading,
-                DownloadPercentage = sizeDownloaded,
+                DownloadPercentage = sizeDownloaded * 100.0 / totalSize,
             });
         }
 
@@ -316,7 +316,7 @@ namespace LiveStreamBOT.Queues
                     break;
 
                 case RenderStatus.Downloading:
-                    log += $" {renderMessage.DownloadPercentage}";
+                    log += $" {renderMessage.DownloadPercentage}%";
                     break;
 
                 case RenderStatus.Error:

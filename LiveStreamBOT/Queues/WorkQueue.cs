@@ -11,6 +11,10 @@ using BaseSouce.SharedSignalrData.Server;
 using BaseSouce.SharedSignalrData.BotClient;
 using LiveStreamBOT.Helpers;
 using System.Data.Common;
+using BaseSource.Shared.Helpers;
+using BaseSource.Shared.Enums;
+using TqkLibrary.Net.CloudStorage.GoogleDrive;
+using FFmpegArgs.Executes.Exceptions;
 
 namespace LiveStreamBOT.Queues
 {
@@ -128,6 +132,23 @@ namespace LiveStreamBOT.Queues
         async Task DownloadFileAsync()
         {
             double sizeDownloaded = 0;
+            using (DriveApiNonLogin driveApiNonLogin = new DriveApiNonLogin())
+            {
+                foreach (var fileData in RenderCommand.FileDatas)
+                {
+                    if (fileData.Size == 0)
+                    {
+                        var driveVideoItem = GoogleDriveHelper.TryParse(fileData.Url);
+                        if (driveVideoItem is null ||
+                            driveVideoItem.LinkType != GoogleDriveLinkType.File)
+                            throw new NotSupportedException($"Link không hỗ trợ hoặc không hợp lệ:  ({fileData.Url})");
+
+                        var videoMetadata = await driveApiNonLogin.GetMetadataAsync(driveVideoItem.ID);
+                        if (videoMetadata.FileSize.HasValue) fileData.Size = videoMetadata.FileSize.Value;
+                    }
+                }
+            }
+
             double totalSize = RenderCommand.FileDatas.Sum(x => x.Size);
             DateTime dateTime = DateTime.Now;
 
@@ -147,7 +168,7 @@ namespace LiveStreamBOT.Queues
                             ItemId = RenderCommand.ItemId,
                             WorkId = RenderCommand.WorkId,
                             RenderStatus = RenderStatus.Downloading,
-                            DownloadPercentage = sizeDownloaded,
+                            DownloadPercentage = sizeDownloaded * 100.0 / totalSize,
                         });
                     }
                 }, CancellationToken);
@@ -159,7 +180,7 @@ namespace LiveStreamBOT.Queues
                 ItemId = RenderCommand.ItemId,
                 WorkId = RenderCommand.WorkId,
                 RenderStatus = RenderStatus.Downloading,
-                DownloadPercentage = sizeDownloaded,
+                DownloadPercentage = sizeDownloaded * 100.0 / totalSize,
             });
         }
 
@@ -293,6 +314,8 @@ namespace LiveStreamBOT.Queues
 
         Task SendErrorAsync(Exception exception)
         {
+            FFmpegRenderException fFmpegRenderException = exception as FFmpegRenderException;
+            bool isFFmpegRenderException = fFmpegRenderException is not null;
             return RenderUpdateAsync(new RenderMessage()
             {
                 ItemId = RenderCommand.ItemId,
@@ -300,7 +323,7 @@ namespace LiveStreamBOT.Queues
                 RenderStatus = RenderStatus.Error,
                 ExceptionInfo = new ExceptionInfo()
                 {
-                    Message = exception.Message,
+                    Message = isFFmpegRenderException ? string.Join("\r\n", fFmpegRenderException.OutputDatas) : exception.Message,
                     Name = exception.GetType().FullName,
                     StackTrace = exception.StackTrace,
                 }
@@ -316,7 +339,11 @@ namespace LiveStreamBOT.Queues
                     break;
 
                 case RenderStatus.Downloading:
-                    log += $" {renderMessage.DownloadPercentage}";
+                    log += $" {renderMessage.DownloadPercentage}%";
+                    break;
+
+                case RenderStatus.Error:
+                    log += $" {renderMessage.ExceptionInfo?.Message}";
                     break;
             }
             Console.WriteLine(log);

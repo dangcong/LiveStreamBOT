@@ -15,7 +15,8 @@ namespace BaseSouce.SharedSignalrData.BotClient
 
 
         /// <summary>
-        /// for <see cref="RenderStatus.Downloading"/>
+        /// 0-100<br>
+        /// </br>for <see cref="RenderStatus.Downloading"/>
         /// </summary>
         public double DownloadPercentage { get; set; }
 

@@ -14,6 +14,7 @@ using System.Data.Common;
 using BaseSource.Shared.Helpers;
 using BaseSource.Shared.Enums;
 using TqkLibrary.Net.CloudStorage.GoogleDrive;
+using FFmpegArgs.Executes.Exceptions;
 
 namespace LiveStreamBOT.Queues
 {
@@ -313,6 +314,8 @@ namespace LiveStreamBOT.Queues
 
         Task SendErrorAsync(Exception exception)
         {
+            FFmpegRenderException fFmpegRenderException = exception as FFmpegRenderException;
+            bool isFFmpegRenderException = fFmpegRenderException is not null;
             return RenderUpdateAsync(new RenderMessage()
             {
                 ItemId = RenderCommand.ItemId,
@@ -320,7 +323,7 @@ namespace LiveStreamBOT.Queues
                 RenderStatus = RenderStatus.Error,
                 ExceptionInfo = new ExceptionInfo()
                 {
-                    Message = exception.Message,
+                    Message = isFFmpegRenderException ? string.Join("\r\n", fFmpegRenderException.OutputDatas) : exception.Message,
                     Name = exception.GetType().FullName,
                     StackTrace = exception.StackTrace,
                 }

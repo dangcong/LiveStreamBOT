@@ -16,7 +16,7 @@ namespace LiveStreamBOT.Helpers
     internal class DownloadHelper : IDisposable
     {
         //https://drive.google.com/file/d/1I0zTP9I5XIcDitHa_4hKug5FM8pCV-EY/view?usp=share_link
-        readonly Regex regex_driveFile = new Regex("(?<=\\/d\\/)[a-zA-Z0-9_-]+(?=\\/)");
+        readonly Regex regex_driveFile = new Regex("(?<=\\/d\\/)[a-zA-Z0-9_-]+(?=\\/|$)");
 
         readonly HttpClient httpClient;
         readonly DriveApiNonLogin driveApiNonLogin;

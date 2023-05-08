@@ -129,8 +129,8 @@ namespace BaseSouce.Services.Services.Stream
 
                 RenderCommand renderCommand = new RenderCommand()
                 {
-                    Arguments = string.Join("", arguments_oldBot),
-                    RenderArguments = string.Join("", renderArguments),
+                    Arguments = string.Join(" ", arguments_oldBot),
+                    RenderArguments = string.Join(" ", renderArguments),
                     LiveStreamArguments = string.Join(" ", liveStreamArguments),
                     Command = Command.Start,
                     UtcEndTime = model.EndTime?.ToUniversalTime(),

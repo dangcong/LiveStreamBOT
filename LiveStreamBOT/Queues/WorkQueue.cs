@@ -11,6 +11,9 @@ using BaseSouce.SharedSignalrData.Server;
 using BaseSouce.SharedSignalrData.BotClient;
 using LiveStreamBOT.Helpers;
 using System.Data.Common;
+using BaseSource.Shared.Helpers;
+using BaseSource.Shared.Enums;
+using TqkLibrary.Net.CloudStorage.GoogleDrive;
 
 namespace LiveStreamBOT.Queues
 {
@@ -128,6 +131,23 @@ namespace LiveStreamBOT.Queues
         async Task DownloadFileAsync()
         {
             double sizeDownloaded = 0;
+            using (DriveApiNonLogin driveApiNonLogin = new DriveApiNonLogin())
+            {
+                foreach (var fileData in RenderCommand.FileDatas)
+                {
+                    if (fileData.Size == 0)
+                    {
+                        var driveVideoItem = GoogleDriveHelper.TryParse(fileData.Url);
+                        if (driveVideoItem is null ||
+                            driveVideoItem.LinkType != GoogleDriveLinkType.File)
+                            throw new NotSupportedException($"Link không hỗ trợ hoặc không hợp lệ:  ({fileData.Url})");
+
+                        var videoMetadata = await driveApiNonLogin.GetMetadataAsync(driveVideoItem.ID);
+                        if (videoMetadata.FileSize.HasValue) fileData.Size = videoMetadata.FileSize.Value;
+                    }
+                }
+            }
+
             double totalSize = RenderCommand.FileDatas.Sum(x => x.Size);
             DateTime dateTime = DateTime.Now;
 

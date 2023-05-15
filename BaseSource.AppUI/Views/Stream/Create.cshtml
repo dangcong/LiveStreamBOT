@@ -204,11 +204,11 @@
                             <div class="section-title">Hẹn lịch -  <span class="text-danger"> Chọn thời gian bắt đầu và thời gian kết thúc (Nếu không hẹn lịch thì để mặc định)</span></div>
                             <div class="form-group">
                                 <label>Thời gian bắt đầu</label>
-                                <input type="datetime-local" asp-for="StartTimeLive" class="form-control col-2" placeholder="Thời gian bắt đầu">
+                                <input type="datetime-local" asp-for="StartTimeLive" class="form-control col-6" placeholder="Thời gian bắt đầu">
                             </div>
                             <div class="form-group">
                                 <label>Thời gian kết thúc</label>
-                                <input type="datetime-local" asp-for="EndTimeLive" class="form-control col-2" placeholder="Thời gian kết thúc">
+                                <input type="datetime-local" asp-for="EndTimeLive" class="form-control col-6" placeholder="Thời gian kết thúc">
                             </div>
                         </div>
                         <div class="card-footer text-left">
@@ -316,22 +316,23 @@
                                                             <span class="badge badge-success">4K</span>
                                                             break;
                                                     }
+
                                                 </td>
                                                 <td>@item.StreamName</td>
                                                 <th>@item.StreamKey</th>
                                                 <td>@item.RTMP</td>
                                                 <td>
-                                                    @if (item.IsForever)
+                                                   
+                                                    @if (item.EndTimeLive != null)
                                                     {
-                                                        <span class="badge badge-success">24//7</span>
-                                                    }
-                                                    else
+                                                        <span class="badge badge-success">Live 11h</span>
+                                                    }else
                                                     {
-                                                        <span class="badge badge-success">Hẹn giờ</span>
+                                                        <span class="badge badge-primary">24//7</span>
                                                     }
                                                 </td>
                                                 <td>
-                                                    @(item.Updatedtime?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")
+                                                    @(item.Updatedtime?.ToString("dd/MM/yyyy HH:mm:ss") ?? item.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")
                                                 </td>
                                                 <td>
                                                     @if (item.EndTimeLive != null)
@@ -346,7 +347,7 @@
                                                 <td>
                                                     @if (item.EndTimeLive != null)
                                                     {
-                                                        <span>@item.EndTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")</span>
+                                                        @*<span>@item.EndTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")</span>*@
                                                         <span>@(item.EndTimeLive - item.StartTimeLive)</span>
                                                     }
                                                     else

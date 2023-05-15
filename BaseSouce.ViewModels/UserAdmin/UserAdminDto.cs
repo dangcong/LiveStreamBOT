@@ -1,4 +1,5 @@
-﻿using BaseSouce.ViewModels.Common;
+﻿using BaseSouce.Shared.Enums;
+using BaseSouce.ViewModels.Common;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -57,6 +58,17 @@ namespace BaseSource.ViewModels.UserAdmin
         public int? Bot4K { get; set; }
         public string UserName { get; set; }
     }
+
+    public class UserManagerBotInfoDto
+    {
+        public int Id { get; set; }
+        public int NumberOfThreads { get; set; }
+        public int NumberOfThreadsInRun { get; set; }
+        public string BotName { get; set; }
+        public string UserName { get; set; }
+        public LiveType? LiveType { get; set; }
+    }
+
     public class UserCreateAdminDto
     {
         public string UserName { get; set; }
@@ -64,5 +76,20 @@ namespace BaseSource.ViewModels.UserAdmin
         public int NumberOfThreads1080 { get; set; }
         public int NumberOfThreads4K { get; set; }
         public string LinkTelegram { get; set; }
+    }
+    public class UserManagerBotUpdateDto
+    {
+        public int Id { get; set; }
+        public int NumberOfThreads { get; set; }
+        public string UserId { get; set; }
+        public string UserName { get; set; }
+    }
+    public class UserAddBOTAdminDto
+    {
+        public string UserId { get; set; }
+        public string UserName { get; set; }
+        public int NumberOfThreads { get; set; }
+        public int? Bot1080 { get; set; }
+        public int? Bot4k { get; set; }
     }
 }

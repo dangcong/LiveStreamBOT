@@ -27,6 +27,16 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+
+            var report = await _streamAdminApiClient.GetReportStream();
+
+            if (report == null || !report.IsSuccessed)
+            {
+                return NotFound();
+
+            }
+
+            ViewBag.Report = report.ResultObj;
             return View(result.ResultObj);
         }
 

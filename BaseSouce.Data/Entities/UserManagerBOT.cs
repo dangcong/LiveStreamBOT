@@ -10,7 +10,7 @@ namespace BaseSource.Data.Entities
         public int ManagerBOTId { get; set; }
         public LiveType LiveType { get; set; }
         public DateTime CreatedTime { get; set; }
-
+        public int NumberOfThreads { get; set; }
         public AppUser User { get; set; }
         public ManagerBOT ManagerBOT { get; set; }
     }

@@ -106,15 +106,19 @@ namespace BaseSouce.Services.Services.BOT
         {
             try
             {
+                var _repositoryUser = _unitOfWork.GetRepository<AppUser>();
+
+                var _repositoryUserBot = _unitOfWork.GetRepository<UserManagerBOT>();
+
                 var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
                 var existStream = await _repositoryStream.ExistsAsync(
-                    x => x.Id == id);
+                    x => x.Id == id && x.Status == StreamStatus.Streaming);
                 if (existStream)
                 {
                     return new KeyValuePair<bool, string>(false, "Đang có luồng Stream, không thể xóa!");
                 }
 
-                var _repository = _unitOfWork.GetRepository<Data.Entities.ManagerBOT>();
+                var _repository = _unitOfWork.GetRepository<ManagerBOT>();
 
                 var botCurrent = await _repository.GetFirstOrDefaultAsync(
                     predicate: x => x.Id == id, disableTracking: false);
@@ -126,6 +130,30 @@ namespace BaseSouce.Services.Services.BOT
                 botCurrent.DeletedTime = DateTime.Now;
                 botCurrent.Status = ManagerBOTStatus.Disconnected;
                 _repository.Update(botCurrent);
+
+                //remove thread of users
+
+                var userOfBots = await _repositoryUserBot.Queryable()
+                    .Where(x => x.ManagerBOTId == botCurrent.Id).ToListAsync();
+
+                if (userOfBots.Any())
+                {
+
+                    _repositoryUserBot.Delete(userOfBots);
+                    //foreach (var item in userOfBots)
+                    //{
+                    //    switch (botCurrent.LiveType)
+                    //    {
+                    //        case LiveType._1080:
+                    //            item.NumberOfThreads1080 = 0;
+                    //            break;
+                    //        case LiveType._4K:
+                    //            item.NumberOfThreads4K = 0;
+                    //            break;
+                    //    }
+                    //}
+                    //_repositoryUser.Update(userOfBots);
+                }
 
                 await _unitOfWork.SaveChangesAsync();
 
@@ -150,9 +178,9 @@ namespace BaseSouce.Services.Services.BOT
                     predicate: x => x.ConnectionId == connectionId, disableTracking: false);
                 if (botCurrent != null)
                 {
-                    botCurrent.Status= ManagerBOTStatus.Disconnected;
+                    botCurrent.Status = ManagerBOTStatus.Disconnected;
 
-                    var streamsCurrents =await _repositoryStream.Queryable()
+                    var streamsCurrents = await _repositoryStream.Queryable()
                         .Where(x => x.ManagerBOTId == botCurrent.Id && x.Status == StreamStatus.Streaming).ToListAsync();
 
                     if (streamsCurrents.Any())
@@ -164,7 +192,7 @@ namespace BaseSouce.Services.Services.BOT
                         _repositoryStream.Update(streamsCurrents);
                     }
                     _repositoryBot.Update(botCurrent);
-                   await _unitOfWork.SaveChangesAsync();
+                    await _unitOfWork.SaveChangesAsync();
                 }
                 return new KeyValuePair<bool, string>(true, string.Empty);
             }
@@ -194,25 +222,21 @@ namespace BaseSouce.Services.Services.BOT
                 foreach (var item in data.Items)
                 {
 
-                    var dataThread = await _repositoryUserBot.Queryable()
+                    var totalThread = await _repositoryUserBot.Queryable()
                         .AsNoTracking()
                         .Include(x => x.User)
                         .Where(x => x.ManagerBOTId == item.Id)
-                        .Select(x => new
-                        {
-                            thread1080 = x.User.NumberOfThreads1080,
-                            thread4k = x.User.NumberOfThreads4K
-                        }).ToListAsync();
-
-                    switch (item.LiveType)
-                    {
-                        case LiveType._1080:
-                            item.NumberOfThreads = dataThread.Sum(x => x.thread1080);
-                            break;
-                        case LiveType._4K:
-                            item.NumberOfThreads = dataThread.Sum(x => x.thread4k);
-                            break;
-                    }
+                        .SumAsync(x => x.NumberOfThreads);
+                    item.NumberOfThreads = totalThread;
+                    //switch (item.LiveType)
+                    //{
+                    //    case LiveType._1080:
+                    //        item.NumberOfThreads = dataThread.Sum(x => x.thread1080);
+                    //        break;
+                    //    case LiveType._4K:
+                    //        item.NumberOfThreads = dataThread.Sum(x => x.thread4k);
+                    //        break;
+                    //}
                 }
             }
             return data;
@@ -258,10 +282,10 @@ namespace BaseSouce.Services.Services.BOT
                 {
                     var userCurrent = await _repositoryUser.GetFirstOrDefaultAsync(
                         predicate: x => x.Id == item.UserId,
-                        include: x => x.Include(x => x.StreamHistorys),
+                        include: x => x.Include(x => x.StreamHistorys).Include(x => x.UserManagerBOTs),
                         selector: x => new
                         {
-                            NumberOfThreads = item.Type == LiveType._1080 ? x.NumberOfThreads1080 : x.NumberOfThreads4K,
+                            NumberOfThreads = x.UserManagerBOTs.Where(x => x.ManagerBOTId == item.BotId).Select(x => x.NumberOfThreads).FirstOrDefault(),
                             NumberOfThreadsInRun = x.StreamHistorys
                             .Where(i => i.Status == StreamStatus.Streaming && i.ManagerBOTId == item.BotId).Count()
                         });
@@ -280,7 +304,7 @@ namespace BaseSouce.Services.Services.BOT
         {
             try
             {
-                var _repository = _unitOfWork.GetRepository<Data.Entities.ManagerBOT>();
+                var _repository = _unitOfWork.GetRepository<ManagerBOT>();
 
                 var botCurrent = await _repository.GetFirstOrDefaultAsync(
                     predicate: x => x.Id == id, disableTracking: false);

@@ -265,18 +265,18 @@ namespace BaseSouce.Services.Services.User
                     PackageLive1080 = new PackageLiveInfoDto
                     {
 
-                        NumberOfThreads = x.NumberOfThreads1080,
+                        NumberOfThreads = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._1080).Sum(i => i.NumberOfThreads),
                         NumberOfThreadsCreated = x.NumberOfThreads1080Create,
                         Name = "Live 1080"
 
                     },
                     PackageLive4k = new PackageLiveInfoDto
                     {
-                        NumberOfThreads = x.NumberOfThreads4K,
+                        NumberOfThreads = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._4K).Sum(i => i.NumberOfThreads),
                         NumberOfThreadsCreated = x.NumberOfThreads4KCreate,
                         Name = "Live 4k"
                     },
-                });
+                }, include: x => x.Include(i => i.UserManagerBOTs).ThenInclude(o => o.ManagerBOT));
             var streamHistorys = await _repositoryStream.Queryable()
                      .Where(x => x.UserId == userId)
                      .GroupBy(x => x.LiveType)
@@ -321,13 +321,13 @@ namespace BaseSouce.Services.Services.User
                     TelegramAPI = x.TelegramAPI,
                     PackageLive1080 = new PackageLiveInfoDto
                     {
-                        NumberOfThreads = x.NumberOfThreads1080,
+                        NumberOfThreads = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._1080).Sum(i => i.NumberOfThreads),
                         NumberOfThreadsInRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._1080 && i.Status == StreamStatus.Streaming).Count(),
                         NumberOfThreadsCreated = x.StreamHistorys.Where(i => i.LiveType == LiveType._1080).Count(),
                     },
                     PackageLive4k = new PackageLiveInfoDto
                     {
-                        NumberOfThreads = x.NumberOfThreads1080,
+                        NumberOfThreads = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._4K).Sum(i => i.NumberOfThreads),
                         NumberOfThreadsInRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._4K && i.Status == StreamStatus.Streaming).Count(),
                         NumberOfThreadsCreated = x.StreamHistorys.Where(i => i.LiveType == LiveType._4K).Count(),
                     },

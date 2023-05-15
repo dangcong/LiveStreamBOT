@@ -1,106 +1,244 @@
-﻿@model UserManagerBotDto
+﻿@model List<UserManagerBotInfoDto>
 @{
+    ViewData["Title"] = $"Danh sách BOT của {ViewBag.UserName}";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
-    ViewData["Title"] = $"Cập nhật BOT cho người dùng {Model.UserName}";
     var bots = ViewBag.Bots as List<ManagerBotInfoDto>;
     var bot1080 = bots.Where(x => x.LiveType == LiveType._1080).ToList();
     var bot4k = bots.Where(x => x.LiveType == LiveType._4K).ToList();
+
 }
 
 <section class="section">
     <div class="section-header">
-        <h1>Cài đặt</h1>
+        <h1>@ViewData["Title"]</h1>
         <div class="section-header-breadcrumb">
             <div class="breadcrumb-item active"><a href="#">Home</a></div>
-            <div class="breadcrumb-item"><a href="#">Chỉnh sửa</a></div>
-            <div class="breadcrumb-item">
-                @ViewData["Title"]
-            </div>
+            <div class="breadcrumb-item"><a href="#">Danh sách </a></div>
+            <div class="breadcrumb-item">BOT</div>
         </div>
     </div>
+
     <div class="section-body">
+        <h2 class="section-title">@ViewData["Title"]</h2>
+
         <div class="row">
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
                         <h4>@ViewData["Title"]</h4>
+                        <button class="btn btn-success" data-toggle="modal" data-target="#addModal">Thêm mới</button>
                     </div>
                     <div class="card-body">
-                        <form method="post" action="/admin/user/managerbot">
-                            <div class="row">
-
-                                <div class="col-12">
-                                    <h6>@ViewData["Title"]</h6>
-                                    <div class="form-group mb-4">
-                                        <label class="">Số luồng 1080 cho phép</label>
-                                        <div class="">
-                                            <input asp-for="UserId" style="display:none;" />
-                                            <input asp-for="NumberOfThreads1080" min="0" placeholder="Nhập số luồng 1080 cho phép" class="form-control" />
-                                            <span asp-validation-for="NumberOfThreads1080" class="text-danger"></span>
-                                        </div>
-                                    </div>
-                                    <div class="form-group mb-4">
-                                        <label class="">BOT 1080 </label>
-                                        <div class="">
-                                            <select class="form-control" asp-for="Bot1080">
-                                                <option value="0">-- Chọn bot --</option>
-                                                @foreach (var item in bot1080)
+                        <div class="table-responsive">
+                            <table class="table table-striped" id="table-bots">
+                                <thead>
+                                    <tr>
+                                        <th>BotName</th>
+                                        <th>Loại</th>
+                                        <th>Số luồng Chạy/Tổng</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model)
+                                    {
+                                        <tr>
+                                            <td> <span class="text-danger"><strong>@item.BotName</strong></span></td>
+                                            <td>
+                                                @switch (item.LiveType)
                                                 {
-                                                    <option value="@item.Id">@item.Name (@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads))</option>
+                                                    case LiveType._1080:
+                                                        <span class="badge badge-success">1080</span>
+                                                        break;
+                                                    case LiveType._4K:
+                                                        <span class="badge badge-danger">4k</span>
+                                                        break;
                                                 }
+                                            </td>
+                                            <td> <span class="badge badge-primary">@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads)</span></td>
 
-                                            </select>
-
-                                            <span asp-validation-for="Bot1080" class="text-danger"></span>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group mb-4">
-                                        <label class="">Số luồng 4K cho phép</label>
-                                        <div class="">
-                                            <input asp-for="NumberOfThreads4K" min="0" placeholder="Nhập số luồng 4k cho phép" class="form-control" />
-                                            <span asp-validation-for="NumberOfThreads4K" class="text-danger"></span>
-                                        </div>
-                                    </div>
-
-                                    <div class="form-group mb-4">
-                                        <label class="">BOT 4k </label>
-                                        <div class="">
-                                            <select class="form-control" asp-for="Bot4K">
-                                                <option value="0">-- Chọn bot --</option>
-                                                @foreach (var item in bot4k)
-                                                {
-                                                    <option value="@item.Id">@item.Name (@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads))</option>
-                                                }
-
-                                            </select>
-
-                                            <span asp-validation-for="Bot4K" class="text-danger"></span>
-                                        </div>
-                                    </div>
-
-
-                                </div>
-
-                            </div>
-                            <div class="form-group row mb-4">
-                                <label class="col-form-label text-md-right col-12 col-md-4 col-lg-4"></label>
-                                <div class="buttons col-sm-12 col-md-8">
-                                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
-                                    <button type="submit" class="btn btn-info btn-lg btn-icon btn-setting"><i class="fas fa-check"></i>&ensp;Cập nhật</button>
-                                </div>
-                            </div>
-                        </form>
+                                            <td>
+                                                <a class="btn btn-info btnUpdate" href="#"
+                                                   data-toggle="modal"
+                                                   data-target="#updateModal"
+                                                   data-id="@item.Id"
+                                                   data-number="@item.NumberOfThreads">Cập nhật</a>
+                                                <a class="btn btn-danger btnDelete" href="#"
+                                                   data-toggle="modal"
+                                                   data-target="#deleteModal"
+                                                   data-id="@item.Id">Xóa</a>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </section>
+<div class="modal fade" tabindex="-1" role="dialog" id="deleteModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Xóa BOT </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Bạn muốn xóa BOT của người dùng này ? Nếu người dùng có luồng đang chạy không thể xóa BOT</p>
+            </div>
+            <div class="modal-footer bg-whitesmoke br">
+                <form id="deleteForm" method="post" action="/admin/user/DeleteBOT">
+                    <input name="Id" type="hidden" />
+                    <input name="UserId" type="hidden" value="@ViewBag.UserId" />
+                    <input name="UserName" type="hidden" value="@ViewBag.UserName" />
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger">Xác nhận </button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" role="dialog" id="updateModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cập nhật số luồng </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="updateForm" method="post" action="/admin/user/UpdateBOtUser">
+                <div class="modal-body">
+                    <div class="form-group mb-4">
+                        <label class="">Nhập số luồng muốn cập nhật</label>
+                        <div class="">
+                            <input name="NumberOfThreads" placeholder="Nhập số luồng cấp phép" required min="1" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+                    <input name="Id" type="hidden" />
+                    <input name="UserId" type="hidden" value="@ViewBag.UserId" />
+                    <input name="UserName" type="hidden" value="@ViewBag.UserName" />
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" id="btn-confirm-payment" class="btn btn-danger">Xác nhận </button>
+
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" role="dialog" id="addModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm BOT cho người dùng (Nếu BOT đã có không thể thêm mới)</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="addForm" method="post" action="/admin/user/AddBOT">
+                <input name="UserId" type="hidden" value="@ViewBag.UserId" />
+                <input name="UserName" type="hidden" value="@ViewBag.UserName" />
+                <div class="modal-body">
+                    <div class="form-group mb-4">
+                        <label class="">Nhập số luồng</label>
+                        <div class="">
+                            <input name="NumberOfThreads" placeholder="Nhập số luồng cấp phép" required min="1" class="form-control" />
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label class="">Loại BOT</label>
+                        <div class="">
+                            <select class="form-control" name="typeBot" id="typeBot" required>
+                                <option>-- Chọn loại bot --</option>
+                                <option value="1">-- BOT 1080 --</option>
+                                <option value="2">-- BOT 4k --</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group mb-4 bot4k" style="display:none">
+                        <label class="">Chọn BOT 4k</label>
+                        <div class="">
+                            <select class="form-control" name="Bot4k">
+                                <option value="0">-- Chọn bot --</option>
+                                @foreach (var item in bot4k)
+                                {
+                                    <option value="@item.Id">@item.Name (@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads))</option>
+                                }
+
+                            </select>
+
+                        </div>
+                    </div>
+                    <div class="form-group mb-4 bot1080" style="display:none">
+                        <label class="">Chọn BOT 1080</label>
+                        <div class="">
+                            <select class="form-control" name="Bot1080">
+                                <option value="0">-- Chọn bot --</option>
+                                @foreach (var item in bot1080)
+                                {
+                                    <option value="@item.Id">@item.Name (@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads))</option>
+                                }
+
+                            </select>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+                   
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" id="btn-confirm-payment" class="btn btn-danger">Xác nhận </button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @section Scripts{
     <script>
-        $('body').on('click', '.btn-setting', function () {
-            showModal(null, 'updateSetting');
+
+        $('body').on('click', '.btnUpdate', function () {
+            let id = $(this).attr('data-id');
+            let number = $(this).attr('data-number');
+            $('#updateForm input[name="Id"]').val(id);
+            $('#updateForm input[name="NumberOfThreads"]').val(number);
+        });
+        $('body').on('click', '.btnDelete', function () {
+            let id = $(this).attr('data-id');
+            $('#deleteForm input[name="Id"]').val(id);
+        });
+        $(document).ready(function () {
+            $("#table-bots").DataTable({});
+
+            $('body').on('change', '#typeBot', function () {
+                let val = $(this).val();
+                console.log(val);
+                switch (val) {
+                    case "1":
+                        $('.bot1080').show();
+                        $('.bot4k').hide();
+                        break;
+                    case "2":
+                        $('.bot4k').show();
+                        $('.bot1080').hide();
+                        break;
+                    default:
+                        $('.bot4k').hide();
+                        $('.bot1080').hide();
+                        break;
+                }
+            })
         });
     </script>
 }

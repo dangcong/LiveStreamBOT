@@ -11,8 +11,8 @@ namespace BaseSouce.Data.Entities
         public DateTime CreatedTime { get; set; }
         public string TelegramAPI { get; set; }
 
-        public int NumberOfThreads1080 { get; set; }
-        public int NumberOfThreads4K { get; set; }
+        //public int NumberOfThreads1080 { get; set; }
+        //public int NumberOfThreads4K { get; set; }
         public int NumberOfThreads1080Create { get; set; }
         public int NumberOfThreads4KCreate { get; set; }
         public string Password { get; set; }

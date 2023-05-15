@@ -1,6 +1,6 @@
 ﻿@model List<UserAdminInfoDto>
 @{
-    ViewData["Title"] = "Danh sách Manager";
+    ViewData["Title"] = "Danh sách Tài khoản Quản lý";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
 }
 
@@ -21,7 +21,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h4>@ViewData["Title"]</h4>
-                        <button class="btn btn-success" data-toggle="modal" data-target="#addRoleModal">Thêm Manager</button>
+                        <button class="btn btn-success" data-toggle="modal" data-target="#addRoleModal">Thêm Tài khoản Quản lý</button>
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -30,7 +30,7 @@
                                     <tr>
                                         <th>Người dùng</th>
                                         <th>Mật khẩu</th>
-                                        <th>Email</th>
+                                        <th>Telegram</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -40,7 +40,7 @@
                                         <tr>
                                             <td>@item.UserName</td>
                                             <td>@item.Password</td>
-                                            <td>@item.Email</td>
+                                            <td>@item.TelegramAPI</td>
                                             <td>
                                                 <button class="btn btn-danger btn-removeRole" data-id="@item.UserName"
                                                         data-toggle="modal" data-target="#removeRoleModal">

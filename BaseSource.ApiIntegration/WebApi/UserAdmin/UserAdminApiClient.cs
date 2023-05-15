@@ -26,6 +26,12 @@ namespace BaseSource.ApiIntegration.WebApi.UserAdmin
             return await client.PostAsync<ApiResult<string>>($"/api/admin/user/delete?userId={userId}");
         }
 
+        public async Task<ApiResult<string>> DeleteUserManagerBot(int id)
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            return await client.PostAsync<ApiResult<string>>($"/api/admin/user/managerBot/delete/{id}");
+        }
+
         public async Task<ApiResult<List<UserAdminInfoDto>>> GetAllManager()
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
@@ -44,11 +50,23 @@ namespace BaseSource.ApiIntegration.WebApi.UserAdmin
             return await client.GetAsync<ApiResult<PagedResult<UserAdminInfoDto>>>($"/api/admin/users", model);
         }
 
-        public async Task<ApiResult<UserManagerBotDto>> GetUserManagerBot(string userId)
+        public async Task<ApiResult<List<UserManagerBotInfoDto>>> GetUserManagerBot(string userId)
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
-            return await client.GetAsync<ApiResult<UserManagerBotDto>>($"/api/admin/user/managerBot?userId={userId}");
+            return await client.GetAsync<ApiResult<List<UserManagerBotInfoDto>>>($"/api/admin/user/managerBot?userId={userId}");
         }
+
+        public async Task<ApiResult<string>> InserBOTUser(UserAddBOTAdminDto model)
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            return await client.PostAsync<ApiResult<string>>($"/api/admin/user/managerBot/add", model);
+        }
+
+        //public async Task<ApiResult<List<UserManagerBotInfoDto>>> GetUserManagerBot(string userId)
+        //{
+        //    var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+        //    return await client.GetAsync<ApiResult<List<UserManagerBotInfoDto>>>($"/api/admin/user/managerBot?userId={userId}");
+        //}
 
         public async Task<ApiResult<string>> ResetPassword(ResetPasswordAdminDto model)
         {
@@ -73,5 +91,13 @@ namespace BaseSource.ApiIntegration.WebApi.UserAdmin
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
             return await client.PostAsync<ApiResult<string>>($"/api/admin/user/managerBot/update", model);
         }
+
+        public async Task<ApiResult<string>> UpdateUserManagetBotAsync(UserManagerBotUpdateDto model)
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            return await client.PostAsync<ApiResult<string>>($"/api/admin/user/managerBot/update", model);
+        }
+
+       
     }
 }

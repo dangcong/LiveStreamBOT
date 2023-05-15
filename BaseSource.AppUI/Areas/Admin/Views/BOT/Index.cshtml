@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Danh sách BOT";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+     var report = ViewBag.Report as StreamReportAdminDto;
 }
 
 <section class="section">
@@ -16,6 +17,45 @@
 
     <div class="section-body">
         <h2 class="section-title">@ViewData["Title"]</h2>
+          <div class=" row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="card card-statistic-2">
+                    <div class="card-stats">
+                        <div class="card-stats-title">
+                            Báo cáo
+                        </div>
+                        <div class="card-stats-items">
+                            <div class="card-stats-item">
+                                <div class="card-stats-item-count"><span class="badge badge-success">@(report.NumberOfThreads1080InRun)/@(report.NumberOfThreads1080)</span></div>
+                                <div class="card-stats-item-label">Tổng số luồng 1080(Đang chạy/Tổng)</div>
+                            </div>
+                            <div class="card-stats-item">
+                                <div class="card-stats-item-count"><span class="badge badge-primary">@(report.NumberOfThreads4KInRun)/@(report.NumberOfThreads4KInRun)</span></div>
+                                <div class="card-stats-item-label">Tổng số luồng 4k(Đang chạy/Tổng)</div>
+                            </div>
+                            <div class="card-stats-item">
+                                <div class="card-stats-item-count">@report.TotalBOT</div>
+                                <div class="card-stats-item-label">Tổng BOT</div>
+                            </div>
+                            <div class="card-stats-item">
+                                <div class="card-stats-item-count">@report.TotalUser</div>
+                                <div class="card-stats-item-label">Tổng User</div>
+                            </div>
+                            <div class="card-stats-item">
+                                <div class="card-stats-item-count">@report.TotalManager</div>
+                                <div class="card-stats-item-label">Tổng Manager</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <br />
+                        <span></span>
+                    </div>
+                   
+                    
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class="col-12">
                 <div class="card">

@@ -52,34 +52,34 @@ namespace BaseSouce.Services.Services.OrderAdmin
 
                 if (userCurrent != null)
                 {
-                    switch (orderEntity.ServicePack.Type)
-                    {
-                        case ServicePackType._1080:
-                            userCurrent.NumberOfThreads1080 = orderEntity.NumberOfThreads;
-                            userCurrent.NumberOfThreads1080Create = orderEntity.ServicePack.NumberOfThreadsCreate;
+                    //switch (orderEntity.ServicePack.Type)
+                    //{
+                    //    case ServicePackType._1080:
+                    //        userCurrent.NumberOfThreads1080 = orderEntity.NumberOfThreads;
+                    //        userCurrent.NumberOfThreads1080Create = orderEntity.ServicePack.NumberOfThreadsCreate;
 
-                            var order1080Disable = _repository.Queryable().Where(x => x.IsActive
-                            && x.ServicePack.Type == ServicePackType._1080).FirstOrDefault();
-                            if (order1080Disable != null)
-                            {
-                                order1080Disable.IsActive = false;
-                                _repository.Update(order1080Disable);
-                            }
+                    //        var order1080Disable = _repository.Queryable().Where(x => x.IsActive
+                    //        && x.ServicePack.Type == ServicePackType._1080).FirstOrDefault();
+                    //        if (order1080Disable != null)
+                    //        {
+                    //            order1080Disable.IsActive = false;
+                    //            _repository.Update(order1080Disable);
+                    //        }
 
-                            break;
-                        case ServicePackType._4K:
-                            userCurrent.NumberOfThreads4K = orderEntity.NumberOfThreads;
-                            userCurrent.NumberOfThreads4KCreate = orderEntity.ServicePack.NumberOfThreadsCreate;
+                    //        break;
+                    //    case ServicePackType._4K:
+                    //        userCurrent.NumberOfThreads4K = orderEntity.NumberOfThreads;
+                    //        userCurrent.NumberOfThreads4KCreate = orderEntity.ServicePack.NumberOfThreadsCreate;
 
-                            var order4KDisable = _repository.Queryable().Where(x => x.IsActive
-                            && x.ServicePack.Type == ServicePackType._4K).FirstOrDefault();
-                            if (order4KDisable != null)
-                            {
-                                order4KDisable.IsActive = false;
-                                _repository.Update(order4KDisable);
-                            }
-                            break;
-                    }
+                    //        var order4KDisable = _repository.Queryable().Where(x => x.IsActive
+                    //        && x.ServicePack.Type == ServicePackType._4K).FirstOrDefault();
+                    //        if (order4KDisable != null)
+                    //        {
+                    //            order4KDisable.IsActive = false;
+                    //            _repository.Update(order4KDisable);
+                    //        }
+                    //        break;
+                    //}
 
                     _repositoryUser.Update(userCurrent);
                 }

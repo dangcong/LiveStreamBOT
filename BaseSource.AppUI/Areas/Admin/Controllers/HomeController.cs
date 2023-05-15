@@ -8,7 +8,8 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
         [Route("/admin")]
         public IActionResult Index()
         {
-            return View();
+            return Redirect("/admin/user/index");
+            //return View();
         }
     }
 }

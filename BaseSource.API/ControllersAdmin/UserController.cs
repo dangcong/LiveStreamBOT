@@ -78,15 +78,40 @@ namespace BaseSource.API.ControllersAdmin
         [Route("/api/admin/user/managerBot")]
         public async Task<IActionResult> GetUserManagerBot([FromQuery] string userId)
         {
-            var result = await _userAdminService.GetUserManagerBotAsync(userId);
+            var result = await _userAdminService.GetUserBotAsync(userId);
             return Ok(new ApiSuccessResult<object>(result));
         }
 
         [HttpPost]
         [Route("/api/admin/user/managerBot/update")]
-        public async Task<IActionResult> UpdateUserManagerBot([FromBody] UserManagerBotDto model)
+        public async Task<IActionResult> UpdateUserManagerBot([FromBody] UserManagerBotUpdateDto model)
         {
-            var result = await _userAdminService.UpdateUserManagerBotAsync(model);
+            var result = await _userAdminService.UpdateUserManagetBotAsync(model);
+            if (result.Key)
+            {
+                return Ok(new ApiSuccessResult<string>(string.Empty));
+            }
+            return Ok(new ApiErrorResult<string>(result.Value));
+        }
+
+
+        [HttpPost]
+        [Route("/api/admin/user/managerBot/add")]
+        public async Task<IActionResult> AddUserManagerBot([FromBody] UserAddBOTAdminDto model)
+        {
+            var result = await _userAdminService.InsertBOTOfUserAsync(model);
+            if (result.Key)
+            {
+                return Ok(new ApiSuccessResult<string>(string.Empty));
+            }
+            return Ok(new ApiErrorResult<string>(result.Value));
+        }
+
+        [HttpPost]
+        [Route("/api/admin/user/managerBot/delete/{id:int:min(1)}")]
+        public async Task<IActionResult> DeleteUserManagerBOT(int id)
+        {
+            var result = await _userAdminService.DeleteUserManagerBot(id);
             if (result.Key)
             {
                 return Ok(new ApiSuccessResult<string>(string.Empty));

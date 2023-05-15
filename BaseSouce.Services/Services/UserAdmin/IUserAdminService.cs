@@ -1,10 +1,5 @@
 ﻿using BaseSource.ViewModels.UserAdmin;
 using EFCore.UnitOfWork.PageList;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BaseSouce.Services.Services.UserAdmin
 {
@@ -20,6 +15,11 @@ namespace BaseSouce.Services.Services.UserAdmin
         Task<KeyValuePair<bool, string>> UpdateUserManagerBotAsync( UserManagerBotDto model);
         Task<KeyValuePair<bool,string>> DeleteAsync(string userId);
         Task<KeyValuePair<bool, string>> CreateUserAsync(UserCreateAdminDto model);
+
+        Task<List<UserManagerBotInfoDto>> GetUserBotAsync(string userId);
+        Task<KeyValuePair<bool, string>> DeleteUserManagerBot(int id);
+        Task<KeyValuePair<bool, string>> UpdateUserManagetBotAsync(UserManagerBotUpdateDto model);
+        Task<KeyValuePair<bool, string>> InsertBOTOfUserAsync(UserAddBOTAdminDto model);
 
     }
 }

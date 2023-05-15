@@ -58,7 +58,7 @@ namespace BaseSource.Data.Migrations
                         new
                         {
                             Id = "c1105ce5-9dbc-49a9-a7d5-c963b6daa62a",
-                            ConcurrencyStamp = "fdb66ee7-0e54-4a79-805a-ef480bdd8e7e",
+                            ConcurrencyStamp = "b17c61b8-cc54-4f37-82b7-5e856c2638d7",
                             Description = "Administrator role",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -194,7 +194,7 @@ namespace BaseSource.Data.Migrations
                         {
                             Id = "ffded6b0-3769-4976-841b-69459049a62d",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "ad8402a0-0b7b-49c9-b5b9-63d823891c11",
+                            ConcurrencyStamp = "3e962069-fc9c-4d23-9238-45f5f1e96662",
                             CreatedTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
@@ -205,7 +205,7 @@ namespace BaseSource.Data.Migrations
                             NumberOfThreads1080Create = 0,
                             NumberOfThreads4K = 0,
                             NumberOfThreads4KCreate = 0,
-                            PasswordHash = "AQAAAAEAACcQAAAAEE0BzDAkuCOXymVXsZxng19/+sykFsZTrlLDRjLdho1U4uHlPP6TA7nqYFxURYoWgg==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEOcpyUGiHmgvIBMTGOpe0XSVqQ8ZivBGL7yjdi5hV4lhEC0acU2+eXMxkYDR5qYdLA==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -640,6 +640,9 @@ namespace BaseSource.Data.Migrations
                         .HasColumnType("tinyint");
 
                     b.Property<int>("ManagerBOTId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NumberOfThreads")
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")

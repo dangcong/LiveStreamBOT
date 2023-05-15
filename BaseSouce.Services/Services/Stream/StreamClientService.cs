@@ -249,9 +249,9 @@ namespace BaseSouce.Services.Services.Stream
                     predicate: x => x.Id == userId,
                     selector: x => new
                     {
-                        NumberOfThreads1080 = x.NumberOfThreads1080,
+                        NumberOfThreads1080 = x.UserManagerBOTs.Where(x => x.ManagerBOT.LiveType == LiveType._1080).Sum(x => x.NumberOfThreads),
                         NumberOfThreads1080InRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._1080).Count(),
-                        NumberOfThreads4k = x.NumberOfThreads4K,
+                        NumberOfThreads4k = x.UserManagerBOTs.Where(x => x.ManagerBOT.LiveType == LiveType._4K).Sum(x => x.NumberOfThreads),
                         NumberOfThreads4kInRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._4K).Count(),
                         Bot1080Id = x.UserManagerBOTs.Where(i => i.LiveType == LiveType._1080).Select(i => new
                         {
@@ -263,7 +263,8 @@ namespace BaseSouce.Services.Services.Stream
                             Id = i.ManagerBOTId,
                             BotId = i.ManagerBOT.BotId
                         }).FirstOrDefault()
-                    });
+                    },
+                    include: x => x.Include(i => i.UserManagerBOTs).ThenInclude(o => o.ManagerBOT));
 
                 //var profileUser = await _userService.GetProfileInfoAsync(userId);
 
@@ -424,6 +425,9 @@ namespace BaseSouce.Services.Services.Stream
 
                 var _repositoryBOT = _unitOfWork.GetRepository<ManagerBOT>();
 
+                var _repositoryUserBOT = _unitOfWork.GetRepository<UserManagerBOT>();
+
+
                 var streamEntity = await _repositoryStream.GetFirstOrDefaultAsync(
                    predicate: x => x.UserId == userId && x.Id == id,
                    include: x => x.Include(i => i.ManagerBOT),
@@ -437,20 +441,40 @@ namespace BaseSouce.Services.Services.Stream
 
                 //check connection bot
 
-                var botCurrent = await _repositoryBOT.GetFirstOrDefaultAsync(
-                    predicate: x => x.Id == streamEntity.ManagerBOTId);
+                //get bot connect 
+                var botConnect = await _repositoryUserBOT.GetFirstOrDefaultAsync(
+                    predicate: x => x.UserId == userId,
+                    include: x => x.Include(i => i.ManagerBOT),
+                    selector: x => new
+                    {
+                        Status = x.ManagerBOT.Status,
+                        BotId = x.ManagerBOTId,
+                        BotStringId = x.ManagerBOT.BotId,
+                        //ConnectionId = x.ManagerBOT.ConnectionId
+                    });
 
-                if (botCurrent == null)
+                if (botConnect == null)
                 {
-                    return new KeyValuePair<bool, string>(false, "BOT không tồn tại, vui lòng thử lại!");
+                    return new KeyValuePair<bool, string>(false, "BOT không có hoặc không tồn tại, vui lòng thử lại!");
                 }
 
-                if (botCurrent.Status == ManagerBOTStatus.Disconnected)
+
+                //var botCurrent = await _repositoryBOT.GetFirstOrDefaultAsync(
+                //    predicate: x => x.Id == streamEntity.ManagerBOTId);
+
+                //if (botCurrent == null)
+                //{
+                //    return new KeyValuePair<bool, string>(false, "BOT không tồn tại, vui lòng thử lại!");
+                //}
+
+                if (botConnect.Status == ManagerBOTStatus.Disconnected)
                 {
                     return new KeyValuePair<bool, string>(false, "BOT đang Disconnect, vui lòng thử lại!");
                 }
 
                 streamEntity.Status = StreamStatus.Streaming;
+                streamEntity.BotId = botConnect.BotStringId;
+                streamEntity.ManagerBOTId = botConnect.BotId;
 
                 _repositoryStream.Update(streamEntity);
                 await _unitOfWork.SaveChangesAsync();

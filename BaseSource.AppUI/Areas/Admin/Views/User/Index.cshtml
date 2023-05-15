@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Danh sách người dùng";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var report = ViewBag.Report as StreamReportAdminDto;
 }
 <section class="section">
     <div class="section-header">
@@ -15,7 +16,45 @@
 
     <div class="section-body">
         <h2 class="section-title">Danh sách người dùng</h2>
+        <div class=" row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="card card-statistic-2">
+                    <div class="card-stats">
+                        <div class="card-stats-title">
+                            Báo cáo
+                        </div>
+                        <div class="card-stats-items">
+                            <div class="card-stats-item">
+                                <div class="card-stats-item-count"><span class="badge badge-success">@(report.NumberOfThreads1080InRun)/@(report.NumberOfThreads1080)</span></div>
+                                <div class="card-stats-item-label">Tổng số luồng 1080(Đang chạy/Tổng)</div>
+                            </div>
+                            <div class="card-stats-item">
+                                <div class="card-stats-item-count"><span class="badge badge-primary">@(report.NumberOfThreads4KInRun)/@(report.NumberOfThreads4KInRun)</span></div>
+                                <div class="card-stats-item-label">Tổng số luồng 4k(Đang chạy/Tổng)</div>
+                            </div>
+                            <div class="card-stats-item">
+                                <div class="card-stats-item-count">@report.TotalBOT</div>
+                                <div class="card-stats-item-label">Tổng BOT</div>
+                            </div>
+                            <div class="card-stats-item">
+                                <div class="card-stats-item-count">@report.TotalUser</div>
+                                <div class="card-stats-item-label">Tổng User</div>
+                            </div>
+                            <div class="card-stats-item">
+                                <div class="card-stats-item-count">@report.TotalManager</div>
+                                <div class="card-stats-item-label">Tổng Manager</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <br />
+                        <span></span>
+                    </div>
 
+
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class="col-12">
                 <div class="card">
@@ -46,8 +85,8 @@
                                             <td><span class="badge badge-primary">@(item.NumberOfThreads4KInRun)/@(item.NumberOfThreads4K)</span></td>
                                             <td><span class="badge badge-primary">@item.TelegramAPI</span></td>
                                             <td>
-                                                <a class="btn btn-success" href="/admin/stream/user?userId=@item.Id">DS Stream</a>
-                                                <a class="btn btn-success" href="/admin/user/managerBot?userId=@item.Id">Cập nhật BOT</a>
+                                                <a class="btn btn-success" href="/admin/stream/user?userId=@(item.Id)&username=@(item.UserName)">DS Stream</a>
+                                                <a class="btn btn-success" href="/admin/user/managerBot?userId=@(item.Id)&username=@(item.UserName)">Cập nhật BOT</a>
                                                 <button class="btn btn-danger btnDelete" data-id="@item.Id" data-toggle="modal" data-target="#deleteUserModal">Delete</button>
                                             </td>
 

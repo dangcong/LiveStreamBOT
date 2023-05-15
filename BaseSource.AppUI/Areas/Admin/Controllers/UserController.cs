@@ -1,4 +1,5 @@
 ﻿using BaseSource.ApiIntegration.WebApi.ManagerBOT;
+using BaseSource.ApiIntegration.WebApi.StreamAdmin;
 using BaseSource.ApiIntegration.WebApi.UserAdmin;
 using BaseSource.Shared.Constants;
 using BaseSource.ViewModels.ManagerBOT;
@@ -11,21 +12,33 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
     {
         private readonly IUserAdminApiClient _userAdminApiClient;
         private readonly IManagerBOTApiClient _managerBOTApiClient;
-        public UserController(IUserAdminApiClient userAdminApiClient, IManagerBOTApiClient managerBOTApiClient)
+        private readonly IStreamAdminApiClient _streamAdminApiClient;
+        public UserController(IUserAdminApiClient userAdminApiClient, IManagerBOTApiClient managerBOTApiClient
+            , IStreamAdminApiClient streamAdminApiClient)
         {
             _userAdminApiClient = userAdminApiClient;
             _managerBOTApiClient = managerBOTApiClient;
+            _streamAdminApiClient = streamAdminApiClient;
         }
 
         [HttpGet]
-        public async Task<IActionResult>  Index()
+        public async Task<IActionResult> Index()
         {
-             var result = await _userAdminApiClient.GetUserByFilter(new UserAdminRequestDto
+            var result = await _userAdminApiClient.GetUserByFilter(new UserAdminRequestDto
             {
                 Page = 1,
                 PageSize = 500,
                 //UserName = searchValue
             });
+            var report = await _streamAdminApiClient.GetReportStream();
+
+            if (report == null || !report.IsSuccessed)
+            {
+                return NotFound();
+
+            }
+
+            ViewBag.Report = report.ResultObj;
             return View(result.ResultObj.Items);
         }
 
@@ -99,7 +112,7 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
         }
 
 
-        public async Task<IActionResult> ManagerBot(string userId)
+        public async Task<IActionResult> ManagerBot(string userId, string username)
         {
             var result = await _userAdminApiClient.GetUserManagerBot(userId);
             if (result == null || !result.IsSuccessed)
@@ -112,9 +125,30 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
                 Page = 1,
                 PageSize = 1000
             });
-
+            ViewBag.UserName = username;
+            ViewBag.UserId = userId;
             ViewBag.Bots = bots.ResultObj.Items.ToList();
             return View(result.ResultObj);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddBOT(UserAddBOTAdminDto model)
+        {
+            var result = await _userAdminApiClient.InserBOTUser(model);
+            return RedirectToAction("ManagerBot", new { userId = model.UserId, username = model.UserName });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteBOT(int id, string userId, string username)
+        {
+            var result = await _userAdminApiClient.DeleteUserManagerBot(id);
+            return RedirectToAction("ManagerBot", new { userId = userId, username = username });
+        }
+        [HttpPost]
+        public async Task<IActionResult> UpdateBOtUser(UserManagerBotUpdateDto model)
+        {
+            var result = await _userAdminApiClient.UpdateUserManagetBotAsync(model);
+            return RedirectToAction("ManagerBot", new { userId = model.UserId, username = model.UserName });
         }
 
         [HttpPost]

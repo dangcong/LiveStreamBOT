@@ -57,8 +57,8 @@ namespace BaseSouce.Services.Services.UserAdmin
                     NormalizedUserName = model.UserName,
                     LinkFB = string.Empty,
                     TelegramAPI = model.LinkTelegram,
-                    NumberOfThreads1080 = model.NumberOfThreads1080,
-                    NumberOfThreads4K = model.NumberOfThreads4K
+                    //NumberOfThreads1080 = model.NumberOfThreads1080,
+                    //NumberOfThreads4K = model.NumberOfThreads4K
 
                 };
                 await _unitOfWork.GetRepository<AppUser>().InsertAsync(user);
@@ -80,16 +80,21 @@ namespace BaseSouce.Services.Services.UserAdmin
             {
                 var _repository = _unitOfWork.GetRepository<AppUser>();
 
+                // var _repositoryUserBOT = _unitOfWork.GetRepository<UserManagerBOT>();
+
                 var userCurrent = await _repository.GetFirstOrDefaultAsync(
-                    predicate: x => x.Id == userId, disableTracking: false);
+                    predicate: x => x.Id == userId, disableTracking: false, include: x => x.Include(i => i.UserManagerBOTs));
                 if (userCurrent == null)
                 {
                     return new KeyValuePair<bool, string>(false, "Người dùng không tồn tại!");
                 }
                 userCurrent.DeletedTime = DateTime.Now;
-                userCurrent.NumberOfThreads1080 = 0;
-                userCurrent.NumberOfThreads4K = 0;
+                //remove usermanagerBot
+
+
                 userCurrent.UserManagerBOTs = null;
+                //userCurrent.NumberOfThreads4K = 0;
+                //userCurrent.UserManagerBOTs = null;
                 _repository.Update(userCurrent);
 
                 await _unitOfWork.SaveChangesAsync();
@@ -99,6 +104,36 @@ namespace BaseSouce.Services.Services.UserAdmin
             {
                 _logger.LogError($"Delete User failed by error:[{ex}]");
                 return new KeyValuePair<bool, string>(false, $"Xóa người dùng không thành công:[{ex.Message}]");
+            }
+        }
+
+        public async Task<KeyValuePair<bool, string>> DeleteUserManagerBot(int id)
+        {
+            try
+            {
+                var _repository = _unitOfWork.GetRepository<UserManagerBOT>();
+                var userBotEntity = await _repository.GetFirstOrDefaultAsync(
+                    predicate: x => x.Id == id, disableTracking: false);
+                if (userBotEntity == null)
+                {
+                    return new KeyValuePair<bool, string>(false, "Dữ liệu không tồn tại, vui lòng thử lại!");
+                }
+                //check stream by bot
+                var anyStream = await _unitOfWork.GetRepository<StreamHistory>()
+                    .ExistsAsync(x => x.ManagerBOTId == userBotEntity.ManagerBOTId && x.Status == StreamStatus.Streaming);
+                if (anyStream)
+                {
+                    return new KeyValuePair<bool, string>(false, "Vui lòng tắt Stream trước khi xóa BOT");
+                }
+                _repository.Delete(userBotEntity);
+                await _unitOfWork.SaveChangesAsync();
+                return new KeyValuePair<bool, string>(true, string.Empty);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Delete UserBot failed by error:[{ex}]");
+                return new KeyValuePair<bool, string>(false, $"Lỗi xóa BOT:[{ex.Message}]");
             }
         }
 
@@ -119,6 +154,26 @@ namespace BaseSouce.Services.Services.UserAdmin
 
 
         }
+
+        public async Task<List<UserManagerBotInfoDto>> GetUserBotAsync(string userId)
+        {
+            var _repository = _unitOfWork.GetRepository<UserManagerBOT>();
+
+            return await _repository.Queryable().AsNoTracking()
+                .Where(x => x.UserId == userId)
+                .Include(x => x.ManagerBOT).ThenInclude(i => i.StreamHistorys)
+                .Select(x => new UserManagerBotInfoDto
+                {
+                    Id = x.Id,
+                    BotName = x.ManagerBOT.Name,
+                    NumberOfThreads = x.NumberOfThreads,
+                    UserName = x.User.UserName,
+                    LiveType = x.LiveType,
+                    NumberOfThreadsInRun = x.ManagerBOT.StreamHistorys.Where(x => x.UserId == userId && x.Status == StreamStatus.Streaming).Count()
+                }).ToListAsync();
+        }
+
+
 
         public async Task<IPagedList<UserAdminInfoDto>> GetUserByFilterAsync(UserAdminRequestDto model)
         {
@@ -141,13 +196,13 @@ namespace BaseSouce.Services.Services.UserAdmin
                     LinkFB = x.LinkFB,
                     LinkTelegram = x.LinkTelegram,
                     Password = x.Password,
-                    NumberOfThreads1080 = x.NumberOfThreads1080,
-                    NumberOfThreads4K = x.NumberOfThreads4K,
+                    NumberOfThreads1080 = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._1080).Sum(i => i.NumberOfThreads),
+                    NumberOfThreads4K = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._4K).Sum(i => i.NumberOfThreads),
                     UserName = x.UserName,
                     TelegramAPI = x.TelegramAPI,
                     NumberOfThreads4KInRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._4K && i.Status == StreamStatus.Streaming).Count(),
                     NumberOfThreads1080InRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._1080 && i.Status == StreamStatus.Streaming).Count(),
-                }, include: x => x.Include(i => i.StreamHistorys),
+                }, include: x => x.Include(i => i.StreamHistorys).Include(i => i.UserManagerBOTs).ThenInclude(o => o.ManagerBOT),
                 orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                 pageIndex: model.Page, pageSize: model.PageSize);
         }
@@ -170,11 +225,11 @@ namespace BaseSouce.Services.Services.UserAdmin
                     Id = x.Id,
                     LinkFB = x.LinkFB,
                     LinkTelegram = x.LinkTelegram,
-                    NumberOfThreads1080 = x.NumberOfThreads1080,
-                    NumberOfThreads4K = x.NumberOfThreads4K,
+                    NumberOfThreads1080 = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._1080).Sum(i => i.NumberOfThreads),
+                    NumberOfThreads4K = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._4K).Sum(i => i.NumberOfThreads),
                     UserName = x.UserName,
                     TelegramAPI = x.TelegramAPI
-                }, include: x => x.Include(i => i.StreamHistorys),
+                }, include: x => x.Include(i => i.StreamHistorys).Include(i => i.UserManagerBOTs).ThenInclude(o => o.ManagerBOT),
                 orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                 pageIndex: 1, pageSize: 1000);
             return data.Items.ToList();
@@ -186,11 +241,11 @@ namespace BaseSouce.Services.Services.UserAdmin
 
             return await _reposiory.Queryable().AsNoTracking()
                  .Where(x => x.Id == userId)
-                 .Include(x => x.UserManagerBOTs)
+                 .Include(x => x.UserManagerBOTs).ThenInclude(o => o.ManagerBOT)
                  .Select(x => new UserManagerBotDto
                  {
-                     NumberOfThreads1080 = x.NumberOfThreads1080,
-                     NumberOfThreads4K = x.NumberOfThreads4K,
+                     NumberOfThreads1080 = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._1080).Sum(i => i.NumberOfThreads),
+                     NumberOfThreads4K = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._4K).Sum(i => i.NumberOfThreads),
                      Bot1080 = x.UserManagerBOTs.Where(i => i.LiveType == LiveType._1080)
                          .Select(i => i.ManagerBOTId).FirstOrDefault(),
                      Bot4K = x.UserManagerBOTs.Where(i => i.LiveType == LiveType._4K)
@@ -199,7 +254,51 @@ namespace BaseSouce.Services.Services.UserAdmin
                  }).FirstOrDefaultAsync();
         }
 
+        public async Task<KeyValuePair<bool, string>> InsertBOTOfUserAsync(UserAddBOTAdminDto model)
+        {
+            try
+            {
+                if (model.NumberOfThreads < 1)
+                {
+                    return new KeyValuePair<bool, string>(false, "Số luồng không hợp lệ!");
+                }
+                var _repositoryBOT = _unitOfWork.GetRepository<ManagerBOT>();
+                var botId = model.Bot1080 ?? model.Bot4k;
+                if (botId == null)
+                {
+                    return new KeyValuePair<bool, string>(false, "BOT Không tồn tại!");
+                }
+                var _repository = _unitOfWork.GetRepository<UserManagerBOT>();
+                var anyData = await _repository.ExistsAsync(x => x.UserId == model.UserId && x.ManagerBOTId == botId);
+                if (anyData)
+                {
+                    return new KeyValuePair<bool, string>(false, "Dữ liệu đã tồn tại!");
+                }
+                var botCurrent = await _repositoryBOT.GetFirstOrDefaultAsync(
+                    predicate: x => x.Id == botId);
+                if (botCurrent == null)
+                {
+                    return new KeyValuePair<bool, string>(false, "BOT Không tồn tại!");
+                }
 
+                _repository.Insert(new UserManagerBOT
+                {
+                    UserId = model.UserId,
+                    ManagerBOTId = botId.GetValueOrDefault(),
+                    LiveType = botCurrent.LiveType.GetValueOrDefault(),
+                    NumberOfThreads = model.NumberOfThreads,
+                    CreatedTime = DateTime.Now,
+                });
+                await _unitOfWork.SaveChangesAsync();
+                return new KeyValuePair<bool, string>(true, string.Empty);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Inser BOT User failed by error:[{ex}]");
+                return new KeyValuePair<bool, string>(false, $"Thêm BOT không thành công![{ex.Message}]");
+            }
+        }
 
         public async Task<KeyValuePair<bool, string>> ResetPassowrdAsync(ResetPasswordAdminDto model)
         {
@@ -320,8 +419,8 @@ namespace BaseSouce.Services.Services.UserAdmin
                 {
                     return new KeyValuePair<bool, string>(false, "Người dùng không tồn tại!");
                 }
-                userCurrent.NumberOfThreads1080 = model.NumberOfThreads1080;
-                userCurrent.NumberOfThreads4K = model.NumberOfThreads4K;
+                //userCurrent.NumberOfThreads1080 = model.NumberOfThreads1080;
+                //userCurrent.NumberOfThreads4K = model.NumberOfThreads4K;
 
 
                 _repositoryUser.Update(userCurrent);
@@ -399,6 +498,30 @@ namespace BaseSouce.Services.Services.UserAdmin
             {
                 _logger.LogError($"Update UserManagerBot failedd by error: [{ex}]");
                 return new KeyValuePair<bool, string>(false, "Cập nhật không thành công!");
+            }
+        }
+
+        public async Task<KeyValuePair<bool, string>> UpdateUserManagetBotAsync(UserManagerBotUpdateDto model)
+        {
+            try
+            {
+                var _repository = _unitOfWork.GetRepository<UserManagerBOT>();
+                var entity = await _repository.GetFirstOrDefaultAsync(
+                    predicate: x => x.Id == model.Id, disableTracking: false);
+                if (entity == null)
+                {
+                    return new KeyValuePair<bool, string>(false, "Dữ liệu không tồn tại, vui lòng thử lại!");
+                }
+                entity.NumberOfThreads = model.NumberOfThreads;
+                _repository.Update(entity);
+                await _unitOfWork.SaveChangesAsync();
+                return new KeyValuePair<bool, string>(true, string.Empty);
+            }
+            catch (Exception ex)
+            {
+
+                _logger.LogError($"Update UserManagerBotFailed by error:[{ex}]");
+                return new KeyValuePair<bool, string>(false, $"Cập nhật không thành công:[{ex.Message}]");
             }
         }
     }

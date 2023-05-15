@@ -100,37 +100,9 @@ namespace BaseSouce.Services.Services.Stream
                 }
 
 
-                List<string> arguments_oldBot = new List<string>();
-                arguments_oldBot.Add("-y");
-
-                {//video
-                    arguments_oldBot.Add("-re");
-                    if (model.IsForever) arguments_oldBot.Add($"-stream_loop -1");
-                    if (!string.IsNullOrWhiteSpace(model.Audio)) arguments_oldBot.Add("-an");
-                    arguments_oldBot.Add("-i video");
-                }
-
-                if (!string.IsNullOrWhiteSpace(model.Audio))
-                {
-                    arguments_oldBot.Add("-re");
-                    if (model.IsForever) arguments_oldBot.Add($"-stream_loop -1");
-                    arguments_oldBot.Add("-vn");
-                    arguments_oldBot.Add("-i sound");
-                }
-
-                {//output
-                    arguments_oldBot.Add("-c copy");
-                    if (!model.IsForever) arguments_oldBot.Add("-shortest");
-                    arguments_oldBot.Add("-f flv");
-                    arguments_oldBot.Add("-flvflags no_duration_filesize");
-                    arguments_oldBot.Add($"\"{uri}\"");
-                }
-
-
                 RenderCommand renderCommand = new RenderCommand()
                 {
-                    Arguments = string.Join("", arguments_oldBot),
-                    RenderArguments = string.Join("", renderArguments),
+                    RenderArguments = string.Join(" ", renderArguments),
                     LiveStreamArguments = string.Join(" ", liveStreamArguments),
                     Command = Command.Start,
                     UtcEndTime = model.EndTime?.ToUniversalTime(),

@@ -4,6 +4,10 @@
       "commandName": "Project",
       "commandLineArgs": "https://localhost:7122"
     },
+    "LivestreamBotLiveApi": {
+      "commandName": "Project",
+      "commandLineArgs": "https://api.shinemusicllc.com/"
+    },
     "WSL Ubuntu-22.04": {
       "commandName": "WSL",
       "distributionName": "Ubuntu-22.04",

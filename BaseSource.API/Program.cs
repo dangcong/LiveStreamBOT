@@ -12,6 +12,7 @@ using EFCore.UnitOfWork;
 using BaseSource.Shared.Helpers;
 using BaseSouce.Services.HubServices;
 using BaseSouce.Services.BackgroundServices;
+using BaseSouce.SharedSignalrData;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -61,7 +62,7 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.SwaggerConfiguration(builder.Configuration);
 
 
-builder.Services.AddSignalR().AddJsonProtocol(configure => configure.PayloadSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals);
+builder.Services.AddSignalR().AddJsonProtocol(configure => configure.PayloadSerializerOptions.SignalR_JsonSerializerOptions());
 
 builder.AddTelegram();
 

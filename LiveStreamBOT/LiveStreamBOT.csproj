@@ -14,7 +14,6 @@
     <PackageReference Include="FFmpegArgs.Executes" Version="1.5.2" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.2" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="7.0.0" />
     <PackageReference Include="System.Management" Version="7.0.1" />
     <PackageReference Include="TqkLibrary.Net.CloudStorage.GoogleDrive" Version="1.0.1-build2023041400" />
@@ -27,6 +26,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BaseSouce.SharedSignalrData\BaseSouce.SharedSignalrData.csproj" />
+    <ProjectReference Include="..\BaseSouce.Shared\BaseSource.Shared.csproj" />
   </ItemGroup>
 
 </Project>

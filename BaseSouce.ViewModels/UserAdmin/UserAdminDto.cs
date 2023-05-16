@@ -89,6 +89,7 @@ namespace BaseSource.ViewModels.UserAdmin
         public string UserId { get; set; }
         public string UserName { get; set; }
         public int NumberOfThreads { get; set; }
+        public int? TypeBot { get; set; }
         public int? Bot1080 { get; set; }
         public int? Bot4k { get; set; }
     }

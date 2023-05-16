@@ -159,6 +159,16 @@ namespace BaseSource.AppUI.Controllers
             return View(result.ResultObj);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> Info(int id)
+        {
+            var result = await _streamApiClient.GetById(id);
+            if (result == null || !result.IsSuccessed)
+            {
+                return NotFound();
+            }
+            return View(result.ResultObj);
+        }
         [HttpPost]
         public async Task<IActionResult> Edit(int id, StreamUpdateDto model)
         {

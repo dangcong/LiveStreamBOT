@@ -38,7 +38,12 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             return View(result.ResultObj.Items);
         }
 
-
+        [HttpGet]
+        public async Task<IActionResult> Info(int id)
+        {
+            var result = await _streamAdminApiClient.GetById(id);
+            return View(result.ResultObj);
+        }
         [HttpGet]
         [Route("/admin/stream/user")]
         public async Task<IActionResult> GetStreamByUser(string userId,string username)

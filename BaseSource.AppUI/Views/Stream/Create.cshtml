@@ -194,12 +194,12 @@
                                         Live 24/7(vĩnh viễn)
                                     </label>
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" asp-for="IsLiveNow" type="checkbox" id="defaultCheck3">
-                                    <label class="form-check-label" for="defaultCheck3">
-                                        Live ngay bây giờ
-                                    </label>
-                                </div>
+                                @* <div class="form-check">
+                                <input class="form-check-input" asp-for="IsLiveNow" type="checkbox" id="defaultCheck3">
+                                <label class="form-check-label" for="defaultCheck3">
+                                Live ngay bây giờ
+                                </label>
+                                </div>*@
                             </div>
                             <div class="section-title">Hẹn lịch -  <span class="text-danger"> Chọn thời gian bắt đầu và thời gian kết thúc (Nếu không hẹn lịch thì để mặc định)</span></div>
                             <div class="form-group">
@@ -248,7 +248,7 @@
                             </div>
                             <div class="col text-center">
 
-                                <div class="mt-2 font-weight-bold badge badge-success">Live hẹn giờ</div>
+                                <div class="mt-2 font-weight-bold badge badge-success">Live Chờ</div>
                                 <div class="text-muted ">
                                     <span class="text-primary">
                                         @report?.TotalTimer
@@ -322,11 +322,12 @@
                                                 <th>@item.StreamKey</th>
                                                 <td>@item.RTMP</td>
                                                 <td>
-                                                   
+
                                                     @if (item.EndTimeLive != null)
                                                     {
                                                         <span class="badge badge-success">Live 11h</span>
-                                                    }else
+                                                    }
+                                                    else
                                                     {
                                                         <span class="badge badge-primary">24//7</span>
                                                     }
@@ -414,6 +415,7 @@
                                                             </button>
                                                             break;
                                                     }
+                                                    <a href="/stream/info?id=@item.Id" class="btn btn-sm btn-primary">Chi tiết</a>
                                                 </td>
                                             </tr>
                                         }

@@ -16,6 +16,9 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using TqkLibrary.Net.CloudStorage.GoogleDrive;
+using Telegram.Bot;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 
 namespace BaseSouce.Services.Services.Stream
 {
@@ -28,18 +31,21 @@ namespace BaseSouce.Services.Services.Stream
         private readonly IMapper _mapper;
         private readonly IHubContext<BotHub, IBotClientHub> _botContextHub;
         private readonly IUserService _userService;
+        private readonly ITelegramBotClient _telegramBotClient;
         public StreamClientService(
             IUnitOfWork<BaseSourceDbContext> unitOfWork,
             ILogger<StreamClientService> logger,
             IMapper mapper,
             IHubContext<BotHub, IBotClientHub> botContextHub,
-            IUserService userService)
+            IUserService userService,
+            ITelegramBotClient telegramBotClient)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
             _mapper = mapper;
             _botContextHub = botContextHub;
             _userService = userService;
+            _telegramBotClient = telegramBotClient;
 
         }
 
@@ -118,7 +124,7 @@ namespace BaseSouce.Services.Services.Stream
                             UrlType = UrlType.GoogleDrive
                         }
                     },
-                    FileType = FileType.File,
+                    FileType = SharedSignalrData.Server.FileType.File,
                 };
                 if (!string.IsNullOrWhiteSpace(model.Audio))
                 {
@@ -215,62 +221,95 @@ namespace BaseSouce.Services.Services.Stream
                 //add database
                 var _repositoryUser = _unitOfWork.GetRepository<AppUser>();
                 var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
+                var _repositoryUserBot = _unitOfWork.GetRepository<UserManagerBOT>();
 
+                //var userCurrent = await _repositoryUser.GetFirstOrDefaultAsync(
+                //    predicate: x => x.Id == userId,
+                //    selector: x => new
+                //    {
+                //        NumberOfThreads1080 = x.UserManagerBOTs.Where(x => x.ManagerBOT.LiveType == LiveType._1080).Sum(x => x.NumberOfThreads),
+                //        NumberOfThreads1080InRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._1080).Count(),
+                //        NumberOfThreads4k = x.UserManagerBOTs.Where(x => x.ManagerBOT.LiveType == LiveType._4K).Sum(x => x.NumberOfThreads),
+                //        NumberOfThreads4kInRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._4K).Count(),
+                //        Bot1080Id = x.UserManagerBOTs.Where(i => i.LiveType == LiveType._1080).Select(i => new
+                //        {
+                //            Id = i.ManagerBOTId,
+                //            BotId = i.ManagerBOT.BotId
+                //        }).FirstOrDefault(),
+                //        Bot4k0Id = x.UserManagerBOTs.Where(i => i.LiveType == LiveType._4K).Select(i => new
+                //        {
+                //            Id = i.ManagerBOTId,
+                //            BotId = i.ManagerBOT.BotId
+                //        }).FirstOrDefault()
+                //    },
+                //    include: x => x.Include(i => i.UserManagerBOTs).ThenInclude(o => o.ManagerBOT));
 
-                var userCurrent = await _repositoryUser.GetFirstOrDefaultAsync(
-                    predicate: x => x.Id == userId,
-                    selector: x => new
+                var userBots = await _repositoryUserBot.Queryable()
+                    .Include(x => x.ManagerBOT).ThenInclude(i => i.StreamHistorys)
+                    .Where(x => x.UserId == userId && x.LiveType == model.LiveType && x.ManagerBOT.Status == ManagerBOTStatus.Connected)
+                    .Select(x => new
                     {
-                        NumberOfThreads1080 = x.UserManagerBOTs.Where(x => x.ManagerBOT.LiveType == LiveType._1080).Sum(x => x.NumberOfThreads),
-                        NumberOfThreads1080InRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._1080).Count(),
-                        NumberOfThreads4k = x.UserManagerBOTs.Where(x => x.ManagerBOT.LiveType == LiveType._4K).Sum(x => x.NumberOfThreads),
-                        NumberOfThreads4kInRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._4K).Count(),
-                        Bot1080Id = x.UserManagerBOTs.Where(i => i.LiveType == LiveType._1080).Select(i => new
-                        {
-                            Id = i.ManagerBOTId,
-                            BotId = i.ManagerBOT.BotId
-                        }).FirstOrDefault(),
-                        Bot4k0Id = x.UserManagerBOTs.Where(i => i.LiveType == LiveType._4K).Select(i => new
-                        {
-                            Id = i.ManagerBOTId,
-                            BotId = i.ManagerBOT.BotId
-                        }).FirstOrDefault()
-                    },
-                    include: x => x.Include(i => i.UserManagerBOTs).ThenInclude(o => o.ManagerBOT));
+                        BotId = x.ManagerBOTId,
+                        BotIdString = x.ManagerBOT.BotId,
+                        NumberOfThreads = x.NumberOfThreads,
+                        NumberOfThreadsInRun = x.ManagerBOT.StreamHistorys.Where(i => i.UserId == userId).Count(),
+                    })
+                    .OrderBy(x => x.NumberOfThreadsInRun)
+                    .ToListAsync();
 
                 //var profileUser = await _userService.GetProfileInfoAsync(userId);
 
                 var botConnectCurrent = string.Empty;
                 var botIdCurrent = 0;
 
-                if (model.LiveType == LiveType._1080)
+                if (userBots == null || !userBots.Any())
                 {
-                    if (userCurrent.NumberOfThreads1080 < userCurrent.NumberOfThreads1080InRun
-                        || userCurrent.NumberOfThreads1080 == 0)
-                    {
-                        return "Số luồng 1080 hiện tại đã đạt tối đa!";
-                    }
-                    if (userCurrent.Bot1080Id == null)
-                    {
-                        return "BOT không hoạt động hoặc chưa kết nối!";
-                    }
-                    botConnectCurrent = userCurrent.Bot1080Id?.BotId;
-                    botIdCurrent = userCurrent.Bot1080Id.Id;
+                    return "BOT không hoạt động hoặc chưa kết nối!";
                 }
-                if (model.LiveType == LiveType._4K)
+
+                foreach (var item in userBots)
                 {
-                    if (userCurrent.NumberOfThreads4k < userCurrent.NumberOfThreads4kInRun
-                        || userCurrent.NumberOfThreads4k == 0)
+                    if (item.NumberOfThreadsInRun < item.NumberOfThreads)
                     {
-                        return "Số luồng 4k hiện tại đã đạt tối đa!";
+                        botIdCurrent = item.BotId;
+                        botConnectCurrent = item.BotIdString;
+                        break;
                     }
-                    if (userCurrent.Bot4k0Id == null)
-                    {
-                        return "BOT không hoạt động hoặc chưa kết nối!";
-                    }
-                    botConnectCurrent = userCurrent.Bot4k0Id?.BotId;
-                    botIdCurrent = userCurrent.Bot4k0Id.Id;
                 }
+                if (botIdCurrent == 0)
+                {
+                    return "Số luồng hiện tại đã đạt tối đa!";
+                }
+
+                //if (model.LiveType == LiveType._1080)
+                //{
+
+                //    if (userCurrent.NumberOfThreads1080 < userCurrent.NumberOfThreads1080InRun
+                //        || userCurrent.NumberOfThreads1080 == 0)
+                //    {
+                //        return "Số luồng 1080 hiện tại đã đạt tối đa!";
+                //    }
+                //    if (userCurrent.Bot1080Id == null)
+                //    {
+                //        return "BOT không hoạt động hoặc chưa kết nối!";
+                //    }
+                //    botConnectCurrent = userCurrent.Bot1080Id?.BotId;
+                //    botIdCurrent = userCurrent.Bot1080Id.Id;
+                //}
+                //if (model.LiveType == LiveType._4K)
+                //{
+                //    if (userCurrent.NumberOfThreads4k < userCurrent.NumberOfThreads4kInRun
+                //        || userCurrent.NumberOfThreads4k == 0)
+                //    {
+                //        return "Số luồng 4k hiện tại đã đạt tối đa!";
+                //    }
+                //    if (userCurrent.Bot4k0Id == null)
+                //    {
+                //        return "BOT không hoạt động hoặc chưa kết nối!";
+                //    }
+                //    botConnectCurrent = userCurrent.Bot4k0Id?.BotId;
+                //    botIdCurrent = userCurrent.Bot4k0Id.Id;
+                //}
 
                 if (string.IsNullOrEmpty(botConnectCurrent))
                 {
@@ -393,12 +432,17 @@ namespace BaseSouce.Services.Services.Stream
         {
             try
             {
+                var _repositoryUser = _unitOfWork.GetRepository<AppUser>();
+
                 var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
 
                 var _repositoryBOT = _unitOfWork.GetRepository<ManagerBOT>();
 
                 var _repositoryUserBOT = _unitOfWork.GetRepository<UserManagerBOT>();
 
+
+                var userCurrent = await _repositoryUser.GetFirstOrDefaultAsync(
+                    predicate: x => x.Id == userId, disableTracking: true);
 
                 var streamEntity = await _repositoryStream.GetFirstOrDefaultAsync(
                    predicate: x => x.UserId == userId && x.Id == id,
@@ -410,25 +454,60 @@ namespace BaseSouce.Services.Services.Stream
                     return new KeyValuePair<bool, string>(false, "Luồng không tồn tại, vui lòng thử lại!");
                 }
 
+                var userBots = await _repositoryUserBOT.Queryable()
+                    .Include(x => x.ManagerBOT).ThenInclude(i => i.StreamHistorys)
+                    .Where(x => x.UserId == userId 
+                    && x.LiveType == streamEntity.LiveType 
+                    && x.ManagerBOT.Status == ManagerBOTStatus.Connected)
+                    .Select(x => new
+                    {
+                        BotId = x.ManagerBOTId,
+                        BotIdString = x.ManagerBOT.BotId,
+                        NumberOfThreads = x.NumberOfThreads,
+                        NumberOfThreadsInRun = x.ManagerBOT.StreamHistorys.Where(i => i.UserId == userId).Count(),
+                    })
+                    .OrderBy(x => x.NumberOfThreadsInRun)
+                    .ToListAsync();
+
+                if (userBots==null || !userBots.Any())
+                {
+                    return new KeyValuePair<bool, string>(false, "BOT không có hoặc không tồn tại, vui lòng thử lại!");
+                }
+
+                var botId = 0;
+                var botIdString = string.Empty;
+                foreach (var item in userBots)
+                {
+                    if (item.NumberOfThreadsInRun < item.NumberOfThreads)
+                    {
+                        botId = item.BotId;
+                        botIdString = item.BotIdString;
+                        break;
+                    }
+                }
+                if (botId == 0)
+                {
+                    return new KeyValuePair<bool, string>(false, "Số lượng luồng đã đạt tối đa!");
+                }
 
                 //check connection bot
 
                 //get bot connect 
-                var botConnect = await _repositoryUserBOT.GetFirstOrDefaultAsync(
-                    predicate: x => x.UserId == userId,
-                    include: x => x.Include(i => i.ManagerBOT),
-                    selector: x => new
-                    {
-                        Status = x.ManagerBOT.Status,
-                        BotId = x.ManagerBOTId,
-                        BotStringId = x.ManagerBOT.BotId,
-                        //ConnectionId = x.ManagerBOT.ConnectionId
-                    });
+                //var botConnect = await _repositoryUserBOT.GetFirstOrDefaultAsync(
+                //    predicate: x => x.UserId == userId && x.ManagerBOT.Status == ManagerBOTStatus.Connected,
+                //    include: x => x.Include(i => i.ManagerBOT),
+                //    selector: x => new
+                //    {
+                //        Status = x.ManagerBOT.Status,
+                //        BotId = x.ManagerBOTId,
+                //        BotStringId = x.ManagerBOT.BotId,
+                //        //ConnectionId = x.ManagerBOT.ConnectionId
+                //    });
 
-                if (botConnect == null)
-                {
-                    return new KeyValuePair<bool, string>(false, "BOT không có hoặc không tồn tại, vui lòng thử lại!");
-                }
+                //if (botConnect == null)
+                //{
+                //    return new KeyValuePair<bool, string>(false, "BOT không có hoặc không tồn tại, vui lòng thử lại!");
+                //}
 
 
                 //var botCurrent = await _repositoryBOT.GetFirstOrDefaultAsync(
@@ -439,14 +518,14 @@ namespace BaseSouce.Services.Services.Stream
                 //    return new KeyValuePair<bool, string>(false, "BOT không tồn tại, vui lòng thử lại!");
                 //}
 
-                if (botConnect.Status == ManagerBOTStatus.Disconnected)
-                {
-                    return new KeyValuePair<bool, string>(false, "BOT đang Disconnect, vui lòng thử lại!");
-                }
+                //if (botConnect.Status == ManagerBOTStatus.Disconnected)
+                //{
+                //    return new KeyValuePair<bool, string>(false, "BOT đang Disconnect, vui lòng thử lại!");
+                //}
 
                 streamEntity.Status = StreamStatus.Streaming;
-                streamEntity.BotId = botConnect.BotStringId;
-                streamEntity.ManagerBOTId = botConnect.BotId;
+                streamEntity.BotId = botIdString;
+                streamEntity.ManagerBOTId = botId;
 
                 _repositoryStream.Update(streamEntity);
                 await _unitOfWork.SaveChangesAsync();
@@ -458,6 +537,22 @@ namespace BaseSouce.Services.Services.Stream
                 {
                     return new KeyValuePair<bool, string>(false, result.Value);
                 }
+                //send message telegram
+                if (!string.IsNullOrEmpty(userCurrent.TelegramAPI))
+                {
+                    var liveType = streamEntity.EndTimeLive != null ? "11h" : "24/7";
+                    var timer = streamEntity.StartTimeLive != null ?
+                        streamEntity.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
+                        : "Ngay bây giờ";
+                    _ = _telegramBotClient
+                    .SendTextMessageAsync(new ChatId(userCurrent.TelegramAPI),
+                    $"User: {userCurrent.UserName}{Environment.NewLine}"
+                    + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
+                    + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
+                    + $"Kiểu live: {liveType}{Environment.NewLine}"
+                    + $"Lên lịch:{timer}", ParseMode.Default, true);
+                }
+
                 return new KeyValuePair<bool, string>(true, string.Empty);
 
             }
@@ -525,12 +620,15 @@ namespace BaseSouce.Services.Services.Stream
 
                 var streamEntity = await _repositoryStream.GetFirstOrDefaultAsync(
                     predicate: x => x.Id == model.ItemId,
-                    disableTracking: false);
+                    disableTracking: false,
+                    include: x => x.Include(i => i.AppUser));
 
                 if (streamEntity == null)
                 {
                     return new KeyValuePair<bool, string>(false, "Luồng không tồn tại, vui lòng thử lại!");
                 }
+
+
 
                 //
                 streamEntity.RenderStatus = model.RenderStatus;
@@ -542,6 +640,50 @@ namespace BaseSouce.Services.Services.Stream
                 }
                 _repositoryStream.Update(streamEntity);
                 await _unitOfWork.SaveChangesAsync();
+
+                if (streamEntity.RenderStatus == RenderStatus.LiveStreaming
+                    && !string.IsNullOrEmpty(streamEntity.AppUser.TelegramAPI))
+                {
+                    //send message telegram
+                    var liveType = streamEntity.EndTimeLive != null ? "11h" : "24/7";
+                    var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                    _ = _telegramBotClient
+                    .SendTextMessageAsync(new ChatId(streamEntity.AppUser.TelegramAPI),
+                    $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                    + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
+                    + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
+                    + $"Kiểu live: {liveType}{Environment.NewLine}"
+                    + $"Bắt đầu:{timer}", ParseMode.Default, true);
+                }
+                else if (streamEntity.RenderStatus == RenderStatus.Error
+                    && !string.IsNullOrEmpty(streamEntity.AppUser.TelegramAPI))
+                {
+                    var liveType = streamEntity.EndTimeLive != null ? "11h" : "24/7";
+                    var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                    _ = _telegramBotClient
+                    .SendTextMessageAsync(new ChatId(streamEntity.AppUser.TelegramAPI),
+                    $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                    + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
+                    + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
+                    + $"Kiểu live: {liveType}{Environment.NewLine}"
+                    + $"Lỗi:{streamEntity.ErrorMessage}", ParseMode.Default, true);
+                }
+                else if (streamEntity.RenderStatus == RenderStatus.Ended
+                    && !string.IsNullOrEmpty(streamEntity.AppUser.TelegramAPI))
+                {
+                    streamEntity.Status = StreamStatus.Stop;
+
+                    var liveType = streamEntity.EndTimeLive != null ? "11h" : "24/7";
+                    var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                    _ = _telegramBotClient
+                    .SendTextMessageAsync(new ChatId(streamEntity.AppUser.TelegramAPI),
+                    $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                    + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
+                    + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
+                    + $"Kiểu live: {liveType}{Environment.NewLine}"
+                    + $"Dừng:{timer}", ParseMode.Default, true);
+                }
+
 
                 return new KeyValuePair<bool, string>(true, string.Empty);
             }
@@ -580,6 +722,7 @@ namespace BaseSouce.Services.Services.Stream
                     ItemId = streamEntity.Id,
                     Command = Command.Cancel
                 });
+
 
 
                 return new KeyValuePair<bool, string>(true, string.Empty);

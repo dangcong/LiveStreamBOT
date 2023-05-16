@@ -80,7 +80,11 @@
                         </li>*@
                         <li><a class="nav-link" href="/stream/create"><i class="fas fa-columns"></i> <span>Live Stream</span></a></li>
                        @* <li><a class="nav-link" href="/admin/Authenticator/EnableAuthenticator"><i class="fas fa-columns"></i> <span>Gói Cước</span></a></li>*@
-                        <li><a class="nav-link" href="/account/profile"><i class="fas fa-columns"></i> <span>Cá nhân</span></a></li>
+                        <li><a class="nav-link" href="/account/profile"><i class="fas fa-user"></i> <span>Cá nhân</span></a></li>
+                        @if (User.IsInRole("Manager")|| User.IsInRole("Admin"))
+                        {
+                            <li><a class="nav-link" href="/admin/user/index"><i class="fas fa-lock"></i> <span>Trang Quản lý</span></a></li>
+                        }
                       @* @await Component.InvokeAsync("LinkVideo")*@
 
                     </ul>

@@ -1,0 +1,116 @@
+﻿@model StreamClientInfoDto
+@{
+     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Thông tin luồng live";
+}
+
+<section class="section">
+    <div class="section-header">
+        <h1>Cấu hình</h1>
+        <div class="section-header-breadcrumb">
+            <div class="breadcrumb-item active"><a href="#">Dashboard</a></div>
+            <div class="breadcrumb-item"><a href="#">Cấu hình</a></div>
+            <div class="breadcrumb-item">@ViewData["Title"]</div>
+        </div>
+    </div>
+    <div class="section-body">
+        <div class="row">
+            <div class="col-12 col-md-12 col-lg-12">
+
+                <div class="card">
+                    <form asp-action="Edit" class="needs-validation" novalidate="">
+                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        <input asp-for="Id" type="hidden" />
+                        <div class="card-header">
+                            <h4>Cấu hình</h4>
+                        </div>
+                        <div class="card-body">
+                            <div class="section-title">Cấu hình</div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="live1080" value="1" checked="@(Model.LiveType==LiveType._1080)" name="LiveType" class="custom-control-input">
+                                <label class="custom-control-label" for="live1080">Live 1080</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="live4k" value="2" checked="@(Model.LiveType==LiveType._4K)" name="LiveType" class="custom-control-input">
+                                <label class="custom-control-label" for="live4k">Live 4k</label>
+                            </div>
+                            <div class="form-group">
+                                <label>Tên luồng live</label>
+                                <input asp-for="StreamName" placeholder="Đặt tên để gợi nhớ" class="form-control" required="">
+                                <span asp-validation-for="StreamName" class="text-danger"></span>
+                            </div>
+                            <div style="display:none">
+                                <div class="section-title">Nền tảng</div>
+                                <div class="custom-control custom-radio custom-control-inline">
+                                    <input type="radio" id="youtube" value="1" checked="@(Model.PlatformType==PlatformType.Youtube)" name="PlatformType" class="custom-control-input">
+                                    <label class="custom-control-label" for="youtube">Youtube</label>
+                                </div>
+                            </div>
+
+                            @* <div class="custom-control custom-radio custom-control-inline">
+                            <input type="radio" id="facebook" checked="@(Model.PlatformType==PlatformType.Facebook) name="PlatformType" class="custom-control-input">
+                            <label class="custom-control-label" for="facebook">Facebook</label>
+                            </div>*@
+                            <div class="form-group">
+                                <label>Khóa luồng</label>
+                                <input class="form-control" required asp-for="StreamKey" />
+                                <span asp-validation-for="StreamKey" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label>RTMP</label>
+                                <input class="form-control" required asp-for="RTMP" />
+                                <span asp-validation-for="RTMP" class="text-danger"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Link Video</label>
+                                <input class="form-control" required asp-for="Video" rows="1" />
+                                <span asp-validation-for="Video" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Link Audio</label>
+                                <input class="form-control" asp-for="Audio" rows="1" />
+                                <span asp-validation-for="Audio" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label class="d-block">Cài đặt</label>
+                                <div class="form-check">
+                                    <input class="form-check-input" asp-for="IsForever" type="checkbox" id="defaultCheck1">
+                                    <label class="form-check-label" for="defaultCheck1">
+                                        Live 24/7(vĩnh viễn)
+                                    </label>
+                                </div>
+                               @* <div class="form-check">
+                                    <input class="form-check-input" asp-for="IsLiveNow" type="checkbox" id="defaultCheck3">
+                                    <label class="form-check-label" for="defaultCheck3">
+                                        Live ngay bây giờ
+                                    </label>
+                                </div>*@
+                            </div>
+                            <div class="section-title">Hẹn lịch -  <span class="text-danger"> Chọn thời gian bắt đầu và thời gian kết thúc (Nếu không hẹn lịch thì để mặc định)</span></div>
+                            <div class="form-group">
+                                <label>Thời gian bắt đầu</label>
+                                <input type="datetime-local" asp-for="StartTimeLive" class="form-control col-6" placeholder="Thời gian bắt đầu">
+                            </div>
+                            <div class="form-group">
+                                <label>Thời gian kết thúc</label>
+                                <input type="datetime-local" asp-for="EndTimeLive" class="form-control col-6" placeholder="Thời gian kết thúc">
+                            </div>
+                        </div>
+                        
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</section>
+@section Scripts{
+    <script>
+
+    </script>
+}
+
+

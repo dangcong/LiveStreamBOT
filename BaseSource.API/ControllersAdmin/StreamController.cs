@@ -20,6 +20,15 @@ namespace BaseSource.API.ControllersAdmin
             var result = await _streamAdminService.GetByFilterAsync(model);
             return Ok(new ApiSuccessResult<object>(result));
         }
+
+        [HttpGet]
+        [Route("{id:int:min(1)}")]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var result = await _streamAdminService.GetStreamByIdAsync(id);
+            return Ok(new ApiSuccessResult<object>(result));
+        }
+        
         [HttpGet]
         [Route("bot/{id:int:min(1)}")]
         public async Task<IActionResult> GetAllByBotId(int id)

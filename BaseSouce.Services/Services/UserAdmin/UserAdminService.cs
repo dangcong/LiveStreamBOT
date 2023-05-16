@@ -1,5 +1,6 @@
 ﻿using BaseSouce.Data.EF;
 using BaseSouce.Data.Entities;
+using BaseSouce.Services.Services.Stream;
 using BaseSouce.Shared.Enums;
 using BaseSouce.Shared.Helpers;
 using BaseSource.Data.Entities;
@@ -17,12 +18,15 @@ namespace BaseSouce.Services.Services.UserAdmin
         private readonly IUnitOfWork _unitOfWork;
         private readonly RoleManager<AppRole> _roleManager;
         private readonly ILogger<UserAdminService> _logger;
+        private readonly IStreamClientService _streamClientService;
         public UserAdminService(IUnitOfWork<BaseSourceDbContext> unitOfWork,
-             RoleManager<AppRole> roleManager, ILogger<UserAdminService> logger)
+             RoleManager<AppRole> roleManager, ILogger<UserAdminService> logger
+            , IStreamClientService streamClientService)
         {
             _unitOfWork = unitOfWork;
             _roleManager = roleManager;
             _logger = logger;
+            _streamClientService = streamClientService;
 
 
         }
@@ -79,11 +83,14 @@ namespace BaseSouce.Services.Services.UserAdmin
             try
             {
                 var _repository = _unitOfWork.GetRepository<AppUser>();
+                var _repositoryUserBOT = _unitOfWork.GetRepository<UserManagerBOT>();
+
+                var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
 
                 // var _repositoryUserBOT = _unitOfWork.GetRepository<UserManagerBOT>();
 
                 var userCurrent = await _repository.GetFirstOrDefaultAsync(
-                    predicate: x => x.Id == userId, disableTracking: false, include: x => x.Include(i => i.UserManagerBOTs));
+                    predicate: x => x.Id == userId, disableTracking: false);
                 if (userCurrent == null)
                 {
                     return new KeyValuePair<bool, string>(false, "Người dùng không tồn tại!");
@@ -91,8 +98,22 @@ namespace BaseSouce.Services.Services.UserAdmin
                 userCurrent.DeletedTime = DateTime.Now;
                 //remove usermanagerBot
 
+                var userBots = await _repositoryUserBOT.Queryable().Where(x => x.UserId == userId).ToListAsync();
+                if (userBots.Any())
+                {
+                    _repositoryUserBOT.Delete(userBots);
+                }
+                var streams = await _repositoryStream.Queryable()
+                    .Where(x => x.UserId == userId && x.Status == StreamStatus.Streaming).ToListAsync();
+                if (streams.Any())
+                {
+                    foreach (var item in streams)
+                    {
+                        await _streamClientService.CancelStreamAsync(userId, item.Id);
+                    }
+                }
 
-                userCurrent.UserManagerBOTs = null;
+                // userCurrent.UserManagerBOTs = null;
                 //userCurrent.NumberOfThreads4K = 0;
                 //userCurrent.UserManagerBOTs = null;
                 _repository.Update(userCurrent);
@@ -214,7 +235,8 @@ namespace BaseSouce.Services.Services.UserAdmin
 
             var query = _repository.Queryable().AsNoTracking();
 
-            query = query.Where(x => x.UserRoles.Any(i => i.RoleId == roleManager.Id));
+            query = query.Where(x => x.DeletedTime == null &&
+            x.UserRoles.Any(i => i.RoleId == roleManager.Id));
 
             var data = await _repository.GetStagesPagedListAsync(
                 stages: query,
@@ -263,7 +285,7 @@ namespace BaseSouce.Services.Services.UserAdmin
                     return new KeyValuePair<bool, string>(false, "Số luồng không hợp lệ!");
                 }
                 var _repositoryBOT = _unitOfWork.GetRepository<ManagerBOT>();
-                var botId = model.Bot1080 ?? model.Bot4k;
+                var botId = model.Bot1080.GetValueOrDefault() > 0 ? model.Bot1080 : model.Bot4k;
                 if (botId == null)
                 {
                     return new KeyValuePair<bool, string>(false, "BOT Không tồn tại!");
@@ -340,8 +362,6 @@ namespace BaseSouce.Services.Services.UserAdmin
         public async Task<KeyValuePair<bool, string>> UpdateManagerAsync(string userName)
         {
             var _repository = _unitOfWork.GetRepository<AppUser>();
-
-
 
             var roleManager = await _roleManager.FindByNameAsync("Admin");
 

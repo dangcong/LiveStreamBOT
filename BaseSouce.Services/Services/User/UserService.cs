@@ -20,7 +20,6 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace BaseSouce.Services.Services.User
 {
@@ -33,8 +32,13 @@ namespace BaseSouce.Services.Services.User
         private readonly ISendMailService _emailService;
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IConfiguration _configuration;
-        public UserService(IUnitOfWork<BaseSourceDbContext> unitOfWork, UserManager<AppUser> userManager, ILogger<UserService> logger,
-            IMapper mapper, ISendMailService emailService, SignInManager<AppUser> signInManager, IConfiguration configuration)
+
+        public UserService(IUnitOfWork<BaseSourceDbContext> unitOfWork,
+            UserManager<AppUser> userManager,
+            ILogger<UserService> logger,
+            IMapper mapper, ISendMailService emailService,
+            SignInManager<AppUser> signInManager,
+            IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
@@ -44,6 +48,7 @@ namespace BaseSouce.Services.Services.User
             _signInManager = signInManager;
             _configuration = configuration;
 
+
         }
 
 
@@ -51,6 +56,10 @@ namespace BaseSouce.Services.Services.User
         {
             try
             {
+                //var resultTele = await _telegramBotClient.TestApiAsync();
+                //await _telegramBotClient
+                //    .SendTextMessageAsync(new ChatId(1711431727), $@"User: abc{Environment.NewLine}Tên luồng:123 {Environment.NewLine}Live:1 {Environment.NewLine}Kiểu live: 24/7{Environment.NewLine}Lên lịch:123", ParseMode.Default, true);
+
                 //_logger.LogError("Authentication");
                 model.UserName = model.UserName.ToLower();
                 var existingUser = await _unitOfWork.GetRepository<AppUser>()
@@ -116,6 +125,8 @@ namespace BaseSouce.Services.Services.User
                 var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
                 if (result.Succeeded)
                 {
+                    user.Password = model.NewPassword;
+                    await _userManager.UpdateAsync(user);
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     await _unitOfWork.SaveChangesAsync();
                     return new KeyValuePair<bool, string>(true, string.Empty);
@@ -410,6 +421,8 @@ namespace BaseSouce.Services.Services.User
             var result = await _userManager.ResetPasswordAsync(user, codeDecoded, model.Password);
             if (result.Succeeded)
             {
+                user.Password = model.Password;
+                await _unitOfWork.SaveChangesAsync();
                 return new KeyValuePair<bool, string>(true, string.Empty);
             }
             return new KeyValuePair<bool, string>(false, "Reset Password failed!");

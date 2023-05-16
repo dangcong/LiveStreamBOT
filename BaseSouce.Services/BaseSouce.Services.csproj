@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
     <PackageReference Include="Mailjet.Api" Version="3.0.0" />
+    <PackageReference Include="Telegram.Bot" Version="15.7.1" />
     <PackageReference Include="UnitOfWork.EntityFrameworkCore" Version="6.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
 	<PackageReference Include="TqkLibrary.Net.CloudStorage.GoogleDrive" Version="1.0.1-build2023041400" />

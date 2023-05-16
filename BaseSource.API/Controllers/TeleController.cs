@@ -20,10 +20,9 @@ namespace BaseSource.API.Controllers
         public async Task<IActionResult> Index()
         {
             var result = await _telegramBotClient.TestApiAsync();
-            for (int i = 0; i < 100; i++)
-            {
-                await _telegramBotClient.SendTextMessageAsync(new ChatId(1711431727), $"hello {i}", ParseMode.Default, true);
-            }
+            await _telegramBotClient
+                .SendTextMessageAsync(new ChatId(1711431727), $@"User: abc{Environment.NewLine}Tên luồng:123 {Environment.NewLine}Live:1 {Environment.NewLine}Kiểu live: 24/7{Environment.NewLine}Lên lịch:123", ParseMode.Default, true);
+
             
 
             return Ok();

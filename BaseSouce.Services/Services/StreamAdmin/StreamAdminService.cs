@@ -100,16 +100,16 @@ namespace BaseSouce.Services.Services.StreamAdmin
                 }).ToListAsync();
 
             data.NumberOfThreads1080 = await _repositoryUserBot.Queryable()
-                .Include(x=>x.ManagerBOT)
-                .Where(x=>x.ManagerBOT.LiveType==LiveType._1080)
+                .Include(x => x.ManagerBOT).Include(x=>x.User)
+                .Where(x =>x.User.DeletedTime == null && x.ManagerBOT.LiveType == LiveType._1080)
                 .SumAsync(x => x.NumberOfThreads);
 
             data.NumberOfThreads1080InRun = streamData
                 .Where(x => x.Type == LiveType._1080 && x.Status == StreamStatus.Streaming).Count();
 
             data.NumberOfThreads4K = await _repositoryUserBot.Queryable()
-                .Include(x => x.ManagerBOT)
-                .Where(x => x.ManagerBOT.LiveType == LiveType._4K)
+                .Include(x => x.ManagerBOT).Include(x=>x.User)
+                .Where(x => x.User.DeletedTime == null && x.ManagerBOT.LiveType == LiveType._4K)
                 .SumAsync(x => x.NumberOfThreads);
 
             data.NumberOfThreads4KInRun = streamData
@@ -118,9 +118,21 @@ namespace BaseSouce.Services.Services.StreamAdmin
             data.TotalUser = await _repositoryUser.Queryable().AsNoTracking()
                 .Where(x => !x.UserRoles.Any() && x.DeletedTime == null).CountAsync();
             data.TotalManager = await _repositoryUser.Queryable().AsNoTracking()
-                .Where(x => x.UserRoles.Any(x => x.RoleId == "c1105ce5-9dbc-49a9-a7d5-c963b6daa62a")).CountAsync();
-
+                .Where(x => x.DeletedTime == null && x.UserRoles.Any(x => x.RoleId == "baea9405-c706-46ea-9f52-6cfa8c83d65f"))
+                .CountAsync();
+            _logger.LogInformation($"NumberOfThreads4K:[{data.NumberOfThreads4K}]");
             return data;
+        }
+
+        public async Task<StreamClientInfoDto> GetStreamByIdAsync(int id)
+        {
+            var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
+
+            return await _repositoryStream.GetFirstOrDefaultAsync(
+                predicate: x => x.Id == id,
+                selector: x => _mapper.Map<StreamClientInfoDto>(x),
+                include: x => x.Include(i => i.AppUser),
+                disableTracking: false);
         }
     }
 }

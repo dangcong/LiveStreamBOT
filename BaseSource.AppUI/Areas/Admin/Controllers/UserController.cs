@@ -27,7 +27,7 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             var result = await _userAdminApiClient.GetUserByFilter(new UserAdminRequestDto
             {
                 Page = 1,
-                PageSize = 500,
+                PageSize = 800,
                 //UserName = searchValue
             });
             var report = await _streamAdminApiClient.GetReportStream();
@@ -134,6 +134,28 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> AddBOT(UserAddBOTAdminDto model)
         {
+            if (model.Bot1080 == null && model.Bot4k == null)
+            {
+                return RedirectToAction("ManagerBot", new { userId = model.UserId, username = model.UserName });
+            }
+            if (model.TypeBot.GetValueOrDefault() < 1)
+            {
+                return RedirectToAction("ManagerBot", new { userId = model.UserId, username = model.UserName });
+            }
+            else
+            {
+                switch (model.TypeBot)
+                {
+                    case 1:
+                        model.Bot4k = 0;
+                        break;
+                    case 2:
+                        model.Bot1080 = 0;
+                        break;
+                    default:
+                        break;
+                }
+            }
             var result = await _userAdminApiClient.InserBOTUser(model);
             return RedirectToAction("ManagerBot", new { userId = model.UserId, username = model.UserName });
         }

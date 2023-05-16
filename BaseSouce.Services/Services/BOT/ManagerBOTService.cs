@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using BaseSouce.Data.EF;
 using BaseSouce.Data.Entities;
+using BaseSouce.Services.Services.Stream;
+using BaseSouce.Services.Services.StreamAdmin;
 using BaseSouce.Shared.Enums;
 using BaseSouce.SharedSignalrData.BotClient;
 using BaseSource.Data.Entities;
@@ -17,19 +19,25 @@ namespace BaseSouce.Services.Services.BOT
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<ManagerBOTService> _logger;
         private readonly IMapper _mapper;
+        private readonly IStreamClientService _streamService;
 
-        public ManagerBOTService(IUnitOfWork<BaseSourceDbContext> unitOfWork, ILogger<ManagerBOTService> logger, IMapper mapper)
+        public ManagerBOTService(IUnitOfWork<BaseSourceDbContext> unitOfWork,
+            ILogger<ManagerBOTService> logger,
+            IMapper mapper,
+            IStreamClientService streamService)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
             _mapper = mapper;
+            _streamService = streamService;
         }
 
         public async Task<KeyValuePair<bool, string>> ChangeUsedAsync(int id)
         {
             try
             {
-                var _repository = _unitOfWork.GetRepository<Data.Entities.ManagerBOT>();
+                var _repository = _unitOfWork.GetRepository<ManagerBOT>();
+                var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
 
                 var botCurrent = await _repository.GetFirstOrDefaultAsync(
                     predicate: x => x.Id == id, disableTracking: false);
@@ -46,6 +54,18 @@ namespace BaseSouce.Services.Services.BOT
                 if (!botCurrent.IsUsed)
                 {
                     //send data to BOT
+                    var streams = await _repositoryStream.Queryable()
+                        .AsNoTracking()
+                        .Where(x => x.ManagerBOTId == botCurrent.Id)
+                        .ToListAsync();
+                    if (streams.Any())
+                    {
+                        foreach (var stream in streams)
+                        {
+                            await _streamService.CancelStreamAsync(stream.UserId, stream.Id);
+                            Thread.Sleep(70);
+                        }
+                    }
                 }
 
                 return new KeyValuePair<bool, string>(true, string.Empty);

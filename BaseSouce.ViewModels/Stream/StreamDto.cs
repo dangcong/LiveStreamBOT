@@ -97,6 +97,8 @@ namespace BaseSource.ViewModels.Stream
         public DateTime? Updatedtime { get; set; }
         public StreamStatus Status { get; set; }
         public PlatformType PlatformType { get; set; }
+        public RenderStatus RenderStatus { get; set; }
+        public string ErrorMessage { get; set; }
     }
 
     public class StreamAdminRequestDto : PageQuery

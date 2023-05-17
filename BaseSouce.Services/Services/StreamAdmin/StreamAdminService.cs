@@ -75,7 +75,7 @@ namespace BaseSouce.Services.Services.StreamAdmin
             return await _repository.GetStagesPagedListAsync(
                 stages: query,
                 selector: x => _mapper.Map<StreamAdminInfoDto>(x),
-                include: x => x.Include(i => i.AppUser),
+                include: x => x.Include(i => i.AppUser).Include(i=>i.ManagerBOT),
                orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                pageIndex: model.Page, pageSize: model.PageSize
                 );

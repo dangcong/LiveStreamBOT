@@ -456,8 +456,8 @@ namespace BaseSouce.Services.Services.Stream
 
                 var userBots = await _repositoryUserBOT.Queryable()
                     .Include(x => x.ManagerBOT).ThenInclude(i => i.StreamHistorys)
-                    .Where(x => x.UserId == userId 
-                    && x.LiveType == streamEntity.LiveType 
+                    .Where(x => x.UserId == userId
+                    && x.LiveType == streamEntity.LiveType
                     && x.ManagerBOT.Status == ManagerBOTStatus.Connected)
                     .Select(x => new
                     {
@@ -469,7 +469,7 @@ namespace BaseSouce.Services.Services.Stream
                     .OrderBy(x => x.NumberOfThreadsInRun)
                     .ToListAsync();
 
-                if (userBots==null || !userBots.Any())
+                if (userBots == null || !userBots.Any())
                 {
                     return new KeyValuePair<bool, string>(false, "BOT không có hoặc không tồn tại, vui lòng thử lại!");
                 }
@@ -628,6 +628,7 @@ namespace BaseSouce.Services.Services.Stream
                     return new KeyValuePair<bool, string>(false, "Luồng không tồn tại, vui lòng thử lại!");
                 }
 
+                var statusOld = streamEntity.RenderStatus;
 
 
                 //
@@ -641,7 +642,7 @@ namespace BaseSouce.Services.Services.Stream
                 _repositoryStream.Update(streamEntity);
                 await _unitOfWork.SaveChangesAsync();
 
-                if (streamEntity.RenderStatus == RenderStatus.LiveStreaming
+                if (statusOld != RenderStatus.LiveStreaming && streamEntity.RenderStatus == RenderStatus.LiveStreaming
                     && !string.IsNullOrEmpty(streamEntity.AppUser.TelegramAPI))
                 {
                     //send message telegram

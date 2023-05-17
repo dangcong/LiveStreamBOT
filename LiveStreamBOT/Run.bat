@@ -1,0 +1,1 @@
+﻿LiveStreamBOT.exe https://api.shinemusicllc.com/

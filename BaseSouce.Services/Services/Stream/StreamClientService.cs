@@ -133,7 +133,7 @@ namespace BaseSouce.Services.Services.Stream
                     RenderArguments = string.Join(" ", renderArguments),
                     LiveStreamArguments = string.Join(" ", liveStreamArguments),
                     Command = Command.Start,
-                    UtcEndTime = model.EndTime?.ToUniversalTime(),
+                    UtcEndTime = model.EndTimeLive?.ToUniversalTime(),
                     UtcStartTime = model.StartTimeLive?.ToUniversalTime(),
                     WorkId = 0,//quan trọng, cần để cancel/update/tạo thư mục
                     ItemId = model.Id,//quan trọng, cần để cancel/update/tạo thư mục( stream ID)

@@ -80,6 +80,12 @@ namespace BaseSource.ApiIntegration.WebApi.UserAdmin
             return await client.PostAsync<ApiResult<string>>($"/api/admin/user/manager/role?userName={userName}");
         }
 
+        public async Task<ApiResult<string>> UpdateTelegram(UpdateTelegramDto model)
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            return await client.PostAsync<ApiResult<string>>($"/api/admin/user/telegram", model);
+        }
+
         public async Task<ApiResult<string>> UpdateUserGroup(UserGroupAddDto model)
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
@@ -98,6 +104,6 @@ namespace BaseSource.ApiIntegration.WebApi.UserAdmin
             return await client.PostAsync<ApiResult<string>>($"/api/admin/user/managerBot/update", model);
         }
 
-       
+
     }
 }

@@ -228,5 +228,18 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             }
             return RedirectToAction("Index");
         }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateTelegram(UpdateTelegramDto model)
+        {
+            var result = await _userAdminApiClient.UpdateTelegram(model);
+            if (result == null || !result.IsSuccessed)
+            {
+
+               // ModelState.AddModelError("", result?.ResultObj ?? "Tạo mới tài khoản không thành công");
+                return RedirectToAction("Index");
+            }
+            return RedirectToAction("Index");
+        }
     }
 }

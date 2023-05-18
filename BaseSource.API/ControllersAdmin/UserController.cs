@@ -34,6 +34,18 @@ namespace BaseSource.API.ControllersAdmin
             return Ok(new ApiErrorResult<string>(result.Value));
         }
 
+        [HttpPost]
+        [Route("telegram")]
+        public async Task<IActionResult> UpdateTelegam(UpdateTelegramDto model)
+        {
+            var result = await _userAdminService.UpdateTelegramUserAsync(model);
+            if (result.Key)
+            {
+                return Ok(new ApiSuccessResult<string>(string.Empty));
+            }
+            return Ok(new ApiErrorResult<string>(result.Value));
+        }
+
         [HttpGet]
         [Route("managers")]
         public async Task<IActionResult> GetAllManager()

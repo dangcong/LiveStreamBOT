@@ -93,4 +93,9 @@ namespace BaseSource.ViewModels.UserAdmin
         public int? Bot1080 { get; set; }
         public int? Bot4k { get; set; }
     }
+    public class UpdateTelegramDto
+    {
+        public string UserId { get; set; }
+        public string Telegram { get; set; }
+    }
 }

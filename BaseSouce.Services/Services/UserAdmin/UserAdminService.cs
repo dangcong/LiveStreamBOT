@@ -393,6 +393,30 @@ namespace BaseSouce.Services.Services.UserAdmin
             return new KeyValuePair<bool, string>(true, string.Empty);
         }
 
+        public async Task<KeyValuePair<bool, string>> UpdateTelegramUserAsync(UpdateTelegramDto model)
+        {
+            try
+            {
+                var _repository = _unitOfWork.GetRepository<AppUser>();
+                var userCurrent =await _repository.GetFirstOrDefaultAsync(
+                    predicate: x => x.Id == model.UserId, disableTracking: false);
+
+                if (userCurrent == null)
+                {
+                    return new KeyValuePair<bool, string>(false, "Tài khoản không tồn tại!");
+                }
+                userCurrent.LinkTelegram= model.Telegram;
+                _repository.Update(userCurrent);
+               await _unitOfWork.SaveChangesAsync();
+                return new KeyValuePair<bool, string>(true, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Update Telegram failed by error:[{ex}]");
+                return new KeyValuePair<bool, string>(false, "Cập nhật không thành công!");
+            }
+        }
+
         public async Task<KeyValuePair<bool, string>> UpdateUserGroupAsync(UserGroupAddDto model)
         {
             var _repositoryUser = _unitOfWork.GetRepository<AppUser>();

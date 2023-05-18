@@ -28,12 +28,19 @@
                                 <thead>
                                     <tr>
                                         <th>Người dùng</th>
-                                        <th>BOTId</th>
+                                        <th>BOTName</th>
+                                        <th>Group</th>
                                         <th>Tên</th>
-                                        <th>Loại</th>
-                                        <th>Nền tảng</th>
-                                        <th>Ngày tạo</th>
-                                        <th>Thời gian Live</th>
+                                        <th>Key</th>
+                                        <th>RTMP</th>
+                                        <th>Kiểu live</th>
+                                        <th>Live</th>
+                                        <th>Thời gian bắt đầu</th>
+                                        <th>Thời gian kết thúc</th>
+                                        <th>Thời gian live</th>
+                                        <th>Log</th>
+                                        <th>Trạng thái</th>
+                                        <th></th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -43,24 +50,94 @@
                                             <td>
                                                 @item.UserName
                                             </td>
-                                            <td>@item.BotId</td>
-                                            <th>@item.StreamName</th>
+                                            <td>@item.BotName</td>
+                                            <td>@item.BotGroup</td>
+                                            <td>@item.StreamName</td>
+                                            <th>@item.StreamKey</th>
+                                            <td>@item.RTMP</td>
                                             <td>
-                                                @switch (item.LiveType)
+                                                @if (item.LiveType == LiveType._1080)
                                                 {
-                                                    case LiveType._1080:
-                                                        <span class="badge badge-success">1080</span>
+                                                    <span class="badge badge-primary">1080</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-danger">4k</span>
+                                                }
+                                            </td>
+                                            <td>
+
+                                                @if (item.EndTimeLive != null)
+                                                {
+                                                    <span class="badge badge-success">Live 11h</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-primary">24//7</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @(item.Updatedtime?.ToString("dd/MM/yyyy HH:mm:ss") ?? item.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")
+                                            </td>
+                                            <td>
+                                                @if (item.EndTimeLive != null)
+                                                {
+                                                    <span>@item.EndTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>Vĩnh viễn</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @if (item.EndTimeLive != null)
+                                                {
+                                                    @*<span>@item.EndTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")</span>*@
+                                                    <span>@(item.EndTimeLive - item.StartTimeLive)</span>
+                                                }
+                                                else
+                                                {
+                                                    <span>Vĩnh viễn</span>
+                                                }
+                                            </td>
+                                            <td>
+                                                @switch (item.RenderStatus)
+                                                {
+                                                    case BaseSouce.SharedSignalrData.BotClient.RenderStatus.Created:
+                                                        <span class="badge badge-success">Mới</span>
                                                         break;
-                                                    case LiveType._4K:
-                                                        <span class="badge badge-success">4k</span>
+                                                    case BaseSouce.SharedSignalrData.BotClient.RenderStatus.Waitting:
+                                                        <span class="badge badge-warning">Chờ</span>
+                                                        break;
+                                                    case BaseSouce.SharedSignalrData.BotClient.RenderStatus.Downloading:
+                                                        <span class="badge badge-info">Tải</span>
+                                                        break;
+                                                    case BaseSouce.SharedSignalrData.BotClient.RenderStatus.LiveStreaming:
+                                                        <span class="badge badge-suceess">Đang stream</span>
+                                                        break;
+                                                    case BaseSouce.SharedSignalrData.BotClient.RenderStatus.Cancelled:
+                                                        <span class="badge badge-danger"> Hủy</span>
+                                                        break;
+                                                    case BaseSouce.SharedSignalrData.BotClient.RenderStatus.Ended:
+                                                        <span class="badge badge-danger"> Kết thúc</span>
+                                                        break;
+                                                    case BaseSouce.SharedSignalrData.BotClient.RenderStatus.Error:
+                                                        <span class="badge badge-danger"> Lỗi(@item.ErrorMessage)</span>
                                                         break;
                                                 }
                                             </td>
                                             <td>
-                                                <span class="badge badge-primary">@item.PlatformType</span>
+                                                @switch (item.Status)
+                                                {
+                                                    case StreamStatus.Streaming:
+                                                        <span class="badge badge-success">Streaming</span>
+                                                        break;
+                                                    case StreamStatus.Stop:
+                                                        <span class="badge badge-danger">Dừng</span>
+                                                        break;
+                                                }
                                             </td>
-                                            <td>@item.CreatedTime.ToString("dd/MM/yyyy HH:mm:ss")</td>
-                                            <td>@item.Updatedtime?.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                            <td><a class="btn btn-primary" href="/admin/stream/info?id=@item.Id">Chi tiết</a></td>
                                         </tr>
                                     }
                                 </tbody>

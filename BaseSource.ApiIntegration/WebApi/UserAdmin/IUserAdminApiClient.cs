@@ -19,5 +19,6 @@ namespace BaseSource.ApiIntegration.WebApi.UserAdmin
         Task<ApiResult<string>> DeleteUserManagerBot(int id);
         Task<ApiResult<string>> UpdateUserManagetBotAsync(UserManagerBotUpdateDto model);
         Task<ApiResult<string>> InserBOTUser(UserAddBOTAdminDto model);
+        Task<ApiResult<string>> UpdateTelegram(UpdateTelegramDto model);
     }
 }

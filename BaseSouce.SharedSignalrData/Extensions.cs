@@ -13,6 +13,7 @@ namespace BaseSouce.SharedSignalrData
         public static JsonSerializerOptions SignalR_JsonSerializerOptions(this JsonSerializerOptions jsonSerializerOptions)
         {
             jsonSerializerOptions.NumberHandling = JsonNumberHandling.AllowNamedFloatingPointLiterals;
+            jsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
             return jsonSerializerOptions;
         }
     }

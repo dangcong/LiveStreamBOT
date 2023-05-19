@@ -93,7 +93,7 @@ namespace BaseSouce.Services.Services.Stream
                 List<string> liveStreamArguments = new List<string>();
                 {//input
                     liveStreamArguments.Add("-re");
-                    if (model.IsForever) liveStreamArguments.Add($"-stream_loop -1");
+                    if (model.IsForever || !model.EndTimeLive.HasValue) liveStreamArguments.Add($"-stream_loop -1");
                     renderArguments.Add("-f flv");
                     liveStreamArguments.Add("-i rendered");
                 }
@@ -689,8 +689,8 @@ namespace BaseSouce.Services.Services.Stream
                     streamEntity.Status = StreamStatus.Stop;
                     streamEntity.ErrorMessage = model.ExceptionInfo.Message;
                 }
-                if (model.RenderStatus==RenderStatus.Ended)
-                { 
+                if (model.RenderStatus == RenderStatus.Ended)
+                {
                     streamEntity.Status = StreamStatus.Stop;
 
                 }

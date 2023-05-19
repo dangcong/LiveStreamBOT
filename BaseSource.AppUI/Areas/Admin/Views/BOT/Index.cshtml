@@ -104,7 +104,7 @@
                                             <td><span>@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads)</span> </td>
                                             <td>@((item.CPU * 100).ToString("n2"))%</td>
                                             <td>@((item.RAM * 100).ToString("n2"))%</td>
-                                            <td>@item.Bandwidth.ToString("n2") mb/s</td>
+                                            <td>@item.Bandwidth.ToString("n2") KB/s</td>
 
                                             <td>
                                                 <a class="btn btn-info" href="/admin/bot/group?id=@(item.Id)">DS User</a>

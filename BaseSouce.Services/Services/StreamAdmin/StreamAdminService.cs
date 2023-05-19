@@ -120,7 +120,7 @@ namespace BaseSouce.Services.Services.StreamAdmin
             data.TotalManager = await _repositoryUser.Queryable().AsNoTracking()
                 .Where(x => x.DeletedTime == null && x.UserRoles.Any(x => x.RoleId == "baea9405-c706-46ea-9f52-6cfa8c83d65f"))
                 .CountAsync();
-            _logger.LogInformation($"NumberOfThreads4K:[{data.NumberOfThreads4K}]");
+           // _logger.LogInformation($"NumberOfThreads4K:[{data.NumberOfThreads4K}]");
             return data;
         }
 

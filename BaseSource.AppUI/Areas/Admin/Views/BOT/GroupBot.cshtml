@@ -44,7 +44,7 @@
                                     {
                                         <tr>
                                             <td> @item.BotName</td>
-                                            <td> <a href="/admin/user/managerbot?userId=@item.UserId" class="">@item.UserName</a></td>
+                                            <td> <a href="/admin/user/managerbot?userId=@(item.UserId)&username=@(item.UserName)" class="">@item.UserName</a></td>
                                             <td>@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads)</td>
                                             <td>@item.Type</td>
                                         </tr>

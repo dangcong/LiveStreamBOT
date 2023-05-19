@@ -135,6 +135,8 @@ namespace BaseSouce.Services.Services.Stream
                         UrlType = UrlType.GoogleDrive
                     });
                 }
+                _logger.LogInformation($"[Bot ConnectionId:[{model.ManagerBOT.ConnectionId}]]");
+                //await _botContextHub.Clients.Client(model.ManagerBOT.ConnectionId).RenderAsync(renderCommand);
                 await _botContextHub.Clients.Client(model.ManagerBOT.ConnectionId).RenderAsync(renderCommand);
                 return true;
 
@@ -208,9 +210,6 @@ namespace BaseSouce.Services.Services.Stream
         {
             try
             {
-
-
-
                 //check link audio
                 var result = await ValidateLink(model.Video, model.Audio);
                 if (!result)
@@ -444,15 +443,25 @@ namespace BaseSouce.Services.Services.Stream
                 var userCurrent = await _repositoryUser.GetFirstOrDefaultAsync(
                     predicate: x => x.Id == userId, disableTracking: true);
 
-                var streamEntity = await _repositoryStream.GetFirstOrDefaultAsync(
-                   predicate: x => x.UserId == userId && x.Id == id,
-                   include: x => x.Include(i => i.ManagerBOT),
-                   disableTracking: false);
+                //var streamEntity = await _repositoryStream.GetFirstOrDefaultAsync(
+                //   predicate: x => x.UserId == userId && x.Id == id,
+                //   include: x => x.Include(i => i.ManagerBOT),
+                //   disableTracking: false);
+
+                var streamEntity = await _repositoryStream.Queryable()
+                    .Include(x => x.ManagerBOT)
+                    .Where(x => x.UserId == userId && x.Id == id).FirstOrDefaultAsync();
+
+
 
                 if (streamEntity == null)
                 {
                     return new KeyValuePair<bool, string>(false, "Luồng không tồn tại, vui lòng thử lại!");
                 }
+
+                _logger.LogInformation($"Stream Info [streamName:[{streamEntity.StreamName}] " +
+                  $"- BotName:[{streamEntity.ManagerBOT?.Name}] " +
+                  $"- Connection:[{streamEntity.ManagerBOT?.ConnectionId}]]");
 
                 var userBots = await _repositoryUserBOT.Queryable()
                     .Include(x => x.ManagerBOT).ThenInclude(i => i.StreamHistorys)
@@ -485,6 +494,9 @@ namespace BaseSouce.Services.Services.Stream
                         break;
                     }
                 }
+
+                _logger.LogInformation($"BOT New [botId:[{botId}]- BotIdString:[{botIdString}]]");
+
                 if (botId == 0)
                 {
                     return new KeyValuePair<bool, string>(false, "Số lượng luồng đã đạt tối đa!");
@@ -530,12 +542,26 @@ namespace BaseSouce.Services.Services.Stream
                 _repositoryStream.Update(streamEntity);
                 await _unitOfWork.SaveChangesAsync();
 
+                streamEntity = await _repositoryStream.Queryable()
+                    .Include(x => x.ManagerBOT)
+                    .Where(x => x.UserId == userId && x.Id == id).FirstOrDefaultAsync();
+
+                _logger.LogInformation($"Stream Info [streamName:[{streamEntity.StreamName}] " +
+                    $"- BotName:[{streamEntity.ManagerBOT?.Name}] " +
+                    $"- Connection:[{streamEntity.ManagerBOT?.ConnectionId}]]");
+
 
                 ///send data to BOT
                 var result = await SendDataToBOTAsync(streamEntity);
                 if (!result)
                 {
+                    _logger.LogError($"Send data to BOT failed by error:[{result.Value}]");
+
+                    streamEntity.Status = StreamStatus.Stop;
+                    _repositoryStream.Update(streamEntity);
+                    await _unitOfWork.SaveChangesAsync();
                     return new KeyValuePair<bool, string>(false, result.Value);
+
                 }
                 //send message telegram
                 if (!string.IsNullOrEmpty(userCurrent.TelegramAPI))
@@ -575,6 +601,7 @@ namespace BaseSouce.Services.Services.Stream
                         }
                     }
                 }
+
 
                 return new KeyValuePair<bool, string>(true, string.Empty);
 
@@ -659,8 +686,13 @@ namespace BaseSouce.Services.Services.Stream
                 if (model.RenderStatus == RenderStatus.Error)
                 {
                     _logger.LogError($"Error when render :[{model.ExceptionInfo}]");
-
+                    streamEntity.Status = StreamStatus.Stop;
                     streamEntity.ErrorMessage = model.ExceptionInfo.Message;
+                }
+                if (model.RenderStatus==RenderStatus.Ended)
+                { 
+                    streamEntity.Status = StreamStatus.Stop;
+
                 }
                 _repositoryStream.Update(streamEntity);
                 await _unitOfWork.SaveChangesAsync();

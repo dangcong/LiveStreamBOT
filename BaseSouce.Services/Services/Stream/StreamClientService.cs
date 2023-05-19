@@ -72,7 +72,11 @@ namespace BaseSouce.Services.Services.Stream
                     renderArguments.Add("-y");
                 }
                 {//video
-                    if (!string.IsNullOrWhiteSpace(model.Audio)) renderArguments.Add("-an");
+                    if (!string.IsNullOrWhiteSpace(model.Audio))
+                    {
+                        renderArguments.Add("-an");
+                        renderArguments.Add($"-stream_loop -1");
+                    }
                     renderArguments.Add("-i video");
                 }
                 if (!string.IsNullOrWhiteSpace(model.Audio))

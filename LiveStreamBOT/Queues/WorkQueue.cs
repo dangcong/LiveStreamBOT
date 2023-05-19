@@ -71,6 +71,7 @@ namespace LiveStreamBOT.Queues
                         {
                             await DownloadFileAsync();
                             await PreRenderAsync();
+                            DeleteDownloaded();
                             await WaitTimeAsync();
                             await LiveStreamAsync();
 
@@ -182,6 +183,15 @@ namespace LiveStreamBOT.Queues
                 RenderStatus = RenderStatus.Downloading,
                 DownloadPercentage = sizeDownloaded * 100.0 / totalSize,
             });
+        }
+
+        void DeleteDownloaded()
+        {
+            foreach (var file in RenderCommand.FileDatas)
+            {
+                string path = Path.Combine(_workingDir, file.Name);
+                File.Delete(path);
+            }
         }
 
         Task<Stream> GetLivestreamAsync()

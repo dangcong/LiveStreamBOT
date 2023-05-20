@@ -97,7 +97,7 @@ namespace BaseSouce.Services.Services.Stream
                 List<string> liveStreamArguments = new List<string>();
                 {//input
                     liveStreamArguments.Add("-re");
-                    if (model.IsForever || !model.EndTimeLive.HasValue) liveStreamArguments.Add($"-stream_loop -1");
+                    liveStreamArguments.Add($"-stream_loop -1");
                     renderArguments.Add("-f flv");
                     liveStreamArguments.Add("-i rendered");
                 }

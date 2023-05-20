@@ -283,7 +283,8 @@ namespace LiveStreamBOT.Queues
                     Time = TimeSpan.Zero
                 }
             });
-            await liveStream.ExecuteAsync(CancellationToken);
+            var result = await liveStream.ExecuteAsync(CancellationToken);
+            Console.WriteLine($"[{RenderCommand.ItemId} - {RenderCommand.WorkId}] ffmpeg exit code {result.ExitCode}");
         }
 
         async void LiveStream_OnEncodingProgress(RenderProgress obj)

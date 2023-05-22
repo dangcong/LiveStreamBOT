@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Danh sách Group BOT";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var index = 1;
 }
 
 <section class="section">
@@ -32,6 +33,7 @@
                             <table class="table table-striped" id="table-groupBot">
                                 <thead>
                                     <tr>
+                                        <th>STT</th>
                                         <th>Tên Bot</th>
                                         <th>Người dùng</th>
                                         <th>Luồng(Đang chạy/Cấp phép)</th>
@@ -43,6 +45,7 @@
                                     @foreach (var item in Model)
                                     {
                                         <tr>
+                                            <td>@(index++)</td>
                                             <td> @item.BotName</td>
                                             <td> <a href="/admin/user/managerbot?userId=@(item.UserId)&username=@(item.UserName)" class="">@item.UserName</a></td>
                                             <td>@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads)</td>

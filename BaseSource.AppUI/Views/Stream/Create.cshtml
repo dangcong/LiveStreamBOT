@@ -4,6 +4,7 @@
     var packageInfo = ViewBag.PackageInfo as PackageLiveUserDto;
     var streamData = ViewBag.StreamData as List<StreamClientInfoDto>;
     var report = ViewBag.Report as StreamReportDto;
+    var index = 1;
 
 }
 <section class="section">
@@ -212,7 +213,7 @@
                             </div>
                         </div>
                         <div class="card-footer text-left">
-                            <button class="btn btn-primary">Auto live</button>
+                            <button class="btn btn-primary">Tạo luồng</button>
                         </div>
                     </form>
                 </div>
@@ -248,7 +249,7 @@
                             </div>
                             <div class="col text-center">
 
-                                <div class="mt-2 font-weight-bold badge badge-success">Live Chờ</div>
+                                <div class="mt-2 font-weight-bold badge badge-warning">Live Chờ</div>
                                 <div class="text-muted ">
                                     <span class="text-primary">
                                         @report?.TotalTimer
@@ -281,6 +282,7 @@
                             <table class="table table-striped" id="tableStreams">
                                 <thead>
                                     <tr>
+                                         <td>STT</td>
                                         <th class="text-center">
                                             BotName
                                         </th>
@@ -300,9 +302,11 @@
                                 <tbody>
                                     @if (streamData != null)
                                     {
+                                        
                                         @foreach (var item in streamData)
                                         {
                                             <tr>
+                                               <td>@(index++)</td>
                                                 <td>
                                                     <span class="text-danger">@item.BotName</span>
                                                 </td>
@@ -389,7 +393,7 @@
                                                             <span class="badge badge-success"> Đang stream</span>
                                                             break;
                                                         case StreamStatus.Stop:
-                                                            <span class="badge badge-success"> Đã dừng</span>
+                                                            <span class="badge badge-danger"> Đã dừng</span>
                                                             break;
                                                     }
                                                 </td>
@@ -418,6 +422,7 @@
                                                     <a href="/stream/info?id=@item.Id" class="btn btn-sm btn-primary">Chi tiết</a>
                                                 </td>
                                             </tr>
+                                           
                                         }
                                     }
                                 </tbody>

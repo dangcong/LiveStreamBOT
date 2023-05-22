@@ -3,6 +3,7 @@
     ViewData["Title"] = "Danh sách Luồng Stream";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
     var report = ViewBag.Report as StreamReportAdminDto;
+    var index = 1;
 }
 
 <section class="section">
@@ -30,7 +31,7 @@
                                 <div class="card-stats-item-label">Tổng số luồng 1080(Đang chạy/Tổng)</div>
                             </div>
                             <div class="card-stats-item">
-                                <div class="card-stats-item-count"><span class="badge badge-primary">@(report.NumberOfThreads4KInRun)/@(report.NumberOfThreads4K)</span></div>
+                                <div class="card-stats-item-count"><span class="badge badge-danger">@(report.NumberOfThreads4KInRun)/@(report.NumberOfThreads4K)</span></div>
                                 <div class="card-stats-item-label">Tổng số luồng 4k(Đang chạy/Tổng)</div>
                             </div>
                             <div class="card-stats-item">
@@ -67,6 +68,7 @@
                             <table class="table table-striped" id="tableAllStream">
                                 <thead>
                                     <tr>
+                                        <th>STT</th>
                                         <th>Người dùng</th>
                                         <th>BOTName</th>
                                         <th>Group</th>
@@ -87,6 +89,7 @@
                                     @foreach (var item in Model)
                                     {
                                         <tr>
+                                            <td>@index</td>
                                             <td>
                                                 @item.UserName
                                             </td>
@@ -98,7 +101,7 @@
                                             <td>
                                                 @if (item.LiveType == LiveType._1080)
                                                 {
-                                                    <span class="badge badge-primary">1080</span>
+                                                    <span class="badge badge-success">1080</span>
                                                 }
                                                 else
                                                 {
@@ -179,6 +182,7 @@
                                             </td>
                                             <td><a class="btn btn-primary" href="/admin/stream/info?id=@item.Id">Chi tiết</a></td>
                                         </tr>
+                                        @(index++)
                                     }
                                 </tbody>
                             </table>

@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = $"Danh sách Luồng Stream của {ViewBag.UserName}";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var index = 1;
 }
 
 <section class="section">
@@ -26,6 +27,7 @@
                             <table class="table table-striped" id="tableAllStream">
                                 <thead>
                                     <tr>
+                                        <th>STT</th>
                                         <th>Người dùng</th>
                                         <th>BOTName</th>
                                         <th>Group</th>
@@ -46,6 +48,7 @@
                                     @foreach (var item in Model)
                                     {
                                         <tr>
+                                            <td>@index</td>
                                             <td>
                                                 @item.UserName
                                             </td>
@@ -138,6 +141,7 @@
                                             </td>
                                             <td><a class="btn btn-primary" href="/admin/stream/info?id=@item.Id">Chi tiết</a></td>
                                         </tr>
+                                        @(index++)
                                     }
                                 </tbody>
                             </table>

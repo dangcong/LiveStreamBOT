@@ -5,6 +5,7 @@
     var bots = ViewBag.Bots as List<ManagerBotInfoDto>;
     var bot1080 = bots.Where(x => x.LiveType == LiveType._1080).ToList();
     var bot4k = bots.Where(x => x.LiveType == LiveType._4K).ToList();
+    var index = 1;
 
 }
 
@@ -33,6 +34,7 @@
                             <table class="table table-striped" id="table-bots">
                                 <thead>
                                     <tr>
+                                        <th>STT</th>
                                         <th>BotName</th>
                                         <th>Loại</th>
                                         <th>Số luồng Chạy/Tổng</th>
@@ -43,6 +45,7 @@
                                     @foreach (var item in Model)
                                     {
                                         <tr>
+                                            <td>@(index++)</td>
                                             <td> <span class="text-danger"><strong>@item.BotName</strong></span></td>
                                             <td>
                                                 @switch (item.LiveType)
@@ -69,6 +72,7 @@
                                                    data-id="@item.Id">Xóa</a>
                                             </td>
                                         </tr>
+                                      
                                     }
                                 </tbody>
                             </table>
@@ -196,7 +200,7 @@
                     </div>
                 </div>
                 <div class="modal-footer bg-whitesmoke br">
-                   
+
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="submit" id="btn-confirm-payment" class="btn btn-danger">Xác nhận </button>
 

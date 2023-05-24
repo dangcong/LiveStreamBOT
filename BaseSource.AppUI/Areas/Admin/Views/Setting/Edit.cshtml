@@ -22,7 +22,7 @@
                     <div class="card-body">
                         <form method="post" action="/admin/Setting/Edit">
                             <div class="row">
-                               
+
                                 <div class="col-12">
                                     <h6>@ViewData["Title"]</h6>
                                     <div class="form-group mb-4">
@@ -35,14 +35,14 @@
                                     <div class="form-group mb-4">
                                         <label class="">Số tài khoản ngân hàng</label>
                                         <div class="">
-                                            <input  asp-for="BankNumber" placeholder="Nhập số tài khoản ngân hàng" class="form-control" />
+                                            <input asp-for="BankNumber" placeholder="Nhập số tài khoản ngân hàng" class="form-control" />
                                             <span asp-validation-for="BankNumber" class="text-danger"></span>
                                         </div>
                                     </div>
                                     <div class="form-group mb-4">
                                         <label class="">Tên người nhận</label>
                                         <div class="">
-                                            <input  asp-for="BankAccountName" placeholder="Nhập tên người nhận" class="form-control" />
+                                            <input asp-for="BankAccountName" placeholder="Nhập tên người nhận" class="form-control" />
                                             <span asp-validation-for="BankAccountName" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -56,12 +56,12 @@
                                     <div class="form-group mb-4">
                                         <label class="">Link Hướng dẫn Youtube</label>
                                         <div class="">
-                                            <input  asp-for="LinkYoutube" placeholder="Nhập link Youtube" class="form-control" />
+                                            <input asp-for="LinkYoutube" placeholder="Nhập link Youtube" class="form-control" />
                                             <span asp-validation-for="LinkYoutube" class="text-danger"></span>
                                         </div>
                                     </div>
                                 </div>
-                               
+
                             </div>
                             <div class="form-group row mb-4">
                                 <label class="col-form-label text-md-right col-12 col-md-4 col-lg-4"></label>
@@ -79,9 +79,13 @@
 </section>
 @section Scripts{
     <script>
-        $('body').on('click', '.btn-setting', function () {
-            showModal(null, 'updateSetting');
-        });
+        $(document).ready(function () {
+            $('body').on('click', '.btn-setting', function () {
+                showModal(null, 'updateSetting');
+            });
+        }
+
+
     </script>
 }
 

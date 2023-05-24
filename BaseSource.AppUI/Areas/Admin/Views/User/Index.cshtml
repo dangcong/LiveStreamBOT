@@ -93,12 +93,16 @@
                                             <td><span class="badge badge-danger">@item.LinkTelegram</span></td>
                                             <td>
                                                 <button class="btn btn-primary btnTelegram" data-tele="@item.LinkTelegram"
-                                                        data-id="@item.Id" data-toggle="modal" data-target="#telegramModal">
+                                                        data-id="@item.Id" 
+                                                        @*data-toggle="modal" data-target="#telegramModal"*@
+                                                >
                                                     Cập nhật ID
                                                 </button>
                                                 <a class="btn btn-success" href="/admin/stream/user?userId=@(item.Id)&username=@(item.UserName)">DS Stream</a>
                                                 <a class="btn btn-success" href="/admin/user/managerBot?userId=@(item.Id)&username=@(item.UserName)">Cập nhật BOT</a>
-                                                <button class="btn btn-danger btnDelete" data-id="@item.Id" data-toggle="modal" data-target="#deleteUserModal">Delete</button>
+                                                <button class="btn btn-danger btnDelete" data-id="@item.Id" 
+                                                @*data-toggle="modal" data-target="#deleteUserModal"*@
+                                                >Delete</button>
                                             </td>
 
                                         </tr>
@@ -130,11 +134,11 @@
                     <div class="form-group mb-4">
                         <label class="">ID telegram(cách nhau ,)</label>
                         <div class="">
-                            <input type="text" 
-                                name="Telegram" 
-                                placeholder="Nhập danh sách ID Telegram" 
-                                class="form-control"
-                                style="height:100px"/>
+                            <input type="text"
+                                   name="Telegram"
+                                   placeholder="Nhập danh sách ID Telegram"
+                                   class="form-control"
+                                   style="height:100px" />
                             <span class="text-danger"></span>
                         </div>
                     </div>
@@ -279,21 +283,25 @@
             //        //<a class="btn btn-primary" href="/admin/order/user?userId=${type.id}">DS Gói</a>
             //    ]
             //});
+            $('body').on('click', '.btnReset', function () {
+                let id = $(this).attr('data-id');
+                $('#formResetPassword input[name="userId"]').val(id);
+            });
+            $('body').on('click', '.btnDelete', function () {
+                 $('#deleteUserModal').modal('show');
+                let id = $(this).attr('data-id');
+                $('#formDeleteUser input[name="userId"]').val(id);
+            });
+            $('body').on('click', '.btnTelegram', function () {
+                 $('#telegramModal').modal('show');
+                
+                let id = $(this).attr('data-id');
+                let telegrams = $(this).attr('data-tele');
+                $('#formTelegram input[name="UserId"]').val(id);
+                $('#formTelegram input[name="Telegram"]').val(telegrams);
+            });
         });
-        $('body').on('click', '.btnReset', function () {
-            let id = $(this).attr('data-id');
-            $('#formResetPassword input[name="userId"]').val(id);
-        });
-        $('body').on('click', '.btnDelete', function () {
-            let id = $(this).attr('data-id');
-            $('#formDeleteUser input[name="userId"]').val(id);
-        });
-        $('body').on('click', '.btnTelegram', function () {
-            let id = $(this).attr('data-id');
-            let telegrams = $(this).attr('data-tele');
-            $('#formTelegram input[name="UserId"]').val(id);
-            $('#formTelegram input[name="Telegram"]').val(telegrams);
-        });
+
 
     </script>
 }

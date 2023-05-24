@@ -22,35 +22,35 @@
                     <div class="card-body">
                         <form method="post" action="/admin/ServicePackByMonth/Edit">
                             <div class="row">
-                               
+
                                 <div class="col-12">
                                     <h6>Chỉnh sửa Live tháng</h6>
                                     <div class="form-group mb-4">
                                         <label class="">Số tháng</label>
                                         <div class="">
-                                            <input type="number"  min="1" name="Month" value="@Model.Month" placeholder="Số tháng" class="form-control" />
-                                            <input name="Id" value="@Model.Id"  class="form-control" style="display:none" />
+                                            <input type="number" min="1" name="Month" value="@Model.Month" placeholder="Số tháng" class="form-control" />
+                                            <input name="Id" value="@Model.Id" class="form-control" style="display:none" />
                                             <span asp-validation-for="Month" class="text-danger"></span>
                                         </div>
                                     </div>
-                                  
+
                                     <div class="form-group mb-4">
                                         <label class="">Giá</label>
                                         <div class="">
                                             <input type="number" min="1" name="Price" value="@Model.Price" class="form-control" />
-                                            <span asp-validation-for="Price"  class="text-danger"></span>
+                                            <span asp-validation-for="Price" class="text-danger"></span>
                                         </div>
                                     </div>
                                     <div class="form-group mb-4">
                                         <label class="">Phần trăm giảm giá(%)</label>
                                         <div class="">
-                                            <input type="number" name="Percent" value="@Model.Percent" class="form-control"/>
-                                            <span asp-validation-for="Percent"  class="text-danger"></span>
+                                            <input type="number" name="Percent" value="@Model.Percent" class="form-control" />
+                                            <span asp-validation-for="Percent" class="text-danger"></span>
                                         </div>
                                     </div>
 
                                 </div>
-                               
+
                             </div>
                             <div class="form-group row mb-4">
                                 <label class="col-form-label text-md-right col-12 col-md-4 col-lg-4"></label>
@@ -68,9 +68,12 @@
 </section>
 @section Scripts{
     <script>
-        $('body').on('click', '.btn-setting', function () {
-            showModal(null, 'updateSetting');
-        });
+        $(document).ready(function () {
+            $('body').on('click', '.btn-setting', function () {
+                showModal(null, 'updateSetting');
+            });
+        }
+
     </script>
 }
 

@@ -22,7 +22,7 @@
                     <div class="card-body">
                         <form method="post" action="/admin/ServicePack/Create">
                             <div class="row">
-                               
+
                                 <div class="col-12">
                                     <h6>Tạo gói Live Stream</h6>
                                     <div class="form-group mb-4">
@@ -43,7 +43,7 @@
                                                     Gói 4k
                                                 </option>
                                             </select>
-                                           
+
                                             <span asp-validation-for="Type"></span>
                                         </div>
                                     </div>
@@ -51,26 +51,26 @@
                                         <label class="">Số luồng</label>
                                         <div class="">
                                             <input type="number" min="1" name="NumberOfThreads" value="@Model.NumberOfThreads" class="form-control" />
-                                            <span asp-validation-for="NumberOfThreads"  class="text-danger"></span>
+                                            <span asp-validation-for="NumberOfThreads" class="text-danger"></span>
                                         </div>
                                     </div>
                                     <div class="form-group mb-4">
                                         <label class="">Giá</label>
                                         <div class="">
-                                            <input type="number" name="Price" value="@Model.Price" class="form-control"/>
-                                            <span asp-validation-for="Price"  class="text-danger"></span>
+                                            <input type="number" name="Price" value="@Model.Price" class="form-control" />
+                                            <span asp-validation-for="Price" class="text-danger"></span>
                                         </div>
                                     </div>
                                     <div class="form-group mb-4">
                                         <label class="">Discount</label>
                                         <div class="">
                                             <input name="Discount" value="@Model.Discount" class="form-control" />
-                                            <span asp-validation-for="Discount"  class="text-danger"></span>
+                                            <span asp-validation-for="Discount" class="text-danger"></span>
                                         </div>
                                     </div>
 
                                 </div>
-                               
+
                             </div>
                             <div class="form-group row mb-4">
                                 <label class="col-form-label text-md-right col-12 col-md-4 col-lg-4"></label>
@@ -88,9 +88,12 @@
 </section>
 @section Scripts{
     <script>
-        $('body').on('click', '.btn-setting', function () {
-            showModal(null, 'updateSetting');
-        });
+        $(document).ready(function () {
+            $('body').on('click', '.btn-setting', function () {
+                showModal(null, 'updateSetting');
+            });
+        }
+
     </script>
 }
 

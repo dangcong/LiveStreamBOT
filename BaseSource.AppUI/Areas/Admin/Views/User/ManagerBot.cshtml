@@ -28,7 +28,7 @@
                     <div class="card-header">
                         <h4>@ViewData["Title"]</h4>
                         <button class="btn btn-success" data-toggle="modal" data-target="#addModal">Thêm mới</button>
-                     
+
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -63,13 +63,13 @@
 
                                             <td>
                                                 <a class="btn btn-info btnUpdate" href="#"
-                                                   data-toggle="modal"
-                                                   data-target="#updateModal"
+                                                  @* data-toggle="modal"
+                                                   data-target="#updateModal"*@
                                                    data-id="@item.Id"
                                                    data-number="@item.NumberOfThreads">Cập nhật</a>
                                                 <a class="btn btn-danger btnDelete" href="#"
-                                                   data-toggle="modal"
-                                                   data-target="#deleteModal"
+                                                  @* data-toggle="modal"
+                                                   data-target="#deleteModal"*@
                                                    data-id="@item.Id">Xóa</a>
                                             </td>
                                         </tr>
@@ -94,7 +94,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p>Bạn muốn xóa BOT của người dùng này ? Nếu người dùng có luồng đang chạy không thể xóa BOT</p>
+                <p>Bạn muốn xóa BOT của người dùng này ? Nếu người dùng có luồng đang chạy sẽ dừng tất cả.</p>
             </div>
             <div class="modal-footer bg-whitesmoke br">
                 <form id="deleteForm" method="post" action="/admin/user/DeleteBOT">
@@ -140,7 +140,7 @@
         </div>
     </div>
 </div>
-<div class="modal fade"  role="dialog" id="addModal">
+<div class="modal fade" role="dialog" id="addModal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -159,8 +159,8 @@
                             <input name="NumberOfThreads" placeholder="Nhập số luồng cấp phép" required min="1" class="form-control" />
                         </div>
                     </div>
-                    
-                   
+
+
                     <div class="form-group mb-4">
                         <label class="">Loại BOT</label>
                         <div class="">
@@ -216,16 +216,6 @@
 
     <script>
 
-        $('body').on('click', '.btnUpdate', function () {
-            let id = $(this).attr('data-id');
-            let number = $(this).attr('data-number');
-            $('#updateForm input[name="Id"]').val(id);
-            $('#updateForm input[name="NumberOfThreads"]').val(number);
-        });
-        $('body').on('click', '.btnDelete', function () {
-            let id = $(this).attr('data-id');
-            $('#deleteForm input[name="Id"]').val(id);
-        });
         $(document).ready(function () {
             $("#table-bots").DataTable({});
 
@@ -246,7 +236,23 @@
                         $('.bot1080').hide();
                         break;
                 }
-            })
+            });
+            $('body').on('click', '.btnUpdate', function (e) {
+                $('#updateModal').modal('show');
+                //e.preventdefault()
+                let id = $(this).attr('data-id');
+                let number = $(this).attr('data-number');
+                //let stringVal="Id:${id}- numer:[${number}]";
+              
+                $('#updateForm input[name="Id"]').val(id);
+                $('#updateForm input[name="NumberOfThreads"]').val(number);
+            });
+            $('body').on('click', '.btnDelete', function () {
+
+                 $('#deleteModal').modal('show');
+                let id = $(this).attr('data-id');
+                $('#deleteForm input[name="Id"]').val(id);
+            });
         });
     </script>
 }

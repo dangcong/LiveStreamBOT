@@ -44,6 +44,7 @@ namespace BaseSource.ViewModels.ManagerBOT
         public double Bandwidth { get; set; }
         public bool IsUsed { get; set; }
         public LiveType? LiveType { get; set; }
+        public int TotalUser { get; set; }
     }
     public class ManagerBOTRequestDto : PageQuery
     {

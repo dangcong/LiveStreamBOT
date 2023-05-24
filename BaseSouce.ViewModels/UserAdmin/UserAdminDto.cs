@@ -23,6 +23,7 @@ namespace BaseSource.ViewModels.UserAdmin
         public int NumberOfThreads1080InRun { get; set; }
         public int NumberOfThreads4KInRun { get; set; }
         public string Password { get; set; }
+        public int TotalBOT { get; set; }
     }
     public class UserAdminRequestDto : PageQuery
     {

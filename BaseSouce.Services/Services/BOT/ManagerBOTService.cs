@@ -233,7 +233,7 @@ namespace BaseSouce.Services.Services.BOT
             var data = await _repository.GetStagesPagedListAsync(
                 stages: query,
                 selector: x => _mapper.Map<ManagerBotInfoDto>(x),
-                include: x => x.Include(i => i.StreamHistorys),
+                include: x => x.Include(i => i.StreamHistorys).Include(i => i.UserManagerBOTs),
                 orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                 pageIndex: model.Page, pageSize: model.PageSize);
 

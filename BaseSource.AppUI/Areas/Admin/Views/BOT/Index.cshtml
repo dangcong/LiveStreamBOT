@@ -31,7 +31,7 @@
                                 <div class="card-stats-item-label">Tổng số luồng 1080(Đang chạy/Tổng)</div>
                             </div>
                             <div class="card-stats-item">
-                                <div class="card-stats-item-count"><span class="badge badge-primary">@(report.NumberOfThreads4KInRun)/@(report.NumberOfThreads4K)</span></div>
+                                <div class="card-stats-item-count"><span class="badge badge-danger">@(report.NumberOfThreads4KInRun)/@(report.NumberOfThreads4K)</span></div>
                                 <div class="card-stats-item-label">Tổng số luồng 4k(Đang chạy/Tổng)</div>
                             </div>
                             <div class="card-stats-item">
@@ -77,6 +77,7 @@
                                         <th>Status</th>
                                         <th>Ngày tạo</th>
                                         <th>Số luồng</th>
+                                        <th>Số User</th>
                                         <th>CPU</th>
                                         <th>RAM</th>
                                         <th>Bandwidth</th>
@@ -93,10 +94,10 @@
                                                 @switch (item.LiveType)
                                                 {
                                                     case LiveType._1080:
-                                                    <span class="badge badge-primary" >1080</span>
+                                                    <span class="badge badge-success" >1080</span>
                                                         break;
                                                      case LiveType._4K:
-                                                     <span class="badge badge-success">4k</span>
+                                                     <span class="badge badge-danger">4k</span>
                                                         break;
                                                 }
                                             </td>
@@ -105,6 +106,7 @@
                                             <td>@item.Status</td>
                                             <td>@item.CreatedTime.ToString("dd/MM/yyyy HH:mm:ss")</td>
                                             <td><span>@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads)</span> </td>
+                                            <td>@item.TotalUser</td>
                                             <td>@((item.CPU * 100).ToString("n2"))%</td>
                                             <td>@((item.RAM * 100).ToString("n2"))%</td>
                                             <td>@item.Bandwidth.ToString("n2") KB/s</td>

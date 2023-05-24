@@ -8,6 +8,7 @@ using BaseSource.ViewModels.Order;
 using BaseSource.ViewModels.ServicePackage;
 using BaseSource.ViewModels.Setting;
 using BaseSource.ViewModels.Stream;
+using System.Security.Cryptography.X509Certificates;
 
 namespace BaseSouce.Services.MappingProfile
 {
@@ -35,6 +36,8 @@ namespace BaseSouce.Services.MappingProfile
             #region ManagerBOT
 
             CreateMap<ManagerBOT, ManagerBotInfoDto>()
+                .ForMember(dest => dest.TotalUser,
+                options => options.MapFrom(source => source.UserManagerBOTs.DistinctBy(x=>x.UserId).Count()))
                 .ForMember(dest => dest.NumberOfThreadsInRun,
                 options => options.MapFrom(source => source.StreamHistorys.Where(x => x.Status == StreamStatus.Streaming).Count()));
 

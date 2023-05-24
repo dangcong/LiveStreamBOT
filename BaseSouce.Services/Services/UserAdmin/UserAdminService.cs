@@ -148,7 +148,7 @@ namespace BaseSouce.Services.Services.UserAdmin
                 {
                     foreach (var item in anyStream)
                     {
-                      await  _streamClientService.CancelStreamAsync(userBotEntity.UserId, item.Id);
+                        await _streamClientService.CancelStreamAsync(userBotEntity.UserId, item.Id);
                     }
                     //return new KeyValuePair<bool, string>(false, "Vui lòng tắt Stream trước khi xóa BOT");
                 }
@@ -229,6 +229,7 @@ namespace BaseSouce.Services.Services.UserAdmin
                     TelegramAPI = x.TelegramAPI,
                     NumberOfThreads4KInRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._4K && i.Status == StreamStatus.Streaming).Count(),
                     NumberOfThreads1080InRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._1080 && i.Status == StreamStatus.Streaming).Count(),
+                    TotalBOT = x.UserManagerBOTs.Count()
                 }, include: x => x.Include(i => i.StreamHistorys).Include(i => i.UserManagerBOTs).ThenInclude(o => o.ManagerBOT),
                 orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                 pageIndex: model.Page, pageSize: model.PageSize);

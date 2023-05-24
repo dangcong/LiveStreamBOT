@@ -28,6 +28,7 @@
                     <div class="card-header">
                         <h4>@ViewData["Title"]</h4>
                         <button class="btn btn-success" data-toggle="modal" data-target="#addModal">Thêm mới</button>
+                     
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -72,7 +73,7 @@
                                                    data-id="@item.Id">Xóa</a>
                                             </td>
                                         </tr>
-                                      
+
                                     }
                                 </tbody>
                             </table>
@@ -139,7 +140,7 @@
         </div>
     </div>
 </div>
-<div class="modal fade" tabindex="-1" role="dialog" id="addModal">
+<div class="modal fade"  role="dialog" id="addModal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -158,7 +159,8 @@
                             <input name="NumberOfThreads" placeholder="Nhập số luồng cấp phép" required min="1" class="form-control" />
                         </div>
                     </div>
-
+                    
+                   
                     <div class="form-group mb-4">
                         <label class="">Loại BOT</label>
                         <div class="">
@@ -173,7 +175,7 @@
                     <div class="form-group mb-4 bot4k" style="display:none">
                         <label class="">Chọn BOT 4k</label>
                         <div class="">
-                            <select class="form-control" name="Bot4k">
+                            <select class="form-control select2" name="Bot4k">
                                 <option value="0">-- Chọn bot --</option>
                                 @foreach (var item in bot4k)
                                 {
@@ -187,7 +189,7 @@
                     <div class="form-group mb-4 bot1080" style="display:none">
                         <label class="">Chọn BOT 1080</label>
                         <div class="">
-                            <select class="form-control" name="Bot1080">
+                            <select class="form-control select2" name="Bot1080">
                                 <option value="0">-- Chọn bot --</option>
                                 @foreach (var item in bot1080)
                                 {
@@ -209,7 +211,9 @@
         </div>
     </div>
 </div>
+
 @section Scripts{
+
     <script>
 
         $('body').on('click', '.btnUpdate', function () {

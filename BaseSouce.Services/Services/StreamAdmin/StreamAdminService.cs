@@ -42,7 +42,7 @@ namespace BaseSouce.Services.Services.StreamAdmin
             var data = await _repository.GetStagesPagedListAsync(
                 stages: query,
                 selector: x => _mapper.Map<StreamAdminInfoDto>(x),
-                include: x => x.Include(i => i.AppUser),
+                include: x => x.Include(i => i.AppUser).Include(i=>i.ManagerBOT),
                orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                pageIndex: 1, pageSize: 500);
             return data.Items.ToList();

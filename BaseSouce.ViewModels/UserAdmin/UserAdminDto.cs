@@ -24,6 +24,8 @@ namespace BaseSource.ViewModels.UserAdmin
         public int NumberOfThreads4KInRun { get; set; }
         public string Password { get; set; }
         public int TotalBOT { get; set; }
+        public DateTime? UpdatedTime { get; set; }
+        public string UserUpdate { get; set; }
     }
     public class UserAdminRequestDto : PageQuery
     {
@@ -47,6 +49,7 @@ namespace BaseSource.ViewModels.UserAdmin
     }
     public class ResetPasswordAdminDto
     {
+        public string UserUpdate { get; set; }
         public string UserId { get; set; }
         public string Password { get; set; }
     }

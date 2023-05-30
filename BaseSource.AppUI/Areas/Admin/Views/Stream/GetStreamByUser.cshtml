@@ -48,7 +48,7 @@
                                     @foreach (var item in Model)
                                     {
                                         <tr>
-                                            <td>@index</td>
+                                            <td>@(index++)</td>
                                             <td>
                                                 @item.UserName
                                             </td>
@@ -60,7 +60,7 @@
                                             <td>
                                                 @if (item.LiveType == LiveType._1080)
                                                 {
-                                                    <span class="badge badge-primary">1080</span>
+                                                    <span class="badge badge-success">1080</span>
                                                 }
                                                 else
                                                 {
@@ -141,7 +141,7 @@
                                             </td>
                                             <td><a class="btn btn-primary" href="/admin/stream/info?id=@item.Id">Chi tiết</a></td>
                                         </tr>
-                                        @(index++)
+                                       
                                     }
                                 </tbody>
                             </table>
@@ -154,12 +154,10 @@
 </section>
 @section Scripts{
     <script>
-
         $(document).ready(function () {
             $("#tableAllStream").DataTable({
-
             });
-        }
+        });
 
     </script>
 }

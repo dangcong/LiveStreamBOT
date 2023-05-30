@@ -255,7 +255,7 @@ namespace BaseSouce.Services.Services.Stream
                         BotId = x.ManagerBOTId,
                         BotIdString = x.ManagerBOT.BotId,
                         NumberOfThreads = x.NumberOfThreads,
-                        NumberOfThreadsInRun = x.ManagerBOT.StreamHistorys.Where(i => i.UserId == userId && i.Status==StreamStatus.Streaming).Count(),
+                        NumberOfThreadsInRun = x.ManagerBOT.StreamHistorys.Where(i => i.UserId == userId && i.Status == StreamStatus.Streaming).Count(),
                     })
                     .OrderBy(x => x.NumberOfThreadsInRun)
                     .ToListAsync();
@@ -477,7 +477,7 @@ namespace BaseSouce.Services.Services.Stream
                         BotId = x.ManagerBOTId,
                         BotIdString = x.ManagerBOT.BotId,
                         NumberOfThreads = x.NumberOfThreads,
-                        NumberOfThreadsInRun = x.ManagerBOT.StreamHistorys.Where(i => i.UserId == userId && i.Status==StreamStatus.Streaming).Count(),
+                        NumberOfThreadsInRun = x.ManagerBOT.StreamHistorys.Where(i => i.UserId == userId && i.Status == StreamStatus.Streaming).Count(),
                     })
                     .OrderBy(x => x.NumberOfThreadsInRun)
                     .ToListAsync();
@@ -574,13 +574,14 @@ namespace BaseSouce.Services.Services.Stream
                     var timer = streamEntity.StartTimeLive != null ?
                         streamEntity.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
                         : "Ngay bây giờ";
+                    var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
                     _ = _telegramBotClient
                     .SendTextMessageAsync(new ChatId(userCurrent.TelegramAPI),
                     $"User: {userCurrent.UserName}{Environment.NewLine}"
                     + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
                     + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
                     + $"Kiểu live: {liveType}{Environment.NewLine}"
-                    + $"Chạy live:{timer}", ParseMode.Default, true);
+                    + $"{textTimer}:{timer}", ParseMode.Default, true);
                 }
 
                 if (!string.IsNullOrEmpty(userCurrent.LinkTelegram))
@@ -589,7 +590,7 @@ namespace BaseSouce.Services.Services.Stream
                     var timer = streamEntity.StartTimeLive != null ?
                         streamEntity.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
                         : "Ngay bây giờ";
-
+                    var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
                     var idTeles = userCurrent.LinkTelegram.Split(',');
                     if (idTeles.Length > 0)
                     {
@@ -601,7 +602,7 @@ namespace BaseSouce.Services.Services.Stream
                            + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
                            + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
                            + $"Kiểu live: {liveType}{Environment.NewLine}"
-                           + $"Chạy live:{timer}", ParseMode.Default, true);
+                           + $"{textTimer}:{timer}", ParseMode.Default, true);
                         }
                     }
                 }
@@ -732,7 +733,7 @@ namespace BaseSouce.Services.Services.Stream
                                + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
                                + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
                                + $"Kiểu live: {liveType}{Environment.NewLine}"
-                               + $"Chạy live:{timer}", ParseMode.Default, true);
+                               + $"Bắt đầu:{timer}", ParseMode.Default, true);
                             }
                         }
                     }
@@ -880,7 +881,7 @@ namespace BaseSouce.Services.Services.Stream
                     Total = x.StreamHistorys.Count(),
                     TotalStop = x.StreamHistorys.Where(i => i.Status == StreamStatus.Stop).Count(),
                     TotalStreaming = x.StreamHistorys.Where(i => i.Status == StreamStatus.Streaming).Count(),
-                    TotalTimer = x.StreamHistorys.Where(x => x.StartTimeLive != null || x.EndTimeLive != null).Count()
+                    TotalTimer = x.StreamHistorys.Where(x => x.StartTimeLive != null && x.StartTimeLive > DateTime.Now).Count()
                 });
         }
 

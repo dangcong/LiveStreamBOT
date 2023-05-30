@@ -229,7 +229,9 @@ namespace BaseSouce.Services.Services.UserAdmin
                     TelegramAPI = x.TelegramAPI,
                     NumberOfThreads4KInRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._4K && i.Status == StreamStatus.Streaming).Count(),
                     NumberOfThreads1080InRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._1080 && i.Status == StreamStatus.Streaming).Count(),
-                    TotalBOT = x.UserManagerBOTs.Count()
+                    TotalBOT = x.UserManagerBOTs.Count(),
+                    UpdatedTime = x.UpdatedTime,
+                    UserUpdate = x.UserUpdate
                 }, include: x => x.Include(i => i.StreamHistorys).Include(i => i.UserManagerBOTs).ThenInclude(o => o.ManagerBOT),
                 orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                 pageIndex: model.Page, pageSize: model.PageSize);
@@ -352,6 +354,8 @@ namespace BaseSouce.Services.Services.UserAdmin
 
                 userCurrent.Password = model.Password;
                 userCurrent.PasswordHash = passwordHash;
+                userCurrent.UpdatedTime = DateTime.Now;
+                userCurrent.UserUpdate = model.UserUpdate;
 
                 _repository.Update(userCurrent);
 

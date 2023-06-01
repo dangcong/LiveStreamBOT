@@ -22,10 +22,10 @@ namespace LiveStreamBOT.Queues
     {
         public RenderCommand RenderCommand { get; }
         readonly IServerHub _serverHub;
-        readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        readonly CancellationTokenSource _cancellationTokenSource_cancel = new CancellationTokenSource();
+        readonly CancellationTokenSource _cancellationTokenSource_endTime = new CancellationTokenSource();
         readonly string _workingDir;
-        bool _isCancelledByEndTime = false;
-        CancellationToken CancellationToken { get { return _cancellationTokenSource.Token; } }
+        CancellationToken CancellationToken { get { return _cancellationTokenSource_cancel.Token; } }
         public WorkQueue(RenderCommand renderCommand, IServerHub serverHub)
         {
             this.RenderCommand = renderCommand ?? throw new ArgumentNullException(nameof(renderCommand));
@@ -39,12 +39,13 @@ namespace LiveStreamBOT.Queues
 
         public void Cancel()
         {
-            _cancellationTokenSource.Cancel();
+            _cancellationTokenSource_cancel.Cancel();
         }
 
         public void Dispose()
         {
-            _cancellationTokenSource.Dispose();
+            _cancellationTokenSource_cancel.Dispose();
+            _cancellationTokenSource_endTime.Dispose();
         }
 
         public async Task DoWork()
@@ -96,7 +97,7 @@ namespace LiveStreamBOT.Queues
             }
             catch (OperationCanceledException)
             {
-                if (_isCancelledByEndTime)
+                if (_cancellationTokenSource_endTime.IsCancellationRequested)
                 {
                     await RenderUpdateAsync(new RenderMessage()
                     {
@@ -174,6 +175,7 @@ namespace LiveStreamBOT.Queues
                     }
                 }, CancellationToken);
                 CheckEndTime();
+                _cancellationTokenSource_endTime.Token.ThrowIfCancellationRequested();
             }
 
             await RenderUpdateAsync(new RenderMessage()
@@ -208,7 +210,12 @@ namespace LiveStreamBOT.Queues
                     WorkingDirectory = _workingDir,
                 });
                 preRender.OnEncodingProgress += PreRender_OnEncodingProgress;
-                var renderResult = await preRender.ExecuteAsync(CancellationToken);
+
+                using CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+                using var register_cancel = _cancellationTokenSource_cancel.Token.Register(() => cancellationTokenSource.Cancel());
+                using var register_endTime = _cancellationTokenSource_endTime.Token.Register(() => cancellationTokenSource.Cancel());
+
+                var renderResult = await preRender.ExecuteAsync(cancellationTokenSource.Token);
                 renderResult.EnsureSuccess();
             }
         }
@@ -244,8 +251,13 @@ namespace LiveStreamBOT.Queues
                     TimeSpan diff = RenderCommand.UtcStartTime.Value - utc_current;
                     if (diff > TimeSpan.Zero)
                     {
+                        using CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+                        using var register_cancel = _cancellationTokenSource_cancel.Token.Register(() => cancellationTokenSource.Cancel());
+                        using var register_endTime = _cancellationTokenSource_endTime.Token.Register(() => cancellationTokenSource.Cancel());
+
                         CheckEndTime();
-                        await Task.Delay(5000, CancellationToken);
+
+                        await Task.Delay(5000, cancellationTokenSource.Token);
                         await RenderUpdateAsync(new RenderMessage()
                         {
                             ItemId = RenderCommand.ItemId,
@@ -283,8 +295,13 @@ namespace LiveStreamBOT.Queues
                     Time = TimeSpan.Zero
                 }
             });
-            var result = await liveStream.ExecuteAsync(CancellationToken);
-            LogHelper.WriteLog($"[{RenderCommand.ItemId} - {RenderCommand.WorkId}] ffmpeg exit code {result.ExitCode}");
+
+            using CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            using var register_cancel = _cancellationTokenSource_cancel.Token.Register(() => cancellationTokenSource.Cancel());
+            using var register_endTime = _cancellationTokenSource_endTime.Token.Register(() => cancellationTokenSource.Cancel());
+
+            var result = await liveStream.ExecuteAsync(cancellationTokenSource.Token);
+            LogHelper.WriteLog($"[{RenderCommand.ItemId} - {RenderCommand.WorkId}] ffmpeg exit code {result.ExitCode}\r\n\r\b{string.Join("\r\n", result.ErrorDatas)}");
         }
 
         async void LiveStream_OnEncodingProgress(RenderProgress obj)
@@ -319,7 +336,7 @@ namespace LiveStreamBOT.Queues
                 )
             {
                 LogHelper.WriteLog($"[{RenderCommand.ItemId} - {RenderCommand.WorkId}] UtcEndTime: {RenderCommand.UtcEndTime}");
-                try { _cancellationTokenSource.Cancel(); _isCancelledByEndTime = true; } catch { }
+                try { _cancellationTokenSource_endTime.Cancel(); } catch { }
             }
         }
 
@@ -354,7 +371,7 @@ namespace LiveStreamBOT.Queues
                     break;
 
                 case RenderStatus.Error:
-                    log += $" {renderMessage.ExceptionInfo?.Message}";
+                    log += $" {renderMessage.ExceptionInfo?.Message}\r\n{renderMessage.ExceptionInfo?.StackTrace}";
                     break;
             }
             LogHelper.WriteLog(log);

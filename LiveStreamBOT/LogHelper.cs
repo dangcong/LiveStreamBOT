@@ -23,7 +23,7 @@ namespace LiveStreamBOT
             Console.WriteLine(log);
             lock (_lock)
             {
-                using StreamWriter streamWriter = new StreamWriter(Path.Combine(LogsDir, $"{DateTime.Now:yyyy-MM-dd}.log"));
+                using StreamWriter streamWriter = new StreamWriter(Path.Combine(LogsDir, $"{DateTime.Now:yyyy-MM-dd}.log"), true);
                 streamWriter.WriteLine(log);
             }
         }

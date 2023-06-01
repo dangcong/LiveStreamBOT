@@ -19,11 +19,12 @@ namespace LiveStreamBOT
 
         public static void WriteLog(string log)
         {
+            log = $"{DateTime.Now:HH:mm:ss}\t{log}";
             Console.WriteLine(log);
             lock (_lock)
             {
                 using StreamWriter streamWriter = new StreamWriter(Path.Combine(LogsDir, $"{DateTime.Now:yyyy-MM-dd}.log"));
-                streamWriter.WriteLine($"{DateTime.Now:HH:mm:ss}\t{log}");
+                streamWriter.WriteLine(log);
             }
         }
 

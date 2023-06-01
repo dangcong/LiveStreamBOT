@@ -59,7 +59,7 @@ namespace LiveStreamBOT.Services
                 {
                     if (ex is AggregateException ae) ex = ae.InnerException;
 
-                    Console.WriteLine($"{ex.GetType().FullName}: {ex.Message}, {ex.StackTrace}");
+                    LogHelper.WriteLog($"{ex.GetType().FullName}: {ex.Message}, {ex.StackTrace}");
                 }
             }
 
@@ -77,7 +77,7 @@ namespace LiveStreamBOT.Services
                 {
                     if (ex is AggregateException ae) ex = ae.InnerException;
 
-                    Console.WriteLine($"{ex.GetType().FullName}: {ex.Message}, {ex.StackTrace}");
+                    LogHelper.WriteLog($"{ex.GetType().FullName}: {ex.Message}, {ex.StackTrace}");
                     ThreadPool.QueueUserWorkItem((o) =>
                     {
                         Task.Delay(100).ContinueWith((t) =>

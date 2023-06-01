@@ -30,7 +30,7 @@ while (uri is null)
     Uri.TryCreate(args.FirstOrDefault(), UriKind.Absolute, out uri);
 }
 
-Console.WriteLine("Starting");
+LogHelper.WriteLog("Starting");
 taskQueue = new TaskQueue<WorkQueue>();
 taskQueue.MaxRun = 999;
 try
@@ -45,7 +45,7 @@ try
     Singleton.Setting.Save();
     using ISystemInfoReader systemInfoReader = GetSystemInfoReader();
 
-    Console.WriteLine($"Started {Singleton.Setting.Setting.BotId}");
+    LogHelper.WriteLog($"Started {Singleton.Setting.Setting.BotId}");
     while (true)
     {
         await Task.Delay(Singleton.Setting.Setting.PingInterval);
@@ -61,7 +61,7 @@ try
         {
             if (isDebug)
             {
-                Console.WriteLine($"PingAsync: CpuUsage:{clientInfo.CpuUsage}, RamUsage:{clientInfo.RamUsage}, Bandwidth:{clientInfo.Bandwidth}KBps");
+                LogHelper.WriteLog($"PingAsync: CpuUsage:{clientInfo.CpuUsage}, RamUsage:{clientInfo.RamUsage}, Bandwidth:{clientInfo.Bandwidth}KBps");
             }
             await ServerHub.PingAsync(clientInfo);
         }
@@ -90,7 +90,7 @@ void SignalrClient_OnRenderCommand(RenderCommand obj)
 {
     try
     {
-        Console.WriteLine($"{nameof(RenderCommand)}: [{obj.ItemId} - {obj.WorkId}] {obj?.Command}");
+        LogHelper.WriteLog($"{nameof(RenderCommand)}: [{obj.ItemId} - {obj.WorkId}] {obj?.Command}");
         switch (obj.Command)
         {
             case Command.Start:
@@ -111,11 +111,11 @@ void SignalrClient_OnRenderCommand(RenderCommand obj)
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"{ex.GetType().FullName}: {ex.Message}, {ex.StackTrace}");
+        LogHelper.WriteLog($"{ex.GetType().FullName}: {ex.Message}, {ex.StackTrace}");
     }
 }
 
 void SignalrClient_OnConnectionStateChange(SignalRConnectionState obj)
 {
-    Console.WriteLine($"{nameof(SignalRConnectionState)}.{obj}");
+    LogHelper.WriteLog($"{nameof(SignalRConnectionState)}.{obj}");
 }

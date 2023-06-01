@@ -284,7 +284,7 @@ namespace LiveStreamBOT.Queues
                 }
             });
             var result = await liveStream.ExecuteAsync(CancellationToken);
-            Console.WriteLine($"[{RenderCommand.ItemId} - {RenderCommand.WorkId}] ffmpeg exit code {result.ExitCode}");
+            LogHelper.WriteLog($"[{RenderCommand.ItemId} - {RenderCommand.WorkId}] ffmpeg exit code {result.ExitCode}");
         }
 
         async void LiveStream_OnEncodingProgress(RenderProgress obj)
@@ -318,7 +318,7 @@ namespace LiveStreamBOT.Queues
                 DateTime.UtcNow >= RenderCommand.UtcEndTime.Value
                 )
             {
-                Console.WriteLine($"[{RenderCommand.ItemId} - {RenderCommand.WorkId}] UtcEndTime: {RenderCommand.UtcEndTime}");
+                LogHelper.WriteLog($"[{RenderCommand.ItemId} - {RenderCommand.WorkId}] UtcEndTime: {RenderCommand.UtcEndTime}");
                 try { _cancellationTokenSource.Cancel(); _isCancelledByEndTime = true; } catch { }
             }
         }
@@ -357,7 +357,7 @@ namespace LiveStreamBOT.Queues
                     log += $" {renderMessage.ExceptionInfo?.Message}";
                     break;
             }
-            Console.WriteLine(log);
+            LogHelper.WriteLog(log);
             return _serverHub.RenderUpdateAsync(renderMessage);
         }
     }

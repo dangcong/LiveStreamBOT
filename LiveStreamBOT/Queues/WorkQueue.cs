@@ -205,6 +205,7 @@ namespace LiveStreamBOT.Queues
         {
             if (!string.IsNullOrWhiteSpace(RenderCommand.RenderArguments))
             {
+                LogHelper.WriteLog($"{nameof(PreRenderAsync)}: {RenderCommand.RenderArguments}");
                 FFmpegRender preRender = FFmpegRender.FromArguments(RenderCommand.RenderArguments, new FFmpegRenderConfig()
                 {
                     WorkingDirectory = _workingDir,
@@ -276,32 +277,36 @@ namespace LiveStreamBOT.Queues
 
         async Task LiveStreamAsync(Stream stream = null)
         {
-            FFmpegRender liveStream = FFmpegRender.FromArguments(RenderCommand.LiveStreamArguments, new FFmpegRenderConfig()
+            while(!(_cancellationTokenSource_cancel.IsCancellationRequested || _cancellationTokenSource_endTime.IsCancellationRequested))
             {
-                WorkingDirectory = _workingDir,
-            });
-            liveStream.OnEncodingProgress += LiveStream_OnEncodingProgress;
-            if (stream != null) liveStream.WithStdInStream(stream);
-            await RenderUpdateAsync(new RenderMessage()
-            {
-                ItemId = RenderCommand.ItemId,
-                WorkId = RenderCommand.WorkId,
-                RenderStatus = RenderStatus.LiveStreaming,
-                RenderInfo = new RenderInfo()
+                LogHelper.WriteLog($"{nameof(LiveStreamAsync)}: {RenderCommand.LiveStreamArguments}");
+                FFmpegRender liveStream = FFmpegRender.FromArguments(RenderCommand.LiveStreamArguments, new FFmpegRenderConfig()
                 {
-                    Bitrate = 0,
-                    Fps = 0,
-                    Size = 0,
-                    Time = TimeSpan.Zero
-                }
-            });
+                    WorkingDirectory = _workingDir,
+                });
+                liveStream.OnEncodingProgress += LiveStream_OnEncodingProgress;
+                if (stream != null) liveStream.WithStdInStream(stream);
+                await RenderUpdateAsync(new RenderMessage()
+                {
+                    ItemId = RenderCommand.ItemId,
+                    WorkId = RenderCommand.WorkId,
+                    RenderStatus = RenderStatus.LiveStreaming,
+                    RenderInfo = new RenderInfo()
+                    {
+                        Bitrate = 0,
+                        Fps = 0,
+                        Size = 0,
+                        Time = TimeSpan.Zero
+                    }
+                });
 
-            using CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            using var register_cancel = _cancellationTokenSource_cancel.Token.Register(() => cancellationTokenSource.Cancel());
-            using var register_endTime = _cancellationTokenSource_endTime.Token.Register(() => cancellationTokenSource.Cancel());
+                using CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+                using var register_cancel = _cancellationTokenSource_cancel.Token.Register(() => cancellationTokenSource.Cancel());
+                using var register_endTime = _cancellationTokenSource_endTime.Token.Register(() => cancellationTokenSource.Cancel());
 
-            var result = await liveStream.ExecuteAsync(cancellationTokenSource.Token);
-            LogHelper.WriteLog($"[{RenderCommand.ItemId} - {RenderCommand.WorkId}] ffmpeg exit code {result.ExitCode}\r\n\r\b{string.Join("\r\n", result.ErrorDatas)}");
+                var result = await liveStream.ExecuteAsync(cancellationTokenSource.Token);
+                LogHelper.WriteLog($"[{RenderCommand.ItemId} - {RenderCommand.WorkId}] ffmpeg exit code {result.ExitCode}\r\n\r\b{string.Join("\r\n", result.ErrorDatas)}");
+            }
         }
 
         async void LiveStream_OnEncodingProgress(RenderProgress obj)

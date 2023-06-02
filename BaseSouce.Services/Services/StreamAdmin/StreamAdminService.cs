@@ -42,7 +42,7 @@ namespace BaseSouce.Services.Services.StreamAdmin
             var data = await _repository.GetStagesPagedListAsync(
                 stages: query,
                 selector: x => _mapper.Map<StreamAdminInfoDto>(x),
-                include: x => x.Include(i => i.AppUser),
+                include: x => x.Include(i => i.AppUser).Include(i=>i.ManagerBOT),
                orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                pageIndex: 1, pageSize: 500);
             return data.Items.ToList();
@@ -118,7 +118,7 @@ namespace BaseSouce.Services.Services.StreamAdmin
             data.TotalUser = await _repositoryUser.Queryable().AsNoTracking()
                 .Where(x => !x.UserRoles.Any() && x.DeletedTime == null).CountAsync();
             data.TotalManager = await _repositoryUser.Queryable().AsNoTracking()
-                .Where(x => x.DeletedTime == null && x.UserRoles.Any(x => x.RoleId == "baea9405-c706-46ea-9f52-6cfa8c83d65f"))
+                .Where(x => x.DeletedTime == null && x.UserRoles.Any(x => x.RoleId == "c1105ce5-9dbc-49a9-a7d5-c963b6daa62a"))
                 .CountAsync();
            // _logger.LogInformation($"NumberOfThreads4K:[{data.NumberOfThreads4K}]");
             return data;

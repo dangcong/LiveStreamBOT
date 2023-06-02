@@ -2,7 +2,8 @@
 @{
     ViewData["Title"] = "Danh sách BOT";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
-     var report = ViewBag.Report as StreamReportAdminDto;
+    var report = ViewBag.Report as StreamReportAdminDto;
+    var index = 1;
 }
 
 <section class="section">
@@ -17,7 +18,7 @@
 
     <div class="section-body">
         <h2 class="section-title">@ViewData["Title"]</h2>
-          <div class=" row">
+        <div class=" row">
             <div class="col-lg-12 col-md-12 col-sm-12">
                 <div class="card card-statistic-2">
                     <div class="card-stats">
@@ -30,7 +31,7 @@
                                 <div class="card-stats-item-label">Tổng số luồng 1080(Đang chạy/Tổng)</div>
                             </div>
                             <div class="card-stats-item">
-                                <div class="card-stats-item-count"><span class="badge badge-primary">@(report.NumberOfThreads4KInRun)/@(report.NumberOfThreads4K)</span></div>
+                                <div class="card-stats-item-count"><span class="badge badge-danger">@(report.NumberOfThreads4KInRun)/@(report.NumberOfThreads4K)</span></div>
                                 <div class="card-stats-item-label">Tổng số luồng 4k(Đang chạy/Tổng)</div>
                             </div>
                             <div class="card-stats-item">
@@ -51,8 +52,8 @@
                         <br />
                         <span></span>
                     </div>
-                   
-                    
+
+
                 </div>
             </div>
         </div>
@@ -68,6 +69,7 @@
                             <table class="table table-striped" id="table-all-user">
                                 <thead>
                                     <tr>
+                                        <th>STT</th>
                                         <th>BotID</th>
                                         <th>Loại</th>
                                         <th>Name</th>
@@ -75,6 +77,7 @@
                                         <th>Status</th>
                                         <th>Ngày tạo</th>
                                         <th>Số luồng</th>
+                                        <th>Số User</th>
                                         <th>CPU</th>
                                         <th>RAM</th>
                                         <th>Bandwidth</th>
@@ -85,15 +88,16 @@
                                     @foreach (var item in Model.Items)
                                     {
                                         <tr>
+                                            <td>@(index++)</td>
                                             <td> <span class="text-sm" style="font-size:10px">@item.BotId</span></td>
                                             <td>
                                                 @switch (item.LiveType)
                                                 {
                                                     case LiveType._1080:
-                                                    <span class="badge badge-primary" >1080</span>
+                                                        <span class="badge badge-success">1080</span>
                                                         break;
-                                                     case LiveType._4K:
-                                                     <span class="badge badge-success">4k</span>
+                                                    case LiveType._4K:
+                                                        <span class="badge badge-danger">4k</span>
                                                         break;
                                                 }
                                             </td>
@@ -102,6 +106,7 @@
                                             <td>@item.Status</td>
                                             <td>@item.CreatedTime.ToString("dd/MM/yyyy HH:mm:ss")</td>
                                             <td><span>@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads)</span> </td>
+                                            <td>@item.TotalUser</td>
                                             <td>@((item.CPU * 100).ToString("n2"))%</td>
                                             <td>@((item.RAM * 100).ToString("n2"))%</td>
                                             <td>@item.Bandwidth.ToString("n2") KB/s</td>
@@ -111,15 +116,26 @@
                                                 <a class="btn btn-primary" href="/admin/bot/edit/@(item.Id)">Sửa</a>
                                                 @if (item.IsUsed)
                                                 {
-                                                    <button class="btn btn-danger btn-update" data-toggle="modal" data-target="#stopModal" data-id="@item.Id">Stop</button>
+                                                    <button class="btn btn-danger btn-stop"
+                                                    @*data-toggle="modal" data-target="#stopModal"*@
+                                                            data-id="@item.Id">
+                                                        Stop
+                                                    </button>
                                                 }
                                                 else
                                                 {
-                                                    <button class="btn btn-success btn-update" data-toggle="modal" data-target="#startModal" data-id="@item.Id">Start</button>
+                                                    <button class="btn btn-success btn-start"
+                                                           @* data-toggle="modal" data-target="#startModal"*@
+                                                            data-id="@item.Id">
+                                                        Start
+                                                    </button>
                                                 }
-                                                <button class="btn btn-danger btn-Delete" data-toggle="modal" data-target="#deleteModal" data-id="@item.Id">Xóa</button>
+                                                <button class="btn btn-danger btn-Delete" 
+                                                @*data-toggle="modal" data-target="#deleteModal" *@
+                                                data-id="@item.Id">Xóa</button>
                                             </td>
                                         </tr>
+
                                     }
                                 </tbody>
                             </table>
@@ -200,22 +216,31 @@
 </div>
 @section Scripts{
     <script>
-        $('body').on('click', '.btn-setting', function () {
-            showModal(null, 'updateSetting');
-        });
-
-        $('body').on('click', '.btn-update', function () {
-            let id = $(this).attr('data-id');
-            $('#stopForm input[name="Id"]').val(id);
-            $('#startForm input[name="Id"]').val(id);
-        });
-        $('body').on('click', '.btn-Delete', function () {
-            let id = $(this).attr('data-id');
-            $('#deleteForm input[name="Id"]').val(id);
-
-        });
         $(document).ready(function () {
             $("#table-all-user").DataTable({});
+            $('body').on('click', '.btn-setting', function () {
+                showModal(null, 'updateSetting');
+            });
+
+            $('body').on('click', '.btn-start', function () {
+                 $('#startModal').modal('show');
+                let id = $(this).attr('data-id');
+                $('#stopForm input[name="Id"]').val(id);
+                $('#startForm input[name="Id"]').val(id);
+            });
+            $('body').on('click', '.btn-stop', function () {
+                 $('#stopModal').modal('show');
+                let id = $(this).attr('data-id');
+                $('#stopForm input[name="Id"]').val(id);
+                $('#startForm input[name="Id"]').val(id);
+            });
+            $('body').on('click', '.btn-Delete', function () {
+                $('#deleteModal').modal('show');
+                
+                let id = $(this).attr('data-id');
+                $('#deleteForm input[name="Id"]').val(id);
+
+            });
         });
     </script>
 }

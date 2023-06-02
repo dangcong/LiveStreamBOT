@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = $"Danh sách Luồng Stream của {ViewBag.UserName}";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var index = 1;
 }
 
 <section class="section">
@@ -13,7 +14,6 @@
             <div class="breadcrumb-item">Stream</div>
         </div>
     </div>
-
     <div class="section-body">
         <h2 class="section-title">@ViewData["Title"]</h2>
         <div class="row">
@@ -27,6 +27,7 @@
                             <table class="table table-striped" id="tableAllStream">
                                 <thead>
                                     <tr>
+                                        <th>STT</th>
                                         <th>Người dùng</th>
                                         <th>BOTName</th>
                                         <th>Group</th>
@@ -47,6 +48,7 @@
                                     @foreach (var item in Model)
                                     {
                                         <tr>
+                                            <td>@(index++)</td>
                                             <td>
                                                 @item.UserName
                                             </td>
@@ -58,7 +60,7 @@
                                             <td>
                                                 @if (item.LiveType == LiveType._1080)
                                                 {
-                                                    <span class="badge badge-primary">1080</span>
+                                                    <span class="badge badge-success">1080</span>
                                                 }
                                                 else
                                                 {
@@ -139,6 +141,7 @@
                                             </td>
                                             <td><a class="btn btn-primary" href="/admin/stream/info?id=@item.Id">Chi tiết</a></td>
                                         </tr>
+                                       
                                     }
                                 </tbody>
                             </table>
@@ -151,8 +154,10 @@
 </section>
 @section Scripts{
     <script>
-        $("#tableAllStream").DataTable({
-
+        $(document).ready(function () {
+            $("#tableAllStream").DataTable({
+            });
         });
+
     </script>
 }

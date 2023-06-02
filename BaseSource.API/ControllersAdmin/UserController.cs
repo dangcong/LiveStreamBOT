@@ -78,6 +78,7 @@ namespace BaseSource.API.ControllersAdmin
         [Route("reset-password")]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordAdminDto model)
         {
+            model.UserUpdate = User.Identity?.Name;
             var result = await _userAdminService.ResetPassowrdAsync(model);
             if (result.Key)
             {

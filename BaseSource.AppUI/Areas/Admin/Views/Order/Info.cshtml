@@ -156,9 +156,11 @@
 </div>
 @section Scripts{
     <script>
-        $('body').on('click', '.btn-setting', function () {
-            showModal(null, 'updateSetting');
-        });
+        $(document).ready(function () {
+            $('body').on('click', '.btn-setting', function () {
+                showModal(null, 'updateSetting');
+            });
+        }
     </script>
 }
 

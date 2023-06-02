@@ -17,6 +17,8 @@ namespace BaseSouce.Data.Entities
         public int NumberOfThreads4KCreate { get; set; }
         public string Password { get; set; }
         public DateTime? DeletedTime { get; set; }
+        public DateTime? UpdatedTime { get; set; }
+        public string UserUpdate { get; set; }
 
         public ICollection<AppUserRole> UserRoles { get; set; }
         public ICollection<AppUserClaim> Claims { get; set; }

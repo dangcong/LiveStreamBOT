@@ -5,6 +5,7 @@
     var bots = ViewBag.Bots as List<ManagerBotInfoDto>;
     var bot1080 = bots.Where(x => x.LiveType == LiveType._1080).ToList();
     var bot4k = bots.Where(x => x.LiveType == LiveType._4K).ToList();
+    var index = 1;
 
 }
 
@@ -27,12 +28,14 @@
                     <div class="card-header">
                         <h4>@ViewData["Title"]</h4>
                         <button class="btn btn-success" data-toggle="modal" data-target="#addModal">Thêm mới</button>
+
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
                             <table class="table table-striped" id="table-bots">
                                 <thead>
                                     <tr>
+                                        <th>STT</th>
                                         <th>BotName</th>
                                         <th>Loại</th>
                                         <th>Số luồng Chạy/Tổng</th>
@@ -43,6 +46,7 @@
                                     @foreach (var item in Model)
                                     {
                                         <tr>
+                                            <td>@(index++)</td>
                                             <td> <span class="text-danger"><strong>@item.BotName</strong></span></td>
                                             <td>
                                                 @switch (item.LiveType)
@@ -59,16 +63,17 @@
 
                                             <td>
                                                 <a class="btn btn-info btnUpdate" href="#"
-                                                   data-toggle="modal"
-                                                   data-target="#updateModal"
+                                                  @* data-toggle="modal"
+                                                   data-target="#updateModal"*@
                                                    data-id="@item.Id"
                                                    data-number="@item.NumberOfThreads">Cập nhật</a>
                                                 <a class="btn btn-danger btnDelete" href="#"
-                                                   data-toggle="modal"
-                                                   data-target="#deleteModal"
+                                                  @* data-toggle="modal"
+                                                   data-target="#deleteModal"*@
                                                    data-id="@item.Id">Xóa</a>
                                             </td>
                                         </tr>
+
                                     }
                                 </tbody>
                             </table>
@@ -89,7 +94,7 @@
                 </button>
             </div>
             <div class="modal-body">
-                <p>Bạn muốn xóa BOT của người dùng này ? Nếu người dùng có luồng đang chạy không thể xóa BOT</p>
+                <p>Bạn muốn xóa BOT của người dùng này ? Nếu người dùng có luồng đang chạy sẽ dừng tất cả.</p>
             </div>
             <div class="modal-footer bg-whitesmoke br">
                 <form id="deleteForm" method="post" action="/admin/user/DeleteBOT">
@@ -135,7 +140,7 @@
         </div>
     </div>
 </div>
-<div class="modal fade" tabindex="-1" role="dialog" id="addModal">
+<div class="modal fade" role="dialog" id="addModal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -155,6 +160,7 @@
                         </div>
                     </div>
 
+
                     <div class="form-group mb-4">
                         <label class="">Loại BOT</label>
                         <div class="">
@@ -169,7 +175,7 @@
                     <div class="form-group mb-4 bot4k" style="display:none">
                         <label class="">Chọn BOT 4k</label>
                         <div class="">
-                            <select class="form-control" name="Bot4k">
+                            <select class="form-control select2" name="Bot4k">
                                 <option value="0">-- Chọn bot --</option>
                                 @foreach (var item in bot4k)
                                 {
@@ -183,7 +189,7 @@
                     <div class="form-group mb-4 bot1080" style="display:none">
                         <label class="">Chọn BOT 1080</label>
                         <div class="">
-                            <select class="form-control" name="Bot1080">
+                            <select class="form-control select2" name="Bot1080">
                                 <option value="0">-- Chọn bot --</option>
                                 @foreach (var item in bot1080)
                                 {
@@ -196,7 +202,7 @@
                     </div>
                 </div>
                 <div class="modal-footer bg-whitesmoke br">
-                   
+
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
                     <button type="submit" id="btn-confirm-payment" class="btn btn-danger">Xác nhận </button>
 
@@ -205,19 +211,11 @@
         </div>
     </div>
 </div>
+
 @section Scripts{
+
     <script>
 
-        $('body').on('click', '.btnUpdate', function () {
-            let id = $(this).attr('data-id');
-            let number = $(this).attr('data-number');
-            $('#updateForm input[name="Id"]').val(id);
-            $('#updateForm input[name="NumberOfThreads"]').val(number);
-        });
-        $('body').on('click', '.btnDelete', function () {
-            let id = $(this).attr('data-id');
-            $('#deleteForm input[name="Id"]').val(id);
-        });
         $(document).ready(function () {
             $("#table-bots").DataTable({});
 
@@ -238,7 +236,23 @@
                         $('.bot1080').hide();
                         break;
                 }
-            })
+            });
+            $('body').on('click', '.btnUpdate', function (e) {
+                $('#updateModal').modal('show');
+                //e.preventdefault()
+                let id = $(this).attr('data-id');
+                let number = $(this).attr('data-number');
+                //let stringVal="Id:${id}- numer:[${number}]";
+              
+                $('#updateForm input[name="Id"]').val(id);
+                $('#updateForm input[name="NumberOfThreads"]').val(number);
+            });
+            $('body').on('click', '.btnDelete', function () {
+
+                 $('#deleteModal').modal('show');
+                let id = $(this).attr('data-id');
+                $('#deleteForm input[name="Id"]').val(id);
+            });
         });
     </script>
 }

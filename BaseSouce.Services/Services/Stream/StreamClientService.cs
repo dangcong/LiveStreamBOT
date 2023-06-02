@@ -255,7 +255,7 @@ namespace BaseSouce.Services.Services.Stream
                         BotId = x.ManagerBOTId,
                         BotIdString = x.ManagerBOT.BotId,
                         NumberOfThreads = x.NumberOfThreads,
-                        NumberOfThreadsInRun = x.ManagerBOT.StreamHistorys.Where(i => i.UserId == userId).Count(),
+                        NumberOfThreadsInRun = x.ManagerBOT.StreamHistorys.Where(i => i.UserId == userId && i.Status == StreamStatus.Streaming).Count(),
                     })
                     .OrderBy(x => x.NumberOfThreadsInRun)
                     .ToListAsync();
@@ -265,24 +265,24 @@ namespace BaseSouce.Services.Services.Stream
                 var botConnectCurrent = string.Empty;
                 var botIdCurrent = 0;
 
-                if (userBots == null || !userBots.Any())
-                {
-                    return "BOT không hoạt động hoặc chưa kết nối!";
-                }
+                //if (userBots == null || !userBots.Any())
+                //{
+                //    return "BOT không hoạt động hoặc chưa kết nối!";
+                //}
 
-                foreach (var item in userBots)
-                {
-                    if (item.NumberOfThreadsInRun < item.NumberOfThreads)
-                    {
-                        botIdCurrent = item.BotId;
-                        botConnectCurrent = item.BotIdString;
-                        break;
-                    }
-                }
-                if (botIdCurrent == 0)
-                {
-                    return "Số luồng hiện tại đã đạt tối đa!";
-                }
+                //foreach (var item in userBots)
+                //{
+                //    if (item.NumberOfThreadsInRun < item.NumberOfThreads)
+                //    {
+                //        botIdCurrent = item.BotId;
+                //        botConnectCurrent = item.BotIdString;
+                //        break;
+                //    }
+                //}
+                //if (botIdCurrent == 0)
+                //{
+                //    return "BOT không hoạt động hoặc chưa kết nối!";
+                //}
 
                 //if (model.LiveType == LiveType._1080)
                 //{
@@ -314,10 +314,10 @@ namespace BaseSouce.Services.Services.Stream
                 //    botIdCurrent = userCurrent.Bot4k0Id.Id;
                 //}
 
-                if (string.IsNullOrEmpty(botConnectCurrent))
-                {
-                    return "BOT không hoạt động hoặc chưa kết nối!";
-                }
+                //if (string.IsNullOrEmpty(botConnectCurrent))
+                //{
+                //    return "BOT không hoạt động hoặc chưa kết nối!";
+                //}
 
                 //check role live
 
@@ -360,8 +360,8 @@ namespace BaseSouce.Services.Services.Stream
                     Audio = model.Audio,
                     Video = model.Video,
                     StreamName = model.StreamName,
-                    BotId = botConnectCurrent,
-                    ManagerBOTId = botIdCurrent,
+                    //BotId = botConnectCurrent,
+                    //ManagerBOTId = botIdCurrent,
                     PlatformType = model.PlatformType,
                     RenderStatus = RenderStatus.Created,
                     CreatedTime = DateTime.Now,
@@ -463,9 +463,9 @@ namespace BaseSouce.Services.Services.Stream
                     return new KeyValuePair<bool, string>(false, "Luồng không tồn tại, vui lòng thử lại!");
                 }
 
-                _logger.LogInformation($"Stream Info [streamName:[{streamEntity.StreamName}] " +
-                  $"- BotName:[{streamEntity.ManagerBOT?.Name}] " +
-                  $"- Connection:[{streamEntity.ManagerBOT?.ConnectionId}]]");
+                //_logger.LogInformation($"Stream Info [streamName:[{streamEntity.StreamName}] " +
+                //  $"- BotName:[{streamEntity.ManagerBOT?.Name}] " +
+                //  $"- Connection:[{streamEntity.ManagerBOT?.ConnectionId}]]");
 
                 var userBots = await _repositoryUserBOT.Queryable()
                     .Include(x => x.ManagerBOT).ThenInclude(i => i.StreamHistorys)
@@ -477,7 +477,7 @@ namespace BaseSouce.Services.Services.Stream
                         BotId = x.ManagerBOTId,
                         BotIdString = x.ManagerBOT.BotId,
                         NumberOfThreads = x.NumberOfThreads,
-                        NumberOfThreadsInRun = x.ManagerBOT.StreamHistorys.Where(i => i.UserId == userId).Count(),
+                        NumberOfThreadsInRun = x.ManagerBOT.StreamHistorys.Where(i => i.UserId == userId && i.Status == StreamStatus.Streaming).Count(),
                     })
                     .OrderBy(x => x.NumberOfThreadsInRun)
                     .ToListAsync();
@@ -499,11 +499,11 @@ namespace BaseSouce.Services.Services.Stream
                     }
                 }
 
-                _logger.LogInformation($"BOT New [botId:[{botId}]- BotIdString:[{botIdString}]]");
+                //_logger.LogInformation($"BOT New [botId:[{botId}]- BotIdString:[{botIdString}]]");
 
                 if (botId == 0)
                 {
-                    return new KeyValuePair<bool, string>(false, "Số lượng luồng đã đạt tối đa!");
+                    return new KeyValuePair<bool, string>(false, "BOT không hoạt động hoặc chưa kết nối!");
                 }
 
                 //check connection bot
@@ -550,9 +550,9 @@ namespace BaseSouce.Services.Services.Stream
                     .Include(x => x.ManagerBOT)
                     .Where(x => x.UserId == userId && x.Id == id).FirstOrDefaultAsync();
 
-                _logger.LogInformation($"Stream Info [streamName:[{streamEntity.StreamName}] " +
-                    $"- BotName:[{streamEntity.ManagerBOT?.Name}] " +
-                    $"- Connection:[{streamEntity.ManagerBOT?.ConnectionId}]]");
+                //_logger.LogInformation($"Stream Info [streamName:[{streamEntity.StreamName}] " +
+                //    $"- BotName:[{streamEntity.ManagerBOT?.Name}] " +
+                //    $"- Connection:[{streamEntity.ManagerBOT?.ConnectionId}]]");
 
 
                 ///send data to BOT
@@ -574,13 +574,14 @@ namespace BaseSouce.Services.Services.Stream
                     var timer = streamEntity.StartTimeLive != null ?
                         streamEntity.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
                         : "Ngay bây giờ";
+                    var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
                     _ = _telegramBotClient
                     .SendTextMessageAsync(new ChatId(userCurrent.TelegramAPI),
                     $"User: {userCurrent.UserName}{Environment.NewLine}"
                     + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
                     + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
                     + $"Kiểu live: {liveType}{Environment.NewLine}"
-                    + $"Lên lịch:{timer}", ParseMode.Default, true);
+                    + $"{textTimer}:{timer}", ParseMode.Default, true);
                 }
 
                 if (!string.IsNullOrEmpty(userCurrent.LinkTelegram))
@@ -589,7 +590,7 @@ namespace BaseSouce.Services.Services.Stream
                     var timer = streamEntity.StartTimeLive != null ?
                         streamEntity.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
                         : "Ngay bây giờ";
-
+                    var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
                     var idTeles = userCurrent.LinkTelegram.Split(',');
                     if (idTeles.Length > 0)
                     {
@@ -601,7 +602,7 @@ namespace BaseSouce.Services.Services.Stream
                            + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
                            + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
                            + $"Kiểu live: {liveType}{Environment.NewLine}"
-                           + $"Lên lịch:{timer}", ParseMode.Default, true);
+                           + $"{textTimer}:{timer}", ParseMode.Default, true);
                         }
                     }
                 }
@@ -732,7 +733,7 @@ namespace BaseSouce.Services.Services.Stream
                                + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
                                + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
                                + $"Kiểu live: {liveType}{Environment.NewLine}"
-                               + $"Lên lịch:{timer}", ParseMode.Default, true);
+                               + $"Bắt đầu:{timer}", ParseMode.Default, true);
                             }
                         }
                     }
@@ -765,7 +766,7 @@ namespace BaseSouce.Services.Services.Stream
                                + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
                                + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
                                + $"Kiểu live: {liveType}{Environment.NewLine}"
-                               + $"Lên lịch:{timer}", ParseMode.Default, true);
+                               + $"Lỗi:{timer}", ParseMode.Default, true);
                             }
                         }
                     }
@@ -801,7 +802,7 @@ namespace BaseSouce.Services.Services.Stream
                                + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
                                + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
                                + $"Kiểu live: {liveType}{Environment.NewLine}"
-                               + $"Lên lịch:{timer}", ParseMode.Default, true);
+                               + $"Dừng:{timer}", ParseMode.Default, true);
                             }
                         }
                     }
@@ -880,7 +881,7 @@ namespace BaseSouce.Services.Services.Stream
                     Total = x.StreamHistorys.Count(),
                     TotalStop = x.StreamHistorys.Where(i => i.Status == StreamStatus.Stop).Count(),
                     TotalStreaming = x.StreamHistorys.Where(i => i.Status == StreamStatus.Streaming).Count(),
-                    TotalTimer = x.StreamHistorys.Where(x => x.StartTimeLive != null || x.EndTimeLive != null).Count()
+                    TotalTimer = x.StreamHistorys.Where(x => x.StartTimeLive != null && x.StartTimeLive > DateTime.Now).Count()
                 });
         }
 

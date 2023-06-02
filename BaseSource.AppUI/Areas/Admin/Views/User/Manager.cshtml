@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Danh sách Tài khoản Quản lý";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var index = 1;
 }
 
 <section class="section">
@@ -28,6 +29,7 @@
                             <table class="table table-striped" id="tableAllManager">
                                 <thead>
                                     <tr>
+                                        <th>STT</th>
                                         <th>Người dùng</th>
                                         <th>Mật khẩu</th>
                                         <th>Telegram</th>
@@ -38,16 +40,18 @@
                                     @foreach (var item in Model)
                                     {
                                         <tr>
+                                            <td>@(index++)</td>
                                             <td>@item.UserName</td>
                                             <td>@item.Password</td>
                                             <td>@item.TelegramAPI</td>
                                             <td>
                                                 <button class="btn btn-danger btn-removeRole" data-id="@item.UserName"
-                                                        data-toggle="modal" data-target="#removeRoleModal">
+                                                @*data-toggle="modal" data-target="#removeRoleModal"*@>
                                                     Hủy Role
                                                 </button>
                                             </td>
                                         </tr>
+
                                     }
                                 </tbody>
                             </table>
@@ -106,13 +110,21 @@
 </div>
 @section Scripts{
     <script>
-        $("#tableAllManager").DataTable({
 
+        $(document).ready(function () {
+
+            $("#tableAllManager").DataTable({
+
+            });
+
+            //$('#telegramModal').modal('show');
+            $('body').on('click', '.btn-removeRole', function () {
+
+                $('#removeRoleModal').modal('show');
+                let userName = $(this).attr('data-id');
+                $('#formRemoveRole input[name="username"]').val(userName);
+            })
         });
 
-        $('body').on('click', '.btn-removeRole', function () {
-            let userName = $(this).attr('data-id');
-            $('#formRemoveRole input[name="username"]').val(userName);
-        })
     </script>
 }

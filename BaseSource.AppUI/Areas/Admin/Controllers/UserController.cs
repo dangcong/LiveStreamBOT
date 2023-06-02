@@ -102,12 +102,14 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> ResetPassword(ResetPasswordAdminDto model)
         {
+            
             var result = await _userAdminApiClient.ResetPassword(model);
             if (result == null || !result.IsSuccessed)
             {
                 return RedirectToAction("Index");
                 //return Json(new { code = ErrorCodeJson.ErrorMess, err = result?.Message ?? "Cập nhật không thành công!" });
             }
+            //return Json(new { code = ErrorCodeJson.Success, value=result.ResultObj });
             return RedirectToAction("Index");
         }
 

@@ -58,7 +58,7 @@ namespace BaseSource.Data.Migrations
                         new
                         {
                             Id = "c1105ce5-9dbc-49a9-a7d5-c963b6daa62a",
-                            ConcurrencyStamp = "b17c61b8-cc54-4f37-82b7-5e856c2638d7",
+                            ConcurrencyStamp = "7af1165f-1f8f-4b60-bee5-bb3a7d154457",
                             Description = "Administrator role",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -139,13 +139,7 @@ namespace BaseSource.Data.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
 
-                    b.Property<int>("NumberOfThreads1080")
-                        .HasColumnType("int");
-
                     b.Property<int>("NumberOfThreads1080Create")
-                        .HasColumnType("int");
-
-                    b.Property<int>("NumberOfThreads4K")
                         .HasColumnType("int");
 
                     b.Property<int>("NumberOfThreads4KCreate")
@@ -173,9 +167,15 @@ namespace BaseSource.Data.Migrations
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
 
+                    b.Property<DateTime?>("UpdatedTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("UserUpdate")
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
@@ -194,18 +194,16 @@ namespace BaseSource.Data.Migrations
                         {
                             Id = "ffded6b0-3769-4976-841b-69459049a62d",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "3e962069-fc9c-4d23-9238-45f5f1e96662",
+                            ConcurrencyStamp = "e98811bb-9b29-4917-945c-5fdc43321de5",
                             CreatedTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
                             LockoutEnabled = false,
                             NormalizedEmail = "admin@gmail.com",
                             NormalizedUserName = "superadmin",
-                            NumberOfThreads1080 = 0,
                             NumberOfThreads1080Create = 0,
-                            NumberOfThreads4K = 0,
                             NumberOfThreads4KCreate = 0,
-                            PasswordHash = "AQAAAAEAACcQAAAAEOcpyUGiHmgvIBMTGOpe0XSVqQ8ZivBGL7yjdi5hV4lhEC0acU2+eXMxkYDR5qYdLA==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEL6ZYmBFmusqiRa/CXoLrTQ8hOq3MOV1HuFSRe3XMjcf1K9jdlMT5zLuTRZvs+Zweg==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,

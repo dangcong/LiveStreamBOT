@@ -3,6 +3,7 @@
     ViewData["Title"] = "Danh sách người dùng";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
     var report = ViewBag.Report as StreamReportAdminDto;
+    var index = 1;
 }
 <section class="section">
     <div class="section-header">
@@ -29,7 +30,7 @@
                                 <div class="card-stats-item-label">Tổng số luồng 1080(Đang chạy/Tổng)</div>
                             </div>
                             <div class="card-stats-item">
-                                <div class="card-stats-item-count"><span class="badge badge-primary">@(report.NumberOfThreads4KInRun)/@(report.NumberOfThreads4K)</span></div>
+                                <div class="card-stats-item-count"><span class="badge badge-danger">@(report.NumberOfThreads4KInRun)/@(report.NumberOfThreads4K)</span></div>
                                 <div class="card-stats-item-label">Tổng số luồng 4k(Đang chạy/Tổng)</div>
                             </div>
                             <div class="card-stats-item">
@@ -67,10 +68,12 @@
                             <table class="table table-striped" id="tableAllUser">
                                 <thead>
                                     <tr>
+                                        <th>STT</th>
                                         <th>Người dùng</th>
                                         <th>Mật khẩu</th>
                                         <th>Luồng 1080(Đang chạy/Tổng)</th>
                                         <th>Luồng 4K(Đang chạy/Tổng)</th>
+                                        <th>Số BOT</th>
                                         <th>Telegram</th>
                                         <th>Teleram QL</th>
                                         <th>Action</th>
@@ -80,20 +83,38 @@
                                     @foreach (var item in Model)
                                     {
                                         <tr>
+                                            <td>@(index++)</td>
                                             <td>@item.UserName</td>
-                                            <td>@item.Password</td>
-                                            <td><span class="badge badge-primary">@(item.NumberOfThreads1080InRun)/@(item.NumberOfThreads1080)</span> </td>
-                                            <td><span class="badge badge-primary">@(item.NumberOfThreads4KInRun)/@(item.NumberOfThreads4K)</span></td>
+                                            @if (!string.IsNullOrEmpty(item.UserUpdate)+)
+                                            {
+                                                <td>[@(item.UserUpdate)- @(item.UpdatedTime?.ToString("dd/MM/yyyy"))]</td>
+                                            }
+                                            else
+                                            {
+                                                <td></td>
+                                            }
+                                            <td><span class="badge badge-success">@(item.NumberOfThreads1080InRun)/@(item.NumberOfThreads1080)</span> </td>
+                                            <td><span class="badge badge-danger">@(item.NumberOfThreads4KInRun)/@(item.NumberOfThreads4K)</span></td>
+                                            <td>@item.TotalBOT</td>
                                             <td><span class="badge badge-primary">@item.TelegramAPI</span></td>
                                             <td><span class="badge badge-danger">@item.LinkTelegram</span></td>
                                             <td>
                                                 <button class="btn btn-primary btnTelegram" data-tele="@item.LinkTelegram"
-                                                        data-id="@item.Id" data-toggle="modal" data-target="#telegramModal">
+                                                        data-id="@item.Id"
+                                                @*data-toggle="modal" data-target="#telegramModal"*@>
                                                     Cập nhật ID
                                                 </button>
                                                 <a class="btn btn-success" href="/admin/stream/user?userId=@(item.Id)&username=@(item.UserName)">DS Stream</a>
-                                                <a class="btn btn-success" href="/admin/user/managerBot?userId=@(item.Id)&username=@(item.UserName)">Cập nhật BOT</a>
-                                                <button class="btn btn-danger btnDelete" data-id="@item.Id" data-toggle="modal" data-target="#deleteUserModal">Delete</button>
+                                                <a class="btn btn-success" href="/admin/user/managerBot?userId=@(item.Id)&username=@(item.UserName)">DS BOT</a>
+                                                <button class="btn btn-danger btnDelete" data-id="@item.Id"
+                                                @*data-toggle="modal" data-target="#deleteUserModal"*@>
+                                                    Delete
+                                                </button>
+                                                <button class="btn btn-warning btnResetPassword"
+                                                        data-id="@item.Id"
+                                                        data-user="@item.UserName">
+                                                    Reset Mật khẩu
+                                                </button>
                                             </td>
 
                                         </tr>
@@ -125,11 +146,11 @@
                     <div class="form-group mb-4">
                         <label class="">ID telegram(cách nhau ,)</label>
                         <div class="">
-                            <input type="text" 
-                                name="Telegram" 
-                                placeholder="Nhập danh sách ID Telegram" 
-                                class="form-control"
-                                style="height:100px"/>
+                            <input type="text"
+                                   name="Telegram"
+                                   placeholder="Nhập danh sách ID Telegram"
+                                   class="form-control"
+                                   style="height:100px" />
                             <span class="text-danger"></span>
                         </div>
                     </div>
@@ -221,74 +242,77 @@
         </div>
     </div>
 </div>
+
+<div class="modal fade" tabindex="-1" role="dialog" id="resetPasswordModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" id="formResetPassword" action="/admin/User/ResetPassword">
+                <div class="modal-header">
+                    <h5 class="modal-title">Reset mật khẩu người dùng :<span class="text-danger text-userName"></span></h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-4">
+                        <label class="">Nhập mật khẩu mới</label>
+                        <div class="">
+                            <input name="Password" required placeholder="Nhập mật khẩu mới" class="form-control" />
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
+                    <input class="form-control" name="userId" type="hidden" />
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Xác nhận</button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script>
         $(document).ready(function () {
             $("#tableAllUser").DataTable({});
-            //$("#tableAllUser").DataTable({
-            //    "processing": true,
-            //    "serverSide": true,
-            //    "filter": true,
-            //    "ajax": {
-            //        "url": "/admin/user/GetAll",
-            //        "type": "POST",
-            //        "datatype": "json"
-            //    },
-            //    //"language": {
-            //    //    "url": "/language/language.json"
-            //    //},
-            //    "columnDefs": [
-            //        {
-            //            "targets": [1],
-            //            "searchable": false,
-            //            "orderable": false
-            //        }],
-            //    "columns": [
-            //        { "data": "userName", "name": "UserName", "autoWidth": true },
-            //        { "data": "password", "name": "Password", "autoWidth": true },
-            //        {
-            //            "data": "userName", "name": "userName", "autoWidth": true,
-            //            "render": function (data, row, type) {
-            //                return `<span class="badge badge-primary" >${type.numberOfThreads1080InRun}/${type.numberOfThreads1080}</span>`;
-            //            }
-            //        },
-            //        {
-            //            "data": "userName", "name": "userName", "autoWidth": true,
-            //            "render": function (data, row, type) {
-            //                return `<span class="badge badge-primary" >${type.numberOfThreads4KInRun}/${type.numberOfThreads4K}</span>`;
-            //            }
-            //        },
-            //        { "data": "linkTelegram", "name": "LinkTelegram", "autoWidth": true },
 
-            //        {
-            //            "data": "userName", "name": "userName", "autoWidth": true,
-            //            "render": function (data, row, type) {
-            //                return `
+            $('body').on('click', '.btnReset', function () {
+                let id = $(this).attr('data-id');
+                $('#formResetPassword input[name="userId"]').val(id);
+            });
+            $('body').on('click', '.btnDelete', function () {
+                $('#deleteUserModal').modal('show');
+                let id = $(this).attr('data-id');
+                $('#formDeleteUser input[name="userId"]').val(id);
+            });
+            $('body').on('click', '.btnTelegram', function () {
+                $('#telegramModal').modal('show');
 
-            //                                         <a class="btn btn-success" href="/admin/stream/user?userId=${type.id}">DS Stream</a>
-            //                                         <a class="btn btn-success" href="/admin/user/managerBot?userId=${type.id}">Cập nhật BOT</a>
+                let id = $(this).attr('data-id');
+                let telegrams = $(this).attr('data-tele');
+                $('#formTelegram input[name="UserId"]').val(id);
+                $('#formTelegram input[name="Telegram"]').val(telegrams);
+            });
 
-            //                                         <button class="btn btn-danger btnDelete" data-id="${type.id}"  data-toggle="modal" data-target="#deleteUserModal">Delete</button>`;
-            //            }
-            //        },
-            //        //<a class="btn btn-primary" href="/admin/order/user?userId=${type.id}">DS Gói</a>
-            //    ]
-            //});
+            $('body').on('click', '.btnResetPassword', function () {
+                let id = $(this).attr('data-id');
+                let user = $(this).attr('data-user');
+                $('.text-userName').html(user);
+                $('#formResetPassword input[name="userId"]').val(id);
+                $('#resetPasswordModal').modal('show');
+                //$('#telegramModal').modal('show');
+
+
+                //let telegrams = $(this).attr('data-tele');
+                //$('#formTelegram input[name="UserId"]').val(id);
+                //$('#formTelegram input[name="Telegram"]').val(telegrams);
+            });
+
+
         });
-        $('body').on('click', '.btnReset', function () {
-            let id = $(this).attr('data-id');
-            $('#formResetPassword input[name="userId"]').val(id);
-        });
-        $('body').on('click', '.btnDelete', function () {
-            let id = $(this).attr('data-id');
-            $('#formDeleteUser input[name="userId"]').val(id);
-        });
-        $('body').on('click', '.btnTelegram', function () {
-            let id = $(this).attr('data-id');
-            let telegrams = $(this).attr('data-tele');
-            $('#formTelegram input[name="UserId"]').val(id);
-            $('#formTelegram input[name="Telegram"]').val(telegrams);
-        });
+
 
     </script>
 }

@@ -141,10 +141,16 @@ namespace BaseSouce.Services.Services.UserAdmin
                 }
                 //check stream by bot
                 var anyStream = await _unitOfWork.GetRepository<StreamHistory>()
-                    .ExistsAsync(x => x.ManagerBOTId == userBotEntity.ManagerBOTId && x.Status == StreamStatus.Streaming);
-                if (anyStream)
+                    .Queryable().Where(x => x.UserId == userBotEntity.UserId
+                    && x.ManagerBOTId == userBotEntity.ManagerBOTId
+                    && x.Status == StreamStatus.Streaming).ToListAsync();
+                if (anyStream != null && anyStream.Any())
                 {
-                    return new KeyValuePair<bool, string>(false, "Vui lòng tắt Stream trước khi xóa BOT");
+                    foreach (var item in anyStream)
+                    {
+                        await _streamClientService.CancelStreamAsync(userBotEntity.UserId, item.Id);
+                    }
+                    //return new KeyValuePair<bool, string>(false, "Vui lòng tắt Stream trước khi xóa BOT");
                 }
                 _repository.Delete(userBotEntity);
                 await _unitOfWork.SaveChangesAsync();
@@ -223,6 +229,9 @@ namespace BaseSouce.Services.Services.UserAdmin
                     TelegramAPI = x.TelegramAPI,
                     NumberOfThreads4KInRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._4K && i.Status == StreamStatus.Streaming).Count(),
                     NumberOfThreads1080InRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._1080 && i.Status == StreamStatus.Streaming).Count(),
+                    TotalBOT = x.UserManagerBOTs.Count(),
+                    UpdatedTime = x.UpdatedTime,
+                    UserUpdate = x.UserUpdate
                 }, include: x => x.Include(i => i.StreamHistorys).Include(i => i.UserManagerBOTs).ThenInclude(o => o.ManagerBOT),
                 orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                 pageIndex: model.Page, pageSize: model.PageSize);
@@ -345,6 +354,8 @@ namespace BaseSouce.Services.Services.UserAdmin
 
                 userCurrent.Password = model.Password;
                 userCurrent.PasswordHash = passwordHash;
+                userCurrent.UpdatedTime = DateTime.Now;
+                userCurrent.UserUpdate = model.UserUpdate;
 
                 _repository.Update(userCurrent);
 
@@ -398,16 +409,16 @@ namespace BaseSouce.Services.Services.UserAdmin
             try
             {
                 var _repository = _unitOfWork.GetRepository<AppUser>();
-                var userCurrent =await _repository.GetFirstOrDefaultAsync(
+                var userCurrent = await _repository.GetFirstOrDefaultAsync(
                     predicate: x => x.Id == model.UserId, disableTracking: false);
 
                 if (userCurrent == null)
                 {
                     return new KeyValuePair<bool, string>(false, "Tài khoản không tồn tại!");
                 }
-                userCurrent.LinkTelegram= model.Telegram;
+                userCurrent.LinkTelegram = model.Telegram;
                 _repository.Update(userCurrent);
-               await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.SaveChangesAsync();
                 return new KeyValuePair<bool, string>(true, string.Empty);
             }
             catch (Exception ex)

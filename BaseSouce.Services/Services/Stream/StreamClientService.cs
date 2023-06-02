@@ -98,7 +98,7 @@ namespace BaseSouce.Services.Services.Stream
                 {//input
                     liveStreamArguments.Add("-re");
                     liveStreamArguments.Add($"-stream_loop -1");
-                    renderArguments.Add("-f flv");
+                    liveStreamArguments.Add("-f flv");
                     liveStreamArguments.Add("-i rendered");
                 }
 

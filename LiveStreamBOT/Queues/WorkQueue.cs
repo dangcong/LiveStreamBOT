@@ -279,7 +279,7 @@ namespace LiveStreamBOT.Queues
         {
             while(!(_cancellationTokenSource_cancel.IsCancellationRequested || _cancellationTokenSource_endTime.IsCancellationRequested))
             {
-                LogHelper.WriteLog($"LiveStreamAsync: {RenderCommand.LiveStreamArguments}");
+                LogHelper.WriteLog($"{nameof(LiveStreamAsync)}: {RenderCommand.LiveStreamArguments}");
                 FFmpegRender liveStream = FFmpegRender.FromArguments(RenderCommand.LiveStreamArguments, new FFmpegRenderConfig()
                 {
                     WorkingDirectory = _workingDir,

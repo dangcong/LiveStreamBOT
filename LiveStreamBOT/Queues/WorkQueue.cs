@@ -205,6 +205,7 @@ namespace LiveStreamBOT.Queues
         {
             if (!string.IsNullOrWhiteSpace(RenderCommand.RenderArguments))
             {
+                LogHelper.WriteLog($"{nameof(PreRenderAsync)}: {RenderCommand.RenderArguments}");
                 FFmpegRender preRender = FFmpegRender.FromArguments(RenderCommand.RenderArguments, new FFmpegRenderConfig()
                 {
                     WorkingDirectory = _workingDir,

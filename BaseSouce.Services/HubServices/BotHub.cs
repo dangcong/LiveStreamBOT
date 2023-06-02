@@ -19,18 +19,16 @@ namespace BaseSouce.Services.HubServices
 {
     public class BotHub : Hub<IBotClientHub>, IServerHub
     {
-        private readonly IBotDataCache _botDataCache;
         private readonly IManagerBOTService _managerBOTService;
         private readonly IStreamClientService _streamClientService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ITelegramBotClient _telegramBotClient;
 
-        public BotHub(IBotDataCache botDataCache, IManagerBOTService managerBOTService,
+        public BotHub(IManagerBOTService managerBOTService,
             IStreamClientService streamClientService,
             IUnitOfWork<BaseSourceDbContext> unitOfWork,
             ITelegramBotClient telegramBotClient)
         {
-            _botDataCache = botDataCache;
             _managerBOTService = managerBOTService;
             _streamClientService = streamClientService;
             _unitOfWork = unitOfWork;
@@ -43,10 +41,6 @@ namespace BaseSouce.Services.HubServices
             if (this.Context.GetHttpContext()?.Request?.Headers?.TryGetValue("BotId", out StringValues strings) == true)
             {
                 string key = strings.ToString();
-                if (!string.IsNullOrWhiteSpace(key))
-                {
-                    _botDataCache[key] = clientInfo;
-                }
                 await _managerBOTService.CreateBOTAsync(new ManagerBotCreateDto
                 {
                     BotId = key,

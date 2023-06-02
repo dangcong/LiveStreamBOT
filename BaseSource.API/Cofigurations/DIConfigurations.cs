@@ -42,9 +42,6 @@ namespace BaseSource.API.Cofigurations
             
             
 
-            //bot DI
-            services.AddSingleton<IBotDataCache, BotDataCache>();
-
             return services;
         }
     }

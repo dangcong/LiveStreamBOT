@@ -694,10 +694,49 @@ namespace BaseSouce.Services.Services.Stream
                     streamEntity.Status = StreamStatus.Stop;
                     streamEntity.ErrorMessage = model.ExceptionInfo.Message;
                 }
-                if (model.RenderStatus == RenderStatus.Ended)
+                else if (model.RenderStatus == RenderStatus.Ended)
                 {
                     streamEntity.Status = StreamStatus.Stop;
 
+                }
+                else if (model.RenderStatus < RenderStatus.Ended)
+                {
+                    if (streamEntity.Status == StreamStatus.Stop)
+                    {
+                        //send message telegram
+                        var liveType = streamEntity.EndTimeLive != null ? "11h" : "24/7";
+                        var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+
+                        if (!string.IsNullOrEmpty(streamEntity.AppUser.TelegramAPI))
+                        {
+                            _ = _telegramBotClient
+                        .SendTextMessageAsync(new ChatId(streamEntity.AppUser.TelegramAPI),
+                        $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                        + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
+                        + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
+                        + $"Kiểu live: {liveType}{Environment.NewLine}"
+                        + $"Tiếp tục live:{timer}", ParseMode.Default, true);
+                        }
+
+                        if (!string.IsNullOrEmpty(streamEntity.AppUser.LinkTelegram))
+                        {
+                            var idTeles = streamEntity.AppUser.LinkTelegram.Split(',');
+                            if (idTeles.Length > 0)
+                            {
+                                foreach (var item in idTeles)
+                                {
+                                    _ = _telegramBotClient
+                                   .SendTextMessageAsync(new ChatId(item.Trim()),
+                                   $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                                   + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
+                                   + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
+                                   + $"Kiểu live: {liveType}{Environment.NewLine}"
+                                   + $"Tiếp tục live:{timer}", ParseMode.Default, true);
+                                }
+                            }
+                        }
+                    }
+                    streamEntity.Status = StreamStatus.Streaming;
                 }
                 _repositoryStream.Update(streamEntity);
                 await _unitOfWork.SaveChangesAsync();

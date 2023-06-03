@@ -12,7 +12,6 @@ namespace BaseSouce.Services.Services.Stream
         Task<KeyValuePair<bool, string>> DeleteAsync(string userId, int id);
         Task<KeyValuePair<bool, string>> StartStreamAsync(string userId, int id);
         Task<IPagedList<StreamClientInfoDto>> GetByFilterAsync(string userId, StreamClientRequestDto model);
-
         Task<KeyValuePair<bool, string>> UpdateStreamAsync(RenderMessage model);
         Task<KeyValuePair<bool, string>> CancelStreamAsync(string userId, int id);
         Task<StreamClientInfoDto> GetStreamByIdAsync(string userId, int id);

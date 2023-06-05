@@ -80,7 +80,7 @@ namespace BaseSouce.Services.HubServices
                         foreach (var item in streamsCurrents)
                         {
 
-                            item.Status = StreamStatus.Stop;
+                            item.Status = StreamStatus.Disconnet;
 
                             if (!string.IsNullOrEmpty(item.AppUser.TelegramAPI))
                             {
@@ -92,7 +92,7 @@ namespace BaseSouce.Services.HubServices
                                 + $"Tên luồng:{item.StreamName}{Environment.NewLine}"
                                 + $"Live:{item.LiveType} {Environment.NewLine}"
                                 + $"Kiểu live: {liveType}{Environment.NewLine}"
-                                + $"Dừng:{timer}", ParseMode.Default, true);
+                                + $"Disconnect:{timer}", ParseMode.Default, true);
                             }
 
                         }

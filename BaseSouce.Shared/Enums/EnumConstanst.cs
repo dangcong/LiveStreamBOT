@@ -42,6 +42,7 @@ namespace BaseSouce.Shared.Enums
     {
         Streaming = 1,
         Stop = 2,
+        Disconnet = 3
     }
     public enum SteamLogStatus : byte
     {

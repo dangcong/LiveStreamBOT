@@ -701,7 +701,7 @@ namespace BaseSouce.Services.Services.Stream
                 }
                 else if (model.RenderStatus < RenderStatus.Ended)
                 {
-                    if (streamEntity.Status == StreamStatus.Stop)
+                    if (streamEntity.Status == StreamStatus.Disconnet || streamEntity.Status == StreamStatus.Stop)
                     {
                         //send message telegram
                         var liveType = streamEntity.EndTimeLive != null ? "11h" : "24/7";

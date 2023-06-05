@@ -85,7 +85,7 @@
                                         <tr>
                                             <td>@(index++)</td>
                                             <td>@item.UserName</td>
-                                            @if (!string.IsNullOrEmpty(item.UserUpdate)+)
+                                            @if (!string.IsNullOrEmpty(item.UserUpdate))
                                             {
                                                 <td>[@(item.UserUpdate)- @(item.UpdatedTime?.ToString("dd/MM/yyyy"))]</td>
                                             }

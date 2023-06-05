@@ -395,6 +395,9 @@
                                                         case StreamStatus.Stop:
                                                             <span class="badge badge-danger"> Đã dừng</span>
                                                             break;
+                                                        case StreamStatus.Disconnet:
+                                                            <span class="badge badge-warning"> Disconnect</span>
+                                                            break;
                                                     }
                                                 </td>
                                                 <td>
@@ -409,6 +412,7 @@
                                                             </button>
                                                             break;
                                                         case StreamStatus.Stop:
+                                                        case StreamStatus.Disconnet:
                                                             <button class="btn btn-sm btn-success " onclick="start('@item.Id');" data-id="@item.Id"
                                                             @* data-toggle="modal"
                                                     data-target="#startStreamModal"*@>

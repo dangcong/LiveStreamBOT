@@ -137,11 +137,14 @@
                                                     case StreamStatus.Stop:
                                                         <span class="badge badge-danger">Dừng</span>
                                                         break;
+                                                    case StreamStatus.Disconnet:
+                                                        <span class="badge badge-warning">Disconnect</span>
+                                                        break;
                                                 }
                                             </td>
                                             <td><a class="btn btn-primary" href="/admin/stream/info?id=@item.Id">Chi tiết</a></td>
                                         </tr>
-                                       
+
                                     }
                                 </tbody>
                             </table>

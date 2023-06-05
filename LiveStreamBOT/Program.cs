@@ -25,7 +25,7 @@ while (uri is null)
 {
     Console.Write("Nhập Url Api (https://api.shinemusicllc.com/):");
     string url = Console.ReadLine();
-    if (string.IsNullOrWhiteSpace(url)) 
+    if (string.IsNullOrWhiteSpace(url))
         url = "https://api.shinemusicllc.com/";
     Uri.TryCreate(args.FirstOrDefault(), UriKind.Absolute, out uri);
 }
@@ -50,12 +50,25 @@ try
     {
         await Task.Delay(Singleton.Setting.Setting.PingInterval);
 
+        try
+        {
+            ClearLog();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"{nameof(ClearLog)}: {ex.GetType().FullName}: {ex.Message}, {ex.StackTrace}");
+        }
+
+
         ClientInfo clientInfo = null;
         try
         {
             clientInfo = systemInfoReader?.GetClientInfo();
         }
-        catch { }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"{nameof(ClearLog)}: {ex.GetType().FullName}: {ex.Message}, {ex.StackTrace}");
+        }
 
         if (clientInfo is not null)
         {
@@ -118,4 +131,25 @@ void SignalrClient_OnRenderCommand(RenderCommand obj)
 void SignalrClient_OnConnectionStateChange(SignalRConnectionState obj)
 {
     LogHelper.WriteLog($"{nameof(SignalRConnectionState)}.{obj}");
+}
+
+
+void ClearLog()
+{
+    var date = DateTime.Now.AddDays(-7);
+    var fileInfos = Directory.GetFiles(LogHelper.LogsDir).Select(x => new FileInfo(x)).ToArray();
+    foreach (var fileInfo in fileInfos)
+    {
+        if (fileInfo.CreationTime < date)
+        {
+            try
+            {
+                fileInfo.Delete();
+            }
+            catch
+            {
+
+            }
+        }
+    }
 }

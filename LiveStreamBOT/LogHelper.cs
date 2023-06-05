@@ -9,7 +9,7 @@ namespace LiveStreamBOT
 {
     internal static class LogHelper
     {
-        static string LogsDir { get; } = Path.Combine(Directory.GetCurrentDirectory(), "Logs");
+        public static string LogsDir { get; } = Path.Combine(Directory.GetCurrentDirectory(), "Logs");
         static LogHelper()
         {
             Directory.CreateDirectory(LogsDir);

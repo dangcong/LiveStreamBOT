@@ -581,7 +581,7 @@ namespace BaseSouce.Services.Services.Stream
                     + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
                     + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
                     + $"Kiểu live: {liveType}{Environment.NewLine}"
-                    + $"{textTimer}:{timer}", ParseMode.Default, true);
+                    + $"{textTimer}:{timer}");
                 }
 
                 if (!string.IsNullOrEmpty(userCurrent.LinkTelegram))
@@ -602,7 +602,7 @@ namespace BaseSouce.Services.Services.Stream
                            + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
                            + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
                            + $"Kiểu live: {liveType}{Environment.NewLine}"
-                           + $"{textTimer}:{timer}", ParseMode.Default, true);
+                           + $"{textTimer}:{timer}");
                         }
                     }
                 }
@@ -715,7 +715,7 @@ namespace BaseSouce.Services.Services.Stream
                         + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
                         + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
                         + $"Kiểu live: {liveType}{Environment.NewLine}"
-                        + $"Tiếp tục live:{timer}", ParseMode.Default, true);
+                        + $"Tiếp tục live:{timer}");
                         }
 
                         if (!string.IsNullOrEmpty(streamEntity.AppUser.LinkTelegram))
@@ -731,7 +731,7 @@ namespace BaseSouce.Services.Services.Stream
                                    + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
                                    + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
                                    + $"Kiểu live: {liveType}{Environment.NewLine}"
-                                   + $"Tiếp tục live:{timer}", ParseMode.Default, true);
+                                   + $"Tiếp tục live:{timer}");
                                 }
                             }
                         }
@@ -756,7 +756,7 @@ namespace BaseSouce.Services.Services.Stream
                     + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
                     + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
                     + $"Kiểu live: {liveType}{Environment.NewLine}"
-                    + $"Bắt đầu:{timer}", ParseMode.Default, true);
+                    + $"Bắt đầu:{timer}");
                     }
 
                     if (!string.IsNullOrEmpty(streamEntity.AppUser.LinkTelegram))
@@ -772,7 +772,7 @@ namespace BaseSouce.Services.Services.Stream
                                + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
                                + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
                                + $"Kiểu live: {liveType}{Environment.NewLine}"
-                               + $"Bắt đầu:{timer}", ParseMode.Default, true);
+                               + $"Bắt đầu:{timer}");
                             }
                         }
                     }
@@ -790,7 +790,7 @@ namespace BaseSouce.Services.Services.Stream
                     + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
                     + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
                     + $"Kiểu live: {liveType}{Environment.NewLine}"
-                    + $"Lỗi:{streamEntity.ErrorMessage}", ParseMode.Default, true);
+                    + $"Lỗi:{streamEntity.ErrorMessage}");
                     }
                     if (!string.IsNullOrEmpty(streamEntity.AppUser.LinkTelegram))
                     {
@@ -805,7 +805,7 @@ namespace BaseSouce.Services.Services.Stream
                                + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
                                + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
                                + $"Kiểu live: {liveType}{Environment.NewLine}"
-                               + $"Lỗi:{timer}", ParseMode.Default, true);
+                               + $"Lỗi:{timer}");
                             }
                         }
                     }
@@ -826,7 +826,7 @@ namespace BaseSouce.Services.Services.Stream
                        + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
                        + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
                        + $"Kiểu live: {liveType}{Environment.NewLine}"
-                       + $"Dừng:{timer}", ParseMode.Default, true);
+                       + $"Dừng:{timer}");
                     }
                     if (!string.IsNullOrEmpty(streamEntity.AppUser.LinkTelegram))
                     {
@@ -841,7 +841,7 @@ namespace BaseSouce.Services.Services.Stream
                                + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
                                + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
                                + $"Kiểu live: {liveType}{Environment.NewLine}"
-                               + $"Dừng:{timer}", ParseMode.Default, true);
+                               + $"Dừng:{timer}");
                             }
                         }
                     }

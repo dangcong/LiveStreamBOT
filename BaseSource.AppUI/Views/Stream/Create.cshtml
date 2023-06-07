@@ -211,6 +211,7 @@
                                 <label>Thời gian kết thúc</label>
                                 <input type="datetime-local" asp-for="EndTimeLive" class="form-control col-6" placeholder="Thời gian kết thúc">
                             </div>
+                            <button class="btn btn-warning" type="button" onclick="myFunction()">Reset thời gian</button>
                         </div>
                         <div class="card-footer text-left">
                             <button class="btn btn-primary">Tạo luồng</button>
@@ -517,7 +518,15 @@
 </div>
 @section Scripts{
     <script>
-
+        function myFunction() {
+            $('#StartTimeLive').val('');
+            $('#EndTimeLive').val('');
+           
+        }
+        //$('body').on('click', '.btnResetTime', function () {
+        //    $('#StartTimeLive').val('');
+        //    $('#EndTimeLive').val('');
+        //})
         function start(id) {
             $('#startStreamModal').modal('show');
 

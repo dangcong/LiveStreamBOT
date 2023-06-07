@@ -209,7 +209,6 @@ namespace BaseSouce.Services.Services.User
                     NormalizedEmail = model.UserName,
                     NormalizedUserName = model.UserName,
                     LinkFB = model.LinkFB,
-
                 };
 
                 //  _logger.LogInformation($"User [{user.Email}] - [ParentId:{user.ParentId}]");

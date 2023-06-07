@@ -21,7 +21,7 @@ namespace BaseSource.API.Controllers
         {
             var result = await _telegramBotClient.TestApiAsync();
             await _telegramBotClient
-                .SendTextMessageAsync(new ChatId(1711431727), $@"User: abc{Environment.NewLine}Tên luồng:123 {Environment.NewLine}Live:1 {Environment.NewLine}Kiểu live: 24/7{Environment.NewLine}Lên lịch:123", ParseMode.Default, true);
+                .SendTextMessageAsync(new ChatId(1711431727), $@"User: abc{Environment.NewLine}Tên luồng:123 {Environment.NewLine}Live:1 {Environment.NewLine}Kiểu live: 24/7{Environment.NewLine}Lên lịch:123");
 
             
 

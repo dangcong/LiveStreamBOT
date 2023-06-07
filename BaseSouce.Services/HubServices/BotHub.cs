@@ -92,7 +92,7 @@ namespace BaseSouce.Services.HubServices
                                 + $"Tên luồng:{item.StreamName}{Environment.NewLine}"
                                 + $"Live:{item.LiveType} {Environment.NewLine}"
                                 + $"Kiểu live: {liveType}{Environment.NewLine}"
-                                + $"Disconnect:{timer}", ParseMode.Default, true);
+                                + $"Disconnect:{timer}");
                             }
 
                         }

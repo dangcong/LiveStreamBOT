@@ -6,11 +6,8 @@ using BaseSource.ApiIntegration.WebApi.SerivePackage;
 
 namespace BaseSource.AppUI.Controllers
 {
-
-
     public class HomeController : BaseController
     {
-
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
 

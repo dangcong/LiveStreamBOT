@@ -703,6 +703,9 @@ namespace BaseSouce.Services.Services.Stream
                 {
                     if (streamEntity.Status == StreamStatus.Disconnet || streamEntity.Status == StreamStatus.Stop)
                     {
+                        _logger.LogInformation($"continue [{streamEntity.Id}]" +
+                            $" [Render:status[{streamEntity.RenderStatus}]] " +
+                            $"[Status :{streamEntity.Status}]");
                         //send message telegram
                         var liveType = streamEntity.EndTimeLive != null ? "11h" : "24/7";
                         var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");

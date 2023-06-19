@@ -21,7 +21,7 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             var result = await _managerBOTApiClient.GetBOTByFilterAsync(new ManagerBOTRequestDto
             {
                 Page = 1,
-                PageSize = 1000
+                PageSize = 800
             });
             if (result == null || !result.IsSuccessed)
             {

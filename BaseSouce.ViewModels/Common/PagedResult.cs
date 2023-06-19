@@ -110,6 +110,7 @@ namespace BaseSouce.ViewModels.Common
                     case 200:
                     case 500:
                     case 800:
+                    case 1000:
                         _pageSize = value;
                         break;
 

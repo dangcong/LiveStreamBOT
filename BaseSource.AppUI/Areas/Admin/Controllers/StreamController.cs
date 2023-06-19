@@ -18,7 +18,7 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             var result = await _streamAdminApiClient.GetByFilterAsync(new StreamAdminRequestDto
             {
                 Page = 1,
-                PageSize = 2000
+                PageSize = 800
             });
             if (result == null || !result.IsSuccessed)
             {

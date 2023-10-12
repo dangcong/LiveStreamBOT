@@ -63,9 +63,7 @@ namespace BaseSouce.Services.Services.Stream
                 {
                     return $"{nameof(model.RTMP)} sai định dạng";
                 }
-                string url = $"{rtmp.Scheme}://{rtmp.Host}{rtmp.AbsolutePath}/{model.StreamKey}";
-                if (!string.IsNullOrWhiteSpace(rtmp.Query)) url += rtmp.Query;
-                Uri uri = new Uri(url);
+                Uri uri = new Uri($"{rtmp.ToString().TrimEnd('/')}/{model.StreamKey.Trim()}");
 
                 List<string> renderArguments = new List<string>();
                 {//global

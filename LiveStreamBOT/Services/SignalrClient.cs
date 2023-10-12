@@ -78,13 +78,16 @@ namespace LiveStreamBOT.Services
                     if (ex is AggregateException ae) ex = ae.InnerException;
 
                     LogHelper.WriteLog($"{ex.GetType().FullName}: {ex.Message}, {ex.StackTrace}");
-                    ThreadPool.QueueUserWorkItem((o) =>
+                    if(renderMessage.RenderStatus >= RenderStatus.Ended)
                     {
-                        Task.Delay(100).ContinueWith((t) =>
+                        ThreadPool.QueueUserWorkItem((o) =>
                         {
-                            _ = this.RenderUpdateAsync(renderMessage);
+                            Task.Delay(100).ContinueWith((t) =>
+                            {
+                                _ = this.RenderUpdateAsync(renderMessage);
+                            });
                         });
-                    });
+                    }
                 }
             }
         }

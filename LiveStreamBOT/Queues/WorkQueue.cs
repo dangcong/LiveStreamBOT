@@ -15,6 +15,8 @@ using BaseSource.Shared.Helpers;
 using BaseSource.Shared.Enums;
 using TqkLibrary.Net.CloudStorage.GoogleDrive;
 using FFmpegArgs.Executes.Exceptions;
+using System.Net.Http;
+using System.Text.RegularExpressions;
 
 namespace LiveStreamBOT.Queues
 {
@@ -133,58 +135,90 @@ namespace LiveStreamBOT.Queues
 
         async Task DownloadFileAsync()
         {
-            double sizeDownloaded = 0;
-            using (DriveApiNonLogin driveApiNonLogin = new DriveApiNonLogin())
+            while (true)
             {
-                foreach (var fileData in RenderCommand.FileDatas)
+                try
                 {
-                    if (fileData.Size == 0)
+                    double sizeDownloaded = 0;
+                    using (DriveApiNonLogin driveApiNonLogin = new DriveApiNonLogin())
                     {
-                        var driveVideoItem = GoogleDriveHelper.TryParse(fileData.Url);
-                        if (driveVideoItem is null ||
-                            driveVideoItem.LinkType != GoogleDriveLinkType.File)
-                            throw new NotSupportedException($"Link không hỗ trợ hoặc không hợp lệ:  ({fileData.Url})");
+                        foreach (var fileData in RenderCommand.FileDatas)
+                        {
+                            if (fileData.Size == 0)
+                            {
+                                var driveVideoItem = GoogleDriveHelper.TryParse(fileData.Url);
+                                if (driveVideoItem is null ||
+                                    driveVideoItem.LinkType != GoogleDriveLinkType.File)
+                                    throw new NotSupportedException($"Link không hỗ trợ hoặc không hợp lệ:  ({fileData.Url})");
 
-                        var videoMetadata = await driveApiNonLogin.GetMetadataAsync(driveVideoItem.ID);
-                        if (videoMetadata.FileSize.HasValue) fileData.Size = videoMetadata.FileSize.Value;
+                                var videoMetadata = await driveApiNonLogin.GetMetadataAsync(driveVideoItem.ID);
+                                if (videoMetadata.FileSize.HasValue) fileData.Size = videoMetadata.FileSize.Value;
+                            }
+                        }
                     }
+
+                    double totalSize = RenderCommand.FileDatas.Sum(x => x.Size);
+                    DateTime dateTime = DateTime.Now;
+
+                    using DownloadHelper downloadHelper = new DownloadHelper();
+                    foreach (var file in RenderCommand.FileDatas)
+                    {
+                        await downloadHelper.DownloadAsync(file, _workingDir, async (x) =>
+                        {
+                            sizeDownloaded += x;
+
+                            if (dateTime > DateTime.Now)
+                            {
+                                dateTime = DateTime.Now.AddSeconds(1);
+
+                                await RenderUpdateAsync(new RenderMessage()
+                                {
+                                    ItemId = RenderCommand.ItemId,
+                                    WorkId = RenderCommand.WorkId,
+                                    RenderStatus = RenderStatus.Downloading,
+                                    DownloadPercentage = sizeDownloaded * 100.0 / totalSize,
+                                });
+                            }
+                        }, CancellationToken);
+                        CheckEndTime();
+                        _cancellationTokenSource_endTime.Token.ThrowIfCancellationRequested();
+                    }
+
+                    await RenderUpdateAsync(new RenderMessage()
+                    {
+                        ItemId = RenderCommand.ItemId,
+                        WorkId = RenderCommand.WorkId,
+                        RenderStatus = RenderStatus.Downloading,
+                        DownloadPercentage = sizeDownloaded * 100.0 / totalSize,
+                    });
+                    break;
+                }
+                catch (HttpRequestException hre)
+                {
+                    if (!string.IsNullOrWhiteSpace(hre.Message))
+                    {
+                        Match match = Regex.Match(hre.Message, "\\d{3}");
+                        if (match.Success)
+                        {
+                            int code = int.Parse(match.Value);
+                            if (code >= 500)
+                            {
+                                DeleteDownloaded();
+                                await RenderUpdateAsync(new RenderMessage()
+                                {
+                                    ItemId = RenderCommand.ItemId,
+                                    WorkId = RenderCommand.WorkId,
+                                    RenderStatus = RenderStatus.Waitting,
+                                    DownloadPercentage = 0,
+                                });
+                                await Task.Delay(Singleton.Setting.Setting.ScheduleTimeOnDownloadFailed, CancellationToken);
+                                continue;
+                            }
+                        }
+                    }
+                    throw;
                 }
             }
-
-            double totalSize = RenderCommand.FileDatas.Sum(x => x.Size);
-            DateTime dateTime = DateTime.Now;
-
-            using DownloadHelper downloadHelper = new DownloadHelper();
-            foreach (var file in RenderCommand.FileDatas)
-            {
-                await downloadHelper.DownloadAsync(file, _workingDir, async (x) =>
-                {
-                    sizeDownloaded += x;
-
-                    if (dateTime > DateTime.Now)
-                    {
-                        dateTime = DateTime.Now.AddSeconds(1);
-
-                        await RenderUpdateAsync(new RenderMessage()
-                        {
-                            ItemId = RenderCommand.ItemId,
-                            WorkId = RenderCommand.WorkId,
-                            RenderStatus = RenderStatus.Downloading,
-                            DownloadPercentage = sizeDownloaded * 100.0 / totalSize,
-                        });
-                    }
-                }, CancellationToken);
-                CheckEndTime();
-                _cancellationTokenSource_endTime.Token.ThrowIfCancellationRequested();
-            }
-
-            await RenderUpdateAsync(new RenderMessage()
-            {
-                ItemId = RenderCommand.ItemId,
-                WorkId = RenderCommand.WorkId,
-                RenderStatus = RenderStatus.Downloading,
-                DownloadPercentage = sizeDownloaded * 100.0 / totalSize,
-            });
         }
 
         void DeleteDownloaded()
@@ -192,7 +226,8 @@ namespace LiveStreamBOT.Queues
             foreach (var file in RenderCommand.FileDatas)
             {
                 string path = Path.Combine(_workingDir, file.Name);
-                File.Delete(path);
+                if (File.Exists(path))
+                    File.Delete(path);
             }
         }
 
@@ -277,7 +312,7 @@ namespace LiveStreamBOT.Queues
 
         async Task LiveStreamAsync(Stream stream = null)
         {
-            while(!(_cancellationTokenSource_cancel.IsCancellationRequested || _cancellationTokenSource_endTime.IsCancellationRequested))
+            while (!(_cancellationTokenSource_cancel.IsCancellationRequested || _cancellationTokenSource_endTime.IsCancellationRequested))
             {
                 LogHelper.WriteLog($"{nameof(LiveStreamAsync)}: {RenderCommand.LiveStreamArguments}");
                 FFmpegRender liveStream = FFmpegRender.FromArguments(RenderCommand.LiveStreamArguments, new FFmpegRenderConfig()

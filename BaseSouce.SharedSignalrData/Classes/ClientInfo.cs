@@ -16,5 +16,10 @@
         /// KBps
         /// </summary>
         public double Bandwidth { get; set; } = 0;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public DiskInfo DiskInfo { get; set; }
     }
 }

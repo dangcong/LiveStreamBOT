@@ -1,8 +1,10 @@
-﻿namespace BaseSouce.SharedSignalrData.Server
+﻿using BaseSouce.SharedSignalrData.Enums;
+
+namespace BaseSouce.SharedSignalrData.Classes
 {
     public class FileData
     {
-        public long Size { get; set; }
+        public long? Size { get; set; }
         public string Name { get; set; }
         public string Url { get; set; }
         public UrlType UrlType { get; set; }

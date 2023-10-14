@@ -1,4 +1,4 @@
-﻿namespace BaseSouce.SharedSignalrData.Server
+﻿namespace BaseSouce.SharedSignalrData.Classes
 {
     public class ClientInfo
     {

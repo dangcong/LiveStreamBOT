@@ -4,8 +4,9 @@ using BaseSouce.Data.Entities;
 using BaseSouce.Services.HubServices;
 using BaseSouce.Services.Services.User;
 using BaseSouce.Shared.Enums;
-using BaseSouce.SharedSignalrData.BotClient;
-using BaseSouce.SharedSignalrData.Server;
+using BaseSouce.SharedSignalrData.Enums;
+using BaseSouce.SharedSignalrData.Classes;
+using BaseSouce.SharedSignalrData.Interfaces;
 using BaseSource.Shared.Enums;
 using BaseSource.Data.Entities;
 using BaseSource.Shared.Helpers;
@@ -19,6 +20,7 @@ using TqkLibrary.Net.CloudStorage.GoogleDrive;
 using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
+using BaseSouce.Services.Services.ValidateLink;
 
 namespace BaseSouce.Services.Services.Stream
 {
@@ -32,13 +34,15 @@ namespace BaseSouce.Services.Services.Stream
         private readonly IHubContext<BotHub, IBotClientHub> _botContextHub;
         private readonly IUserService _userService;
         private readonly ITelegramBotClient _telegramBotClient;
+        private readonly IValidateLinkService _validateLinkService;
         public StreamClientService(
             IUnitOfWork<BaseSourceDbContext> unitOfWork,
             ILogger<StreamClientService> logger,
             IMapper mapper,
             IHubContext<BotHub, IBotClientHub> botContextHub,
             IUserService userService,
-            ITelegramBotClient telegramBotClient)
+            ITelegramBotClient telegramBotClient,
+            IValidateLinkService validateLinkService)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
@@ -46,6 +50,7 @@ namespace BaseSouce.Services.Services.Stream
             _botContextHub = botContextHub;
             _userService = userService;
             _telegramBotClient = telegramBotClient;
+            _validateLinkService = validateLinkService;
 
         }
 
@@ -126,7 +131,7 @@ namespace BaseSouce.Services.Services.Stream
                             UrlType = UrlType.GoogleDrive
                         }
                     },
-                    FileType = SharedSignalrData.Server.FileType.File,
+                    FileType = BaseSouce.SharedSignalrData.Enums.FileType.File,
                 };
                 if (!string.IsNullOrWhiteSpace(model.Audio))
                 {
@@ -169,41 +174,12 @@ namespace BaseSouce.Services.Services.Stream
 
         private async Task<BoolStringKeyValuePair> ValidateLink(string video, string audio)
         {
-            var driveVideoItem = GoogleDriveHelper.TryParse(video);
-            if (driveVideoItem is null ||
-                driveVideoItem.LinkType != GoogleDriveLinkType.File)
-                return "Link video không hỗ trợ hoặc không hợp lệ";
-
-            var driveAudioItem = GoogleDriveHelper.TryParse(audio);
-            if (!string.IsNullOrWhiteSpace(audio) &&
-                (driveAudioItem is null || driveAudioItem.LinkType != GoogleDriveLinkType.File))
-                return new BoolStringKeyValuePair(false, "Link audio không hỗ trợ hoặc không hợp lệ");
-
-
-            using (DriveApiNonLogin driveApiNonLogin = new DriveApiNonLogin())
-            {
-                try
-                {
-                    var videoMetadata = await driveApiNonLogin.GetMetadataAsync(driveVideoItem.ID);
-                }
-                catch (Exception)
-                {
-                    return "Link video không truy cập được";
-                }
-
-                if (driveAudioItem is not null)
-                {
-                    try
-                    {
-                        var videoMetadata = await driveApiNonLogin.GetMetadataAsync(driveAudioItem.ID);
-                    }
-                    catch (Exception)
-                    {
-                        return "Link audio không truy cập được";
-                    }
-                }
-            }
-
+            var result = await _validateLinkService.ValidateLinkAsync(video, "video");
+            if (!result.Key)
+                return result.Value;
+            result = await _validateLinkService.ValidateLinkAsync(audio, "audio");
+            if (!result.Key)
+                return result.Value;
             return true;
         }
 
@@ -925,26 +901,9 @@ namespace BaseSouce.Services.Services.Stream
                 });
         }
 
-        public async Task<KeyValuePair<bool, string>> ValidateLinkAsync(string link)
+        public Task<KeyValuePair<bool, string>> ValidateLinkAsync(string link)
         {
-            var driveVideoItem = GoogleDriveHelper.TryParse(link);
-            if (driveVideoItem is null ||
-                driveVideoItem.LinkType != GoogleDriveLinkType.File)
-                return new KeyValuePair<bool, string>(false, "Link  không hỗ trợ hoặc không hợp lệ");
-
-            using (DriveApiNonLogin driveApiNonLogin = new DriveApiNonLogin())
-            {
-                try
-                {
-                    var videoMetadata = await driveApiNonLogin.GetMetadataAsync(driveVideoItem.ID);
-                }
-                catch (Exception)
-                {
-                    return new KeyValuePair<bool, string>(false, "Link không truy cập được");
-                }
-            }
-
-            return new KeyValuePair<bool, string>(true, string.Empty);
+            return _validateLinkService.ValidateLinkAsync(link);
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using BaseSouce.SharedSignalrData.BotClient;
+﻿using BaseSouce.SharedSignalrData.Enums;
+using BaseSouce.SharedSignalrData.Classes;
+using BaseSouce.SharedSignalrData.Interfaces;
 using BaseSource.Shared.Helpers;
 using BaseSource.ViewModels.Stream;
 using EFCore.UnitOfWork.PageList;

@@ -1,6 +1,6 @@
-﻿using BaseSouce.SharedSignalrData.BotClient;
+﻿using BaseSouce.SharedSignalrData.Classes;
 
-namespace BaseSouce.SharedSignalrData.Server
+namespace BaseSouce.SharedSignalrData.Interfaces
 {
     public interface IServerHub
     {

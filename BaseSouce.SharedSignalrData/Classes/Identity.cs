@@ -1,4 +1,4 @@
-﻿namespace BaseSouce.SharedSignalrData
+﻿namespace BaseSouce.SharedSignalrData.Classes
 {
     public class Identity
     {

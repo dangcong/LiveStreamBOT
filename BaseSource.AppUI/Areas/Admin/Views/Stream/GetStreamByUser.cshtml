@@ -105,25 +105,25 @@
                                             <td>
                                                 @switch (item.RenderStatus)
                                                 {
-                                                    case BaseSouce.SharedSignalrData.BotClient.RenderStatus.Created:
+                                                    case BaseSouce.SharedSignalrData.Enums.RenderStatus.Created:
                                                         <span class="badge badge-success">Mới</span>
                                                         break;
-                                                    case BaseSouce.SharedSignalrData.BotClient.RenderStatus.Waitting:
+                                                    case BaseSouce.SharedSignalrData.Enums.RenderStatus.Waitting:
                                                         <span class="badge badge-warning">Chờ</span>
                                                         break;
-                                                    case BaseSouce.SharedSignalrData.BotClient.RenderStatus.Downloading:
+                                                    case BaseSouce.SharedSignalrData.Enums.RenderStatus.Downloading:
                                                         <span class="badge badge-info">Tải</span>
                                                         break;
-                                                    case BaseSouce.SharedSignalrData.BotClient.RenderStatus.LiveStreaming:
+                                                    case BaseSouce.SharedSignalrData.Enums.RenderStatus.LiveStreaming:
                                                         <span class="badge badge-suceess">Đang stream</span>
                                                         break;
-                                                    case BaseSouce.SharedSignalrData.BotClient.RenderStatus.Cancelled:
+                                                    case BaseSouce.SharedSignalrData.Enums.RenderStatus.Cancelled:
                                                         <span class="badge badge-danger"> Hủy</span>
                                                         break;
-                                                    case BaseSouce.SharedSignalrData.BotClient.RenderStatus.Ended:
+                                                    case BaseSouce.SharedSignalrData.Enums.RenderStatus.Ended:
                                                         <span class="badge badge-danger"> Kết thúc</span>
                                                         break;
-                                                    case BaseSouce.SharedSignalrData.BotClient.RenderStatus.Error:
+                                                    case BaseSouce.SharedSignalrData.Enums.RenderStatus.Error:
                                                         <span class="badge badge-danger"> Lỗi(@item.ErrorMessage)</span>
                                                         break;
                                                 }

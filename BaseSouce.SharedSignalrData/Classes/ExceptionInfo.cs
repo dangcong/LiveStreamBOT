@@ -1,4 +1,4 @@
-﻿namespace BaseSouce.SharedSignalrData.BotClient
+﻿namespace BaseSouce.SharedSignalrData.Classes
 {
     public class ExceptionInfo
     {

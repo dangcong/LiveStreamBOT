@@ -1,5 +1,7 @@
 ﻿using BaseSouce.Shared.Enums;
-using BaseSouce.SharedSignalrData.BotClient;
+using BaseSouce.SharedSignalrData.Enums;
+using BaseSouce.SharedSignalrData.Classes;
+using BaseSouce.SharedSignalrData.Interfaces;
 using BaseSouce.ViewModels.Common;
 using System;
 using System.Collections.Generic;

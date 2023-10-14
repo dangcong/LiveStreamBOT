@@ -4,8 +4,9 @@ using BaseSouce.Data.Entities;
 using BaseSouce.Services.HubServices;
 using BaseSouce.Services.Services.User;
 using BaseSouce.Shared.Enums;
-using BaseSouce.SharedSignalrData.BotClient;
-using BaseSouce.SharedSignalrData.Server;
+using BaseSouce.SharedSignalrData.Enums;
+using BaseSouce.SharedSignalrData.Classes;
+using BaseSouce.SharedSignalrData.Interfaces;
 using BaseSource.Shared.Enums;
 using BaseSource.Data.Entities;
 using BaseSource.Shared.Helpers;
@@ -126,7 +127,7 @@ namespace BaseSouce.Services.Services.Stream
                             UrlType = UrlType.GoogleDrive
                         }
                     },
-                    FileType = SharedSignalrData.Server.FileType.File,
+                    FileType = BaseSouce.SharedSignalrData.Enums.FileType.File,
                 };
                 if (!string.IsNullOrWhiteSpace(model.Audio))
                 {

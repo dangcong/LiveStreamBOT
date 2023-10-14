@@ -1,5 +1,4 @@
-﻿using BaseSouce.SharedSignalrData.Server;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -9,6 +8,9 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using BaseSouce.SharedSignalrData.Enums;
+using BaseSouce.SharedSignalrData.Classes;
+using BaseSouce.SharedSignalrData.Interfaces;
 using TqkLibrary.Net.CloudStorage.GoogleDrive;
 using TqkLibrary.Net.CloudStorage.Dropbox;
 using TqkLibrary.Net.CloudStorage.OneDrive;

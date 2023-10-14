@@ -1,4 +1,6 @@
-﻿using BaseSouce.SharedSignalrData.Server;
+﻿using BaseSouce.SharedSignalrData.Enums;
+using BaseSouce.SharedSignalrData.Classes;
+using BaseSouce.SharedSignalrData.Interfaces;
 using LiveStreamBOT;
 using LiveStreamBOT.Enums;
 using LiveStreamBOT.Helpers;

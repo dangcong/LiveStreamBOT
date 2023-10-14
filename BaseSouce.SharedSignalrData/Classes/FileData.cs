@@ -1,4 +1,6 @@
-﻿namespace BaseSouce.SharedSignalrData.Server
+﻿using BaseSouce.SharedSignalrData.Enums;
+
+namespace BaseSouce.SharedSignalrData.Classes
 {
     public class FileData
     {

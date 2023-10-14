@@ -1,4 +1,4 @@
-﻿using BaseSouce.SharedSignalrData.Server;
+﻿using BaseSouce.SharedSignalrData.Classes;
 using LiveStreamBOT.Interfaces;
 using System;
 using System.Collections.Generic;

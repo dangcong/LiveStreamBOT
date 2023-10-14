@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using BaseSouce.SharedSignalrData.Enums;
 
-namespace BaseSouce.SharedSignalrData.BotClient
+namespace BaseSouce.SharedSignalrData.Classes
 {
     public class RenderMessage : Identity
     {

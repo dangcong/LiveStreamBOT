@@ -1,4 +1,4 @@
-﻿namespace BaseSouce.SharedSignalrData.Server
+﻿namespace BaseSouce.SharedSignalrData.Enums
 {
     public enum UrlType
     {

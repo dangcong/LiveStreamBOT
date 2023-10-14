@@ -1,6 +1,4 @@
-﻿using BaseSouce.SharedSignalrData.BotClient;
-using BaseSouce.SharedSignalrData.Server;
-using Microsoft.AspNetCore.SignalR.Client;
+﻿using Microsoft.AspNetCore.SignalR.Client;
 using System;
 using System.Collections.Generic;
 using System.Data.Common;
@@ -15,6 +13,9 @@ using LiveStreamBOT.Enums;
 using Microsoft.Extensions.DependencyInjection;
 using System.Text.Json.Serialization;
 using BaseSouce.SharedSignalrData;
+using BaseSouce.SharedSignalrData.Interfaces;
+using BaseSouce.SharedSignalrData.Classes;
+using BaseSouce.SharedSignalrData.Enums;
 
 namespace LiveStreamBOT.Services
 {

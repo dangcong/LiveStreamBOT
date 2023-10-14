@@ -1,4 +1,6 @@
-﻿using BaseSouce.SharedSignalrData.Server;
+﻿using BaseSouce.SharedSignalrData.Enums;
+using BaseSouce.SharedSignalrData.Classes;
+using BaseSouce.SharedSignalrData.Interfaces;
 
 namespace BaseSouce.Services.HubServices
 {

@@ -16,7 +16,9 @@
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
     <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="7.0.0" />
     <PackageReference Include="System.Management" Version="7.0.1" />
-    <PackageReference Include="TqkLibrary.Net.CloudStorage.GoogleDrive" Version="1.0.1-build2023041400" />
+    <PackageReference Include="TqkLibrary.Net.CloudStorage.Dropbox" Version="1.0.2-build20231014164108" />
+    <PackageReference Include="TqkLibrary.Net.CloudStorage.GoogleDrive" Version="1.0.2-build20231014162252" />
+    <PackageReference Include="TqkLibrary.Net.CloudStorage.OneDrive" Version="1.0.2-build20231014164201" />
     <PackageReference Include="TqkLibrary.Queues" Version="1.0.0-build2022121301" />
     <PackageReference Include="TypedSignalR.Client" Version="3.3.0">
       <PrivateAssets>all</PrivateAssets>

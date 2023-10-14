@@ -139,28 +139,17 @@ namespace LiveStreamBOT.Queues
             {
                 try
                 {
-                    double sizeDownloaded = 0;
-                    using (DriveApiNonLogin driveApiNonLogin = new DriveApiNonLogin())
-                    {
-                        foreach (var fileData in RenderCommand.FileDatas)
-                        {
-                            if (fileData.Size == 0)
-                            {
-                                var driveVideoItem = GoogleDriveHelper.TryParse(fileData.Url);
-                                if (driveVideoItem is null ||
-                                    driveVideoItem.LinkType != GoogleDriveLinkType.File)
-                                    throw new NotSupportedException($"Link không hỗ trợ hoặc không hợp lệ:  ({fileData.Url})");
+                    using DownloadHelper downloadHelper = new DownloadHelper();
 
-                                var videoMetadata = await driveApiNonLogin.GetMetadataAsync(driveVideoItem.ID);
-                                if (videoMetadata.FileSize.HasValue) fileData.Size = videoMetadata.FileSize.Value;
-                            }
-                        }
+                    foreach (var fileData in RenderCommand.FileDatas.Where(x => !x.Size.HasValue || x.Size == 0))
+                    {
+                        fileData.Size = await downloadHelper.GetFileSizeAsync(fileData, CancellationToken);
                     }
 
                     double totalSize = RenderCommand.FileDatas.Where(x => x.Size.HasValue).Sum(x => x.Size.Value);
                     DateTime dateTime = DateTime.Now;
+                    double sizeDownloaded = 0;
 
-                    using DownloadHelper downloadHelper = new DownloadHelper();
                     foreach (var file in RenderCommand.FileDatas)
                     {
                         await downloadHelper.DownloadAsync(file, _workingDir, async (x) =>

@@ -2,6 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
+	  <LangVersion>11.0</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -12,7 +13,9 @@
     <PackageReference Include="Telegram.Bot" Version="15.7.1" />
     <PackageReference Include="UnitOfWork.EntityFrameworkCore" Version="6.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
-	<PackageReference Include="TqkLibrary.Net.CloudStorage.GoogleDrive" Version="1.0.1-build2023041400" />
+	  <PackageReference Include="TqkLibrary.Net.CloudStorage.Dropbox" Version="1.0.2-build20231014164108" />
+	  <PackageReference Include="TqkLibrary.Net.CloudStorage.GoogleDrive" Version="1.0.2-build20231014162252" />
+	  <PackageReference Include="TqkLibrary.Net.CloudStorage.OneDrive" Version="1.0.2-build20231014164201" />
   </ItemGroup>
 
   <ItemGroup>

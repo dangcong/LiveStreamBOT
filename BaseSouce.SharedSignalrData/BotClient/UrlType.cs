@@ -4,5 +4,7 @@
     {
         Normal,
         GoogleDrive,
+        OneDrive,
+        Dropbox
     }
 }

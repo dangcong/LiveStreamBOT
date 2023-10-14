@@ -157,7 +157,7 @@ namespace LiveStreamBOT.Queues
                         }
                     }
 
-                    double totalSize = RenderCommand.FileDatas.Sum(x => x.Size);
+                    double totalSize = RenderCommand.FileDatas.Where(x => x.Size.HasValue).Sum(x => x.Size.Value);
                     DateTime dateTime = DateTime.Now;
 
                     using DownloadHelper downloadHelper = new DownloadHelper();

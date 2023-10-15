@@ -1,7 +1,9 @@
-﻿using LiveStreamBOT.Interfaces;
+﻿using BaseSouce.SharedSignalrData.Classes;
+using LiveStreamBOT.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Management;
 using System.Text;
@@ -32,6 +34,23 @@ namespace LiveStreamBOT.Services
         public double GetBandwidth()
         {
             return pcsents.Sum(x => x.NextValue()) / 1024;
+        }
+
+        public DiskInfo GetDiskInfo()
+        {
+            DirectoryInfo directoryInfo = new DirectoryInfo(Singleton.ExeDir);
+            foreach (DriveInfo drive in DriveInfo.GetDrives().Where(x => x.IsReady))
+            {
+                if (directoryInfo.Root.Name.StartsWith(drive.Name))
+                {
+                    return new DiskInfo()
+                    {
+                        Used = drive.TotalSize - drive.AvailableFreeSpace,
+                        Total = drive.TotalSize
+                    };
+                }
+            }
+            return null;
         }
 
         public double GetPercentCpu()

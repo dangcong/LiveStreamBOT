@@ -16,6 +16,7 @@ namespace LiveStreamBOT
                 CpuUsage = systemInfoReader.GetPercentCpu(),
                 RamUsage = systemInfoReader.GetPercentRam(),
                 Bandwidth = systemInfoReader.GetBandwidth(),
+                DiskInfo = systemInfoReader.GetDiskInfo(),
             };
     }
 }

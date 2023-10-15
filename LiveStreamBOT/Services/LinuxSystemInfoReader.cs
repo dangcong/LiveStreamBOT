@@ -1,6 +1,9 @@
-﻿using LiveStreamBOT.Interfaces;
+﻿using BaseSouce.SharedSignalrData.Classes;
+using LiveStreamBOT.DataClass;
+using LiveStreamBOT.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -105,6 +108,35 @@ namespace LiveStreamBOT.Services
                 }
             }
             return double.NaN;
+        }
+
+        public DiskInfo GetDiskInfo()
+        {
+            using Process process = Process.Start(new ProcessStartInfo()
+            {
+                FileName = "df",
+                Arguments = ".",
+                WorkingDirectory = Singleton.ExeDir,
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+            });
+            using StringReader stringReader = new StringReader(process.StandardOutput.ReadToEnd());
+            string firstLine = stringReader.ReadLine();
+            string data = stringReader.ReadLine()?.Trim();
+            if (!string.IsNullOrWhiteSpace(data))
+            {
+                string[] datas = data.Split(' ', '\t').Where(x => !string.IsNullOrWhiteSpace(x)).ToArray();
+                if (datas.Length > 4 &&
+                    long.TryParse(datas[2], out long used) && long.TryParse(datas[3], out long avalable))
+                {
+                    return new DiskInfo()
+                    {
+                        Used = used,
+                        Total = avalable + used,
+                    };
+                }
+            }
+            return null;
         }
     }
 }

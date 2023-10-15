@@ -58,7 +58,7 @@ namespace BaseSource.Data.Migrations
                         new
                         {
                             Id = "c1105ce5-9dbc-49a9-a7d5-c963b6daa62a",
-                            ConcurrencyStamp = "7af1165f-1f8f-4b60-bee5-bb3a7d154457",
+                            ConcurrencyStamp = "de6e3578-4f6a-478e-a649-b4341395affd",
                             Description = "Administrator role",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -194,7 +194,7 @@ namespace BaseSource.Data.Migrations
                         {
                             Id = "ffded6b0-3769-4976-841b-69459049a62d",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "e98811bb-9b29-4917-945c-5fdc43321de5",
+                            ConcurrencyStamp = "bdff738a-f320-4925-a2e8-faf72c8a2f93",
                             CreatedTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
@@ -203,7 +203,7 @@ namespace BaseSource.Data.Migrations
                             NormalizedUserName = "superadmin",
                             NumberOfThreads1080Create = 0,
                             NumberOfThreads4KCreate = 0,
-                            PasswordHash = "AQAAAAEAACcQAAAAEL6ZYmBFmusqiRa/CXoLrTQ8hOq3MOV1HuFSRe3XMjcf1K9jdlMT5zLuTRZvs+Zweg==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEGgFyGg5ZgQ17h6KNA0E43VqjNNhEP01T5aTSFH7ncTN//jB1fYUV9X9K3Rbrr3ZWQ==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -324,6 +324,12 @@ namespace BaseSource.Data.Migrations
 
                     b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<long>("DiskTotal")
+                        .HasColumnType("bigint");
+
+                    b.Property<long>("DiskUsed")
+                        .HasColumnType("bigint");
 
                     b.Property<string>("Group")
                         .HasColumnType("nvarchar(max)");

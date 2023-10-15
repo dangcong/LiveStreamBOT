@@ -91,7 +91,7 @@ namespace BaseSouce.Services.Services.BOT
 
                 if (botCurrent == null)
                 {
-                    _repository.Insert(new Data.Entities.ManagerBOT
+                    _repository.Insert(new ManagerBOT
                     {
                         BotId = model.BotId,
                         CreatedTime = DateTime.Now,
@@ -99,6 +99,11 @@ namespace BaseSouce.Services.Services.BOT
                         Name = model.Name,
                         Status = ManagerBOTStatus.Connected,
                         UpdatedTime = DateTime.Now,
+                        Bandwidth = model.Bandwidth,
+                        RAM = model.RamUsage,
+                        DiskTotal = model.DiskInfo?.Total ?? 0,
+                        DiskUsed = model.DiskInfo?.Used ?? 0,
+
                     });
                 }
                 else
@@ -109,6 +114,10 @@ namespace BaseSouce.Services.Services.BOT
                     botCurrent.CPU = model.CpuUsage;
                     botCurrent.Status = ManagerBOTStatus.Connected;
                     botCurrent.UpdatedTime = DateTime.Now;
+                    botCurrent.RAM = model.RamUsage;
+                    botCurrent.Bandwidth = model.Bandwidth;
+                    botCurrent.DiskTotal = model.DiskInfo?.Total ?? 0;
+                    botCurrent.DiskUsed = model.DiskInfo?.Used ?? 0;
                     _repository.Update(botCurrent);
 
                 }

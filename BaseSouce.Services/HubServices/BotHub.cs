@@ -48,7 +48,8 @@ namespace BaseSouce.Services.HubServices
                     ConnectionId = Context.ConnectionId,
                     Bandwidth = clientInfo.Bandwidth,
                     CpuUsage = clientInfo.CpuUsage,
-                    RamUsage = clientInfo.RamUsage
+                    RamUsage = clientInfo.RamUsage,
+                    DiskInfo = clientInfo.DiskInfo,
                 });
             }
         }

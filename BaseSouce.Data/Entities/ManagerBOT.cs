@@ -19,6 +19,8 @@ namespace BaseSouce.Data.Entities
         public double CPU { get; set; }
         public double RAM { get; set; }
         public double Bandwidth { get; set; }
+        public long DiskUsed { get; set; }
+        public long DiskTotal { get; set; }
         public DateTime? UpdatedTime { get; set; }
         public LiveType? LiveType { get; set; }
 

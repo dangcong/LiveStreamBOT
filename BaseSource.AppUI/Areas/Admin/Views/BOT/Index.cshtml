@@ -81,6 +81,7 @@
                                         <th>CPU</th>
                                         <th>RAM</th>
                                         <th>Bandwidth</th>
+                                        <th>Space</th>
                                         <th>Action</th>
                                     </tr>
                                 </thead>
@@ -110,7 +111,7 @@
                                             <td>@((item.CPU * 100).ToString("n2"))%</td>
                                             <td>@((item.RAM * 100).ToString("n2"))%</td>
                                             <td>@item.Bandwidth.ToString("n2") KB/s</td>
-
+                                            <td><span class="badge badge-success">@(item.DiskUsed.ToString("n2"))GB/@(item.DiskUsed.ToString("n2"))GB</span></td>
                                             <td>
                                                 <a class="btn btn-info" href="/admin/bot/group?id=@(item.Id)">DS User</a>
                                                 <a class="btn btn-primary" href="/admin/bot/edit/@(item.Id)">Sửa</a>
@@ -125,14 +126,16 @@
                                                 else
                                                 {
                                                     <button class="btn btn-success btn-start"
-                                                           @* data-toggle="modal" data-target="#startModal"*@
+                                                    @* data-toggle="modal" data-target="#startModal"*@
                                                             data-id="@item.Id">
                                                         Start
                                                     </button>
                                                 }
-                                                <button class="btn btn-danger btn-Delete" 
+                                                <button class="btn btn-danger btn-Delete"
                                                 @*data-toggle="modal" data-target="#deleteModal" *@
-                                                data-id="@item.Id">Xóa</button>
+                                                        data-id="@item.Id">
+                                                    Xóa
+                                                </button>
                                             </td>
                                         </tr>
 
@@ -223,20 +226,20 @@
             });
 
             $('body').on('click', '.btn-start', function () {
-                 $('#startModal').modal('show');
+                $('#startModal').modal('show');
                 let id = $(this).attr('data-id');
                 $('#stopForm input[name="Id"]').val(id);
                 $('#startForm input[name="Id"]').val(id);
             });
             $('body').on('click', '.btn-stop', function () {
-                 $('#stopModal').modal('show');
+                $('#stopModal').modal('show');
                 let id = $(this).attr('data-id');
                 $('#stopForm input[name="Id"]').val(id);
                 $('#startForm input[name="Id"]').val(id);
             });
             $('body').on('click', '.btn-Delete', function () {
                 $('#deleteModal').modal('show');
-                
+
                 let id = $(this).attr('data-id');
                 $('#deleteForm input[name="Id"]').val(id);
 

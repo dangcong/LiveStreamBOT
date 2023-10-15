@@ -110,6 +110,7 @@ namespace BaseSouce.Services.Services.User
             }
             catch (Exception ex)
             {
+                _logger.LogError($"AuthenticateAsync failed by error:[{ex}]");
                 return new KeyValuePair<bool, string>(false, "Tài khoản hoặc mật khẩu không chính xác!");
             }
 

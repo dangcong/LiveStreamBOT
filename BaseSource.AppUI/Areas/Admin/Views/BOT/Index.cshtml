@@ -111,7 +111,7 @@
                                             <td>@((item.CPU * 100).ToString("n2"))%</td>
                                             <td>@((item.RAM * 100).ToString("n2"))%</td>
                                             <td>@item.Bandwidth.ToString("n2") KB/s</td>
-                                            <td><span class="badge badge-success">@(item.DiskUsed.ToString("n2"))GB/@(item.DiskUsed.ToString("n2"))GB</span></td>
+                                            <td><span class="badge badge-success">@((item.DiskUsed * 1.0 / 1024 / 1024 / 1024).ToString("n2"))GB/@((item.DiskTotal * 1.0 / 1024 / 1024 / 1024).ToString("n2"))GB</span></td>
                                             <td>
                                                 <a class="btn btn-info" href="/admin/bot/group?id=@(item.Id)">DS User</a>
                                                 <a class="btn btn-primary" href="/admin/bot/edit/@(item.Id)">Sửa</a>

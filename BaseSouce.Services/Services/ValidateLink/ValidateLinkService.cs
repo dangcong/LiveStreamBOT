@@ -11,6 +11,7 @@ using TqkLibrary.Net.CloudStorage.GoogleDrive;
 using TqkLibrary.Net.CloudStorage.OneDrive;
 using BaseSource.Shared.Helpers;
 using BaseSource.Shared.Enums;
+using BaseSouce.SharedSignalrData.Enums;
 
 namespace BaseSouce.Services.Services.ValidateLink
 {
@@ -49,6 +50,31 @@ namespace BaseSouce.Services.Services.ValidateLink
             _httpClientHandler.Dispose();
         }
 
+        public UrlType? GetUrlType(string url)
+        {
+            Uri.TryCreate(url, UriKind.RelativeOrAbsolute, out Uri? result);
+            return GetUrlType(result);
+        }
+
+        public UrlType? GetUrlType(Uri? uri)
+        {
+            switch (uri?.Host)
+            {
+                case "1drv.ms":
+                    return UrlType.OneDrive;
+
+                case "www.dropbox.com":
+                    return UrlType.Dropbox;
+
+                case "drive.google.com":
+                    return UrlType.GoogleDrive;
+
+                default:
+                    return null;
+            }
+        }
+
+
         public async Task<KeyValuePair<bool, string>> ValidateLinkAsync(string link, string? name = null)
         {
             if (string.IsNullOrWhiteSpace(link))
@@ -59,14 +85,14 @@ namespace BaseSouce.Services.Services.ValidateLink
 
             try
             {
-                switch (uri.Host)
+                switch (GetUrlType(uri))
                 {
-                    case "1drv.ms"://oneDrive
+                    case UrlType.OneDrive://oneDrive
                         var data = await _oneDriveApiNonLogin.DecodeShortLinkAsync(uri);
                         await _oneDriveApiNonLogin.GetMetadataAsync(data);
                         return new KeyValuePair<bool, string>(true, string.Empty);
 
-                    case "www.dropbox.com"://dropbox
+                    case UrlType.Dropbox://dropbox
                         await _dropboxApiNonLogin.GetCookieAsync(uri);
                         using (System.IO.Stream stream = await _dropboxApiNonLogin.DownloadFileAsync(uri.ToString()))
                         {
@@ -74,7 +100,7 @@ namespace BaseSouce.Services.Services.ValidateLink
                         }
                         return new KeyValuePair<bool, string>(true, string.Empty);
 
-                    case "drive.google.com"://google drive
+                    case UrlType.GoogleDrive://google drive
                         var driveVideoItem = GoogleDriveHelper.TryParse(link);
                         if (driveVideoItem is null ||
                             driveVideoItem.LinkType != GoogleDriveLinkType.File)

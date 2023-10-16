@@ -113,6 +113,10 @@ namespace BaseSouce.Services.Services.Stream
                 }
 
 
+                var videoUrlType = _validateLinkService.GetUrlType(model.Video);
+                if (!videoUrlType.HasValue)
+                    return $"Không hỗ trợ kiểu link '{model.Video}'";
+
                 RenderCommand renderCommand = new RenderCommand()
                 {
                     RenderArguments = string.Join(" ", renderArguments),
@@ -128,18 +132,23 @@ namespace BaseSouce.Services.Services.Stream
                         {
                             Name = "video",
                             Url = model.Video,
-                            UrlType = UrlType.GoogleDrive
+                            UrlType = videoUrlType.Value,
                         }
                     },
                     FileType = BaseSouce.SharedSignalrData.Enums.FileType.File,
                 };
+
+                var audioUrlType = _validateLinkService.GetUrlType(model.Audio);
+                if (!audioUrlType.HasValue)
+                    return $"Không hỗ trợ kiểu link '{model.Audio}'";
+
                 if (!string.IsNullOrWhiteSpace(model.Audio))
                 {
                     renderCommand.FileDatas.Add(new FileData()
                     {
                         Name = "sound",
                         Url = model.Audio,
-                        UrlType = UrlType.GoogleDrive,
+                        UrlType = audioUrlType.Value,
                     });
                 }
                 _logger.LogInformation($"[Bot ConnectionId:[{model.ManagerBOT.ConnectionId}]]");

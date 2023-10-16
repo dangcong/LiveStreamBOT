@@ -101,8 +101,8 @@ namespace BaseSouce.Services.Services.BOT
                         UpdatedTime = DateTime.Now,
                         Bandwidth = model.Bandwidth,
                         RAM = model.RamUsage,
-                        DiskTotal = model.DiskInfo?.Total ?? 0,
-                        DiskUsed = model.DiskInfo?.Used ?? 0,
+                        DiskTotal = model.DiskInfo.Total,
+                        DiskUsed = model.DiskInfo.Used,
 
                     });
                 }

@@ -139,7 +139,7 @@ namespace BaseSouce.Services.Services.Stream
                     {
                         Name = "sound",
                         Url = model.Audio,
-                        UrlType = UrlType.GoogleDrive
+                        UrlType = UrlType.GoogleDrive,
                     });
                 }
                 _logger.LogInformation($"[Bot ConnectionId:[{model.ManagerBOT.ConnectionId}]]");

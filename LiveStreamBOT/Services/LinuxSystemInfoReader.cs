@@ -131,8 +131,8 @@ namespace LiveStreamBOT.Services
                 {
                     return new DiskInfo()
                     {
-                        Used = used,
-                        Total = avalable + used,
+                        Used = used * 1024,
+                        Total = (avalable + used) * 1024,
                     };
                 }
             }

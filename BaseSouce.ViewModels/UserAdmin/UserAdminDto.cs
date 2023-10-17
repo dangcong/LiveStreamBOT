@@ -43,6 +43,12 @@ namespace BaseSource.ViewModels.UserAdmin
         public string UserName { get; set; }
         public string UserManagerId { get; set; }
     }
+    public class UserAddBotAdminDto
+    {
+        public int BotId { get; set; }
+        public string UserId { get; set; }
+        public int NumberOfThreads { get; set; }
+    }
     public class UserGroupDeleteDto : UserGroupAddDto
     {
 

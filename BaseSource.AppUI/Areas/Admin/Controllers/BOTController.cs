@@ -1,7 +1,9 @@
 ﻿using BaseSource.ApiIntegration.WebApi.ManagerBOT;
 using BaseSource.ApiIntegration.WebApi.StreamAdmin;
+using BaseSource.ApiIntegration.WebApi.UserAdmin;
 using BaseSource.Shared.Constants;
 using BaseSource.ViewModels.ManagerBOT;
+using BaseSource.ViewModels.UserAdmin;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks.Dataflow;
 
@@ -11,10 +13,16 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
     {
         private readonly IManagerBOTApiClient _managerBOTApiClient;
         private readonly IStreamAdminApiClient _streamAdminApiClient;
-        public BOTController(IManagerBOTApiClient managerBOTApiClient, IStreamAdminApiClient streamAdminApiClient)
+        private readonly IUserAdminApiClient _userAdminApiClient;
+        public BOTController(
+            IManagerBOTApiClient managerBOTApiClient
+            , IStreamAdminApiClient streamAdminApiClient
+            , IUserAdminApiClient userAdminApiClient
+            )
         {
             _managerBOTApiClient = managerBOTApiClient;
             _streamAdminApiClient = streamAdminApiClient;
+            _userAdminApiClient = userAdminApiClient;
         }
         public async Task<IActionResult> Index()
         {
@@ -109,7 +117,19 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             {
                 return NotFound();
             }
+
+            var users = await _userAdminApiClient.GetAll();
+            ViewBag.Users = users.ResultObj;
+            ViewBag.BotId = id;
             return View(result.ResultObj);
+        }
+
+        [HttpPost]
+ 
+        public async Task<IActionResult> AddBotToUser(UserAddBotAdminDto model)
+        {
+            var result = await _userAdminApiClient.AddBot(model);
+            return Redirect($"/admin/bot/group?id={model.BotId}");
         }
     }
 }

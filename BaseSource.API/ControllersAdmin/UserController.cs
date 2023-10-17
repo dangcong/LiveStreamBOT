@@ -22,6 +22,14 @@ namespace BaseSource.API.ControllersAdmin
             return Ok(new ApiSuccessResult<object>(result));
         }
 
+        [HttpGet]
+        [Route("/api/admin/user/all")]
+        public async Task<IActionResult> GetAllUser()
+        {
+            var result = await _userAdminService.GetAllAsync();
+            return Ok(new ApiSuccessResult<object>(result));
+        }
+
         [HttpPost]
         [Route("manger")]
         public async Task<IActionResult> UpdateUserGroup(UserGroupAddDto model)
@@ -149,6 +157,18 @@ namespace BaseSource.API.ControllersAdmin
         public async Task<IActionResult> CreateUser([FromBody] UserCreateAdminDto model)
         {
             var result = await _userAdminService.CreateUserAsync(model);
+            if (result.Key)
+            {
+                return Ok(new ApiSuccessResult<string>(string.Empty));
+            }
+            return Ok(new ApiErrorResult<string>(result.Value));
+        }
+
+        [HttpPost]
+        [Route("/api/admin/user/addbot")]
+        public async Task<IActionResult> AddBotToUser([FromBody] UserAddBotAdminDto model)
+        {
+            var result = await _userAdminService.AddUserToBotAsync(model);
             if (result.Key)
             {
                 return Ok(new ApiSuccessResult<string>(string.Empty));

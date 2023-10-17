@@ -42,14 +42,14 @@ namespace BaseSouce.Services.Services.UserAdmin
 
                 var _repository = _unitOfWork.GetRepository<UserManagerBOT>();
                 var _repositoryBOT = _unitOfWork.GetRepository<ManagerBOT>();
-                var anyData =await _repository.ExistsAsync(
+                var anyData = await _repository.ExistsAsync(
                     x => x.UserId == model.UserId && x.ManagerBOTId == model.BotId);
                 if (anyData)
                 {
-                      return new KeyValuePair<bool, string>(false, "BOT đã tồn tại");
+                    return new KeyValuePair<bool, string>(false, "BOT đã tồn tại");
                 }
-              
-               
+
+
                 var botCurrent = await _repositoryBOT.GetFirstOrDefaultAsync(
                     predicate: x => x.Id == model.BotId);
                 if (botCurrent == null)
@@ -256,6 +256,7 @@ namespace BaseSouce.Services.Services.UserAdmin
                     NumberOfThreads = x.NumberOfThreads,
                     UserName = x.User.UserName,
                     LiveType = x.LiveType,
+                    BotId = x.ManagerBOTId,
                     NumberOfThreadsInRun = x.ManagerBOT.StreamHistorys.Where(x => x.UserId == userId && x.Status == StreamStatus.Streaming).Count()
                 }).ToListAsync();
         }

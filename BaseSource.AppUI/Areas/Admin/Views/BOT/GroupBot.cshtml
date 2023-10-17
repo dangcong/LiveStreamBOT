@@ -25,7 +25,7 @@
                 <div class="card">
                     <div class="card-header">
                         <h4>@ViewData["Title"]</h4>
-                        <button class="btn btn-success btnAddUser">Thêm User</button>
+                        <button class="btn btn-success " onclick="addUser()">Thêm User</button>
                         <hr />
                         <h4>
                             Tổng luồng đang chạy/ luồng cấp phép
@@ -113,9 +113,9 @@
             $("#table-groupBot").DataTable({});
         });
 
-        $('body').on('click', '.btnAddUser', function () {
-            $('#addUserModal').modal('show');
-
-        });
+        function addUser() {
+             $('#addUserModal').modal('show');
+        }
+       
     </script>
 }

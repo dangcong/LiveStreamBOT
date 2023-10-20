@@ -363,3 +363,4 @@ MigrationBackup/
 FodyWeavers.xsd
 
 LiveStreamBOT/Setting.json
+/BaseSource.AppUI/appsettings.json

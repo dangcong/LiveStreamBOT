@@ -138,12 +138,12 @@ namespace BaseSouce.Services.Services.Stream
                     FileType = BaseSouce.SharedSignalrData.Enums.FileType.File,
                 };
 
-                var audioUrlType = _validateLinkService.GetUrlType(model.Audio);
-                if (!audioUrlType.HasValue)
-                    return $"Không hỗ trợ kiểu link '{model.Audio}'";
-
                 if (!string.IsNullOrWhiteSpace(model.Audio))
                 {
+                    var audioUrlType = _validateLinkService.GetUrlType(model.Audio);
+                    if (!audioUrlType.HasValue)
+                        return $"Không hỗ trợ kiểu link '{model.Audio}'";
+
                     renderCommand.FileDatas.Add(new FileData()
                     {
                         Name = "sound",

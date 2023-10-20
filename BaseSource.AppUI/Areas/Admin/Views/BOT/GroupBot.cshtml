@@ -3,6 +3,8 @@
     ViewData["Title"] = "Danh sách Group BOT";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
     var index = 1;
+    var botId = ViewBag.BotId;
+    var users = ViewBag.Users as List<UserAdminInfoDto>;
 }
 
 <section class="section">
@@ -17,11 +19,13 @@
 
     <div class="section-body">
         <h2 class="section-title">@ViewData["Title"]</h2>
+
         <div class="row">
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
                         <h4>@ViewData["Title"]</h4>
+                        <button class="btn btn-success " onclick="addUser()">Thêm User</button>
                         <hr />
                         <h4>
                             Tổng luồng đang chạy/ luồng cấp phép
@@ -61,13 +65,57 @@
         </div>
     </div>
 </section>
+<div class="modal fade" role="dialog" id="addUserModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Thêm BOT cho người dùng (Nếu BOT đã có không thể thêm mới)</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="addForm" method="post" action="/admin/bot/AddBotToUser">
+                <input name="botId" type="hidden" value="@botId" />
+                <div class="modal-body">
+                    <div class="form-group mb-4">
+                        <label class="">Nhập số luồng</label>
+                        <div class="">
+                            <input name="NumberOfThreads" placeholder="Nhập số luồng cấp phép" required min="1" class="form-control" />
+                        </div>
+                    </div>
 
+
+                    <div class="form-group mb-4">
+                        <label class="">Tên người dùng</label>
+                        <div class="">
+                            <select class="form-control select2" name="UserId" required>
+                                @foreach (var item in users)
+                                {
+                                    <option value="@item.Id">@item.UserName</option>
+                                }
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" id="btn-confirm-payment" class="btn btn-danger">Xác nhận </button>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 @section Scripts{
     <script>
         $(document).ready(function () {
-           $("#table-groupBot").DataTable({});
-        }
-        
+            $("#table-groupBot").DataTable({});
+        });
 
+        function addUser() {
+             $('#addUserModal').modal('show');
+        }
+       
     </script>
 }

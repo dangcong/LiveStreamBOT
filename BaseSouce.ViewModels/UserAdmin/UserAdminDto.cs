@@ -43,6 +43,12 @@ namespace BaseSource.ViewModels.UserAdmin
         public string UserName { get; set; }
         public string UserManagerId { get; set; }
     }
+    public class UserAddBotAdminDto
+    {
+        public int BotId { get; set; }
+        public string UserId { get; set; }
+        public int NumberOfThreads { get; set; }
+    }
     public class UserGroupDeleteDto : UserGroupAddDto
     {
 
@@ -69,6 +75,7 @@ namespace BaseSource.ViewModels.UserAdmin
         public int NumberOfThreads { get; set; }
         public int NumberOfThreadsInRun { get; set; }
         public string BotName { get; set; }
+        public int BotId { get; set; }
         public string UserName { get; set; }
         public LiveType? LiveType { get; set; }
     }

@@ -31,6 +31,51 @@ namespace BaseSouce.Services.Services.UserAdmin
 
         }
 
+        public async Task<KeyValuePair<bool, string>> AddUserToBotAsync(UserAddBotAdminDto model)
+        {
+            try
+            {
+                if (model.NumberOfThreads < 1)
+                {
+                    return new KeyValuePair<bool, string>(false, "Số luồng không hợp lệ!");
+                }
+
+                var _repository = _unitOfWork.GetRepository<UserManagerBOT>();
+                var _repositoryBOT = _unitOfWork.GetRepository<ManagerBOT>();
+                var anyData = await _repository.ExistsAsync(
+                    x => x.UserId == model.UserId && x.ManagerBOTId == model.BotId);
+                if (anyData)
+                {
+                    return new KeyValuePair<bool, string>(false, "BOT đã tồn tại");
+                }
+
+
+                var botCurrent = await _repositoryBOT.GetFirstOrDefaultAsync(
+                    predicate: x => x.Id == model.BotId);
+                if (botCurrent == null)
+                {
+                    return new KeyValuePair<bool, string>(false, "BOT Không tồn tại!");
+                }
+
+                _repository.Insert(new UserManagerBOT
+                {
+                    UserId = model.UserId,
+                    ManagerBOTId = model.BotId,
+                    LiveType = botCurrent.LiveType.GetValueOrDefault(),
+                    NumberOfThreads = model.NumberOfThreads,
+                    CreatedTime = DateTime.Now,
+                });
+                await _unitOfWork.SaveChangesAsync();
+                return new KeyValuePair<bool, string>(true, string.Empty);
+
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Inser BOT User failed by error:[{ex}]");
+                return new KeyValuePair<bool, string>(false, $"Thêm BOT không thành công![{ex.Message}]");
+            }
+        }
+
         public async Task<KeyValuePair<bool, string>> CreateUserAsync(UserCreateAdminDto model)
         {
             try
@@ -164,6 +209,21 @@ namespace BaseSouce.Services.Services.UserAdmin
             }
         }
 
+        public async Task<List<UserAdminInfoDto>> GetAllAsync()
+        {
+            var _repository = _unitOfWork.GetRepository<AppUser>();
+
+            var query = _repository.Queryable().AsNoTracking();
+
+
+            return await _repository.Queryable().AsNoTracking()
+                .Select(x => new UserAdminInfoDto
+                {
+                    Id = x.Id,
+                    UserName = x.UserName
+                }).ToListAsync();
+        }
+
         public async Task<List<UserGroupDto>> GetAllUserOfManagerAsync(string userId)
         {
             var _repository = _unitOfWork.GetRepository<AppUser>();
@@ -196,6 +256,7 @@ namespace BaseSouce.Services.Services.UserAdmin
                     NumberOfThreads = x.NumberOfThreads,
                     UserName = x.User.UserName,
                     LiveType = x.LiveType,
+                    BotId = x.ManagerBOTId,
                     NumberOfThreadsInRun = x.ManagerBOT.StreamHistorys.Where(x => x.UserId == userId && x.Status == StreamStatus.Streaming).Count()
                 }).ToListAsync();
         }

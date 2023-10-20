@@ -47,7 +47,7 @@
                                     {
                                         <tr>
                                             <td>@(index++)</td>
-                                            <td> <span class="text-danger"><strong>@item.BotName</strong></span></td>
+                                            <td> <a href="/admin/bot/group?id=@(item.BotId)"> <span class="text-danger"><strong>@item.BotName</strong></span></a></td>
                                             <td>
                                                 @switch (item.LiveType)
                                                 {

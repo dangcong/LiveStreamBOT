@@ -186,9 +186,13 @@ namespace BaseSouce.Services.Services.Stream
             var result = await _validateLinkService.ValidateLinkAsync(video, "video");
             if (!result.Key)
                 return result.Value;
-            result = await _validateLinkService.ValidateLinkAsync(audio, "audio");
-            if (!result.Key)
-                return result.Value;
+
+            if (!string.IsNullOrWhiteSpace(audio))
+            {
+                result = await _validateLinkService.ValidateLinkAsync(audio, "audio");
+                if (!result.Key)
+                    return result.Value;
+            }
             return true;
         }
 

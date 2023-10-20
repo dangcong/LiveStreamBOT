@@ -213,10 +213,10 @@ namespace BaseSouce.Services.Services.UserAdmin
         {
             var _repository = _unitOfWork.GetRepository<AppUser>();
 
-            var query = _repository.Queryable().AsNoTracking();
 
 
-            return await _repository.Queryable().AsNoTracking()
+
+            return await _repository.Queryable().AsNoTracking().Where(x => x.DeletedTime == null)
                 .Select(x => new UserAdminInfoDto
                 {
                     Id = x.Id,

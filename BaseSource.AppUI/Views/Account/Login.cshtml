@@ -33,8 +33,8 @@
     <meta property="og:title" content="LiveStream" />
     <meta property="og:description" content="LiveStream" />
     <title>Auto Live Stream 24/7 Youtube - Facebook - Twitch</title>
-    <link href="https://autolive.vip/landing/css/side-right.css?v=1" rel="stylesheet" />
-    <link href="https://autolive.vip/landing/css/saas-bundle.min.css" rel="stylesheet" />
+    <link href="~/css/side-right.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/saas-bundle.min.css" rel="stylesheet" asp-append-version="true" />
 </head>
 <body class="pace-done">
     <div style="position: fixed; top: 0px; left: 0px; width: 0; height: 0;" id="scrollzipPoint"></div>
@@ -72,21 +72,21 @@
                     <div class="container max-lg inner-wrap">
                         <div class="decoration">
                             @*<svg class="left-deco" width="1045px" height="1468px" viewBox="0 0 1045 1468" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                <g transform="translate(-1030.000000, 0.000000)">
-                                    <g transform="translate(950.000000, 0.000000)">
-                                        <path d="M0,0 L805.395445,0 C731.131815,0 740.666667,76.9414646 834,230.824394 C915.57424,365.319569 1045,513.536468 1045,652.024982 C1045,806.30828 951.877684,902.632061 904.5,1091.56209 C874.07902,1212.87314 909.795583,1338.35244 1011.64969,1468 L0,1468 L0,0 Z"></path>
-                                    </g>
-                                </g>
+                            <g transform="translate(-1030.000000, 0.000000)">
+                            <g transform="translate(950.000000, 0.000000)">
+                            <path d="M0,0 L805.395445,0 C731.131815,0 740.666667,76.9414646 834,230.824394 C915.57424,365.319569 1045,513.536468 1045,652.024982 C1045,806.30828 951.877684,902.632061 904.5,1091.56209 C874.07902,1212.87314 909.795583,1338.35244 1011.64969,1468 L0,1468 L0,0 Z"></path>
+                            </g>
+                            </g>
                             </svg>
                             <svg class="right-deco" width="389px" height="1468px" viewBox="0 0 389 1468" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                <g transform="translate(-2171.000000, 0.000000)">
-                                    <g transform="translate(-950.000000, 0.000000)">
-                                        <g transform="translate(950.000000, 0.000000)">
-                                            <path d="M2329.58044,-732.909805 L3294.66463,-608.836163 C3018.10652,-208.944402 2934.07929,71.8618948 3042.58292,233.582726 C3136.98689,374.288498 3255.13325,471.945016 3255.13325,636.668858 C3255.13325,820.179655 3107.51302,903.798038 3059.64228,1128.51906 C3028.9047,1272.81133 3063.63816,1429.66837 3163.84265,1599.0902 L2141.66463,1599.0902 L2329.58044,-732.909805 Z"
-                                                  transform="translate(2718.164626, 433.090195) rotate(179.000000) translate(-2718.164626, -433.090195) "></path>
-                                        </g>
-                                    </g>
-                                </g>
+                            <g transform="translate(-2171.000000, 0.000000)">
+                            <g transform="translate(-950.000000, 0.000000)">
+                            <g transform="translate(950.000000, 0.000000)">
+                            <path d="M2329.58044,-732.909805 L3294.66463,-608.836163 C3018.10652,-208.944402 2934.07929,71.8618948 3042.58292,233.582726 C3136.98689,374.288498 3255.13325,471.945016 3255.13325,636.668858 C3255.13325,820.179655 3107.51302,903.798038 3059.64228,1128.51906 C3028.9047,1272.81133 3063.63816,1429.66837 3163.84265,1599.0902 L2141.66463,1599.0902 L2329.58044,-732.909805 Z"
+                            transform="translate(2718.164626, 433.090195) rotate(179.000000) translate(-2718.164626, -433.090195) "></path>
+                            </g>
+                            </g>
+                            </g>
                             </svg>*@
                         </div>
                         <div class="card form-box fragment-fadeUp">
@@ -118,8 +118,8 @@
                                                     <div class="title-secondary align-left">
                                                         <h3>Đăng nhập</h3>
                                                     </div>
-                                                   @* <a class="btn btn-flat waves-effect button-link" href="/auth/create-account">
-                                                        <i class="material-icons icon left mr-1">arrow_forward</i>Đăng ký tài khoản
+                                                    @* <a class="btn btn-flat waves-effect button-link" href="/auth/create-account">
+                                                    <i class="material-icons icon left mr-1">arrow_forward</i>Đăng ký tài khoản
                                                     </a>*@
                                                 </div>
                                                 <form id="register_form" method="POST" action="/account/login">
@@ -175,7 +175,7 @@
                                                         </div>
                                                     </div>
                                                     @*<div class="form-helper mt-4">
-                                                        <a class="btn-flat button-link" target="_blank" href="https://www.facebook.com/messages/t/100002470941874">Quên mật khẩu</a>
+                                                    <a class="btn-flat button-link" target="_blank" href="https://www.facebook.com/messages/t/100002470941874">Quên mật khẩu</a>
                                                     </div>*@
                                                     <div class="btn-area">
                                                         <button class="btn secondary btn-large block waves-effect" type="submit">Đăng nhập</button>

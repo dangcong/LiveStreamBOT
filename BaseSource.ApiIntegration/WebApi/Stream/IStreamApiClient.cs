@@ -1,4 +1,5 @@
 ﻿using BaseSouce.ViewModels.Common;
+using BaseSource.ViewModels.ManagerBOT;
 using BaseSource.ViewModels.Stream;
 namespace BaseSource.ApiIntegration.WebApi.Stream
 {
@@ -13,6 +14,7 @@ namespace BaseSource.ApiIntegration.WebApi.Stream
         Task<ApiResult<StreamClientInfoDto>> GetById(int id);
         Task<ApiResult<StreamReportDto>> GetReport();
         Task<ApiResult<string>> ValidateLink(StreamLinkDto model);
+        Task<ApiResult<List<UserBotDto>>> GetBotOfUserAsync();
         
     }
 }

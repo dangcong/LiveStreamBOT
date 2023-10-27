@@ -1,7 +1,6 @@
-﻿using BaseSouce.SharedSignalrData.Enums;
-using BaseSouce.SharedSignalrData.Classes;
-using BaseSouce.SharedSignalrData.Interfaces;
+﻿using BaseSouce.SharedSignalrData.Classes;
 using BaseSource.Shared.Helpers;
+using BaseSource.ViewModels.ManagerBOT;
 using BaseSource.ViewModels.Stream;
 using EFCore.UnitOfWork.PageList;
 
@@ -19,6 +18,7 @@ namespace BaseSouce.Services.Services.Stream
         Task<StreamClientInfoDto> GetStreamByIdAsync(string userId, int id);
         Task<StreamReportDto> GetStreamReportAsync(string userId);
         Task<KeyValuePair<bool, string>> ValidateLinkAsync(string link);
-        
+        Task<List<UserBotDto>> GetBotOfUserAsync(string userId);
+
     }
 }

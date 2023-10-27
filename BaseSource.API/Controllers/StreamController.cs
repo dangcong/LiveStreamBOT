@@ -123,5 +123,12 @@ namespace BaseSource.API.Controllers
             }
             return Ok(new ApiSuccessResult<object>(string.Empty));
         }
+        [HttpGet]
+        [Route("/api/stream/bots")]
+        public async Task<IActionResult> GetBotsOfUser()
+        {
+            var result = await _streamClientService.GetBotOfUserAsync(UserId);
+            return Ok(new ApiSuccessResult<object>(result));
+        }
     }
 }

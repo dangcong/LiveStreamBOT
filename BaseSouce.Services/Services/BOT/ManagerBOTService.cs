@@ -119,7 +119,6 @@ namespace BaseSouce.Services.Services.BOT
                     botCurrent.DiskTotal = model.DiskInfo?.Total ?? 0;
                     botCurrent.DiskUsed = model.DiskInfo?.Used ?? 0;
                     _repository.Update(botCurrent);
-
                 }
 
                 await _unitOfWork.SaveChangesAsync();

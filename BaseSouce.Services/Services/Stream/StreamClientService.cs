@@ -21,6 +21,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using BaseSouce.Services.Services.ValidateLink;
+using BaseSource.ViewModels.ManagerBOT;
 
 namespace BaseSouce.Services.Services.Stream
 {
@@ -361,6 +362,7 @@ namespace BaseSouce.Services.Services.Stream
                     StreamKey = model.StreamKey,
                     UserId = userId,
                     LiveType = model.LiveType,
+                    ManagerBOTId = model.ManagerBOTId > 0 ? model.ManagerBOTId : null,
                     LiveOrder = model.LiveOrder,
                 };
 
@@ -473,25 +475,47 @@ namespace BaseSouce.Services.Services.Stream
                 {
                     return new KeyValuePair<bool, string>(false, "BOT không có hoặc không tồn tại, vui lòng thử lại!");
                 }
-
                 var botId = 0;
                 var botIdString = string.Empty;
-                foreach (var item in userBots)
+                if (streamEntity.ManagerBOTId != null)
                 {
-                    if (item.NumberOfThreadsInRun < item.NumberOfThreads)
+                    foreach (var item in userBots)
                     {
-                        botId = item.BotId;
-                        botIdString = item.BotIdString;
-                        break;
+                        if (item.BotId == streamEntity.ManagerBOTId && item.NumberOfThreadsInRun < item.NumberOfThreads)
+                        {
+                            botId = item.BotId;
+                            botIdString = item.BotIdString;
+                            break;
+                        }
+                    }
+                    if (botId == 0)
+                    {
+                        return new KeyValuePair<bool, string>(false, "BOT không hoạt động hoặc chưa kết nối!");
                     }
                 }
 
+                else
+                {
+
+                    foreach (var item in userBots)
+                    {
+                        if (item.NumberOfThreadsInRun < item.NumberOfThreads)
+                        {
+                            botId = item.BotId;
+                            botIdString = item.BotIdString;
+                            break;
+                        }
+                    }
+                    if (botId == 0)
+                    {
+                        return new KeyValuePair<bool, string>(false, "BOT không hoạt động hoặc chưa kết nối!");
+                    }
+                }
+
+
                 //_logger.LogInformation($"BOT New [botId:[{botId}]- BotIdString:[{botIdString}]]");
 
-                if (botId == 0)
-                {
-                    return new KeyValuePair<bool, string>(false, "BOT không hoạt động hoặc chưa kết nối!");
-                }
+
 
                 //check connection bot
 
@@ -639,7 +663,7 @@ namespace BaseSouce.Services.Services.Stream
                 streamEntity.EndTimeLive = model.EndTimeLive;
                 streamEntity.StreamKey = model.StreamKey;
                 streamEntity.LiveOrder = model.LiveOrder;
-
+                streamEntity.ManagerBOTId = model.ManagerBOTId > 0 ? model.ManagerBOTId : null;
                 _repositoryStream.Update(streamEntity);
 
 
@@ -917,6 +941,23 @@ namespace BaseSouce.Services.Services.Stream
         public Task<KeyValuePair<bool, string>> ValidateLinkAsync(string link)
         {
             return _validateLinkService.ValidateLinkAsync(link);
+        }
+
+        public async Task<List<UserBotDto>> GetBotOfUserAsync(string userId)
+        {
+            var _repository = _unitOfWork.GetRepository<UserManagerBOT>();
+
+            return await _repository.Queryable().AsNoTracking().Include(x => x.ManagerBOT)
+                .Where(x => x.UserId == userId && x.ManagerBOT.Status == ManagerBOTStatus.Connected)
+                .Select(x => new UserBotDto
+                {
+                    BotId = x.ManagerBOTId,
+                    BotName = x.ManagerBOT.Name,
+                    NumberOfThreads = x.NumberOfThreads,
+                    NumberOfThreadsInRun = x.ManagerBOT.StreamHistorys.Where(i => i.Status == StreamStatus.Streaming && i.UserId == userId).Count(),
+                    Type = x.ManagerBOT.LiveType
+                }).ToListAsync();
+
         }
     }
 }

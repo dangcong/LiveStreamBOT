@@ -1,10 +1,12 @@
-﻿@model StreamCreateDto
+﻿@using BaseSource.ViewModels.ManagerBOT;
+@model StreamCreateDto
 @{
     ViewData["Title"] = "Cài đặt LIVE";
     var packageInfo = ViewBag.PackageInfo as PackageLiveUserDto;
     var streamData = ViewBag.StreamData as List<StreamClientInfoDto>;
     var report = ViewBag.Report as StreamReportDto;
     var index = 1;
+    var bots = ViewBag.Bots as List<UserBotDto>;
 
 }
 <section class="section">
@@ -146,6 +148,8 @@
                                 <input type="radio" id="live4k" value="2" name="LiveType" class="custom-control-input">
                                 <label class="custom-control-label" for="live4k">Live 4k</label>
                             </div>
+
+
                             <div class="form-group">
                                 <label>Tên luồng live</label>
                                 <input asp-for="StreamName" placeholder="Đặt tên để gợi nhớ" class="form-control" required="">
@@ -157,6 +161,20 @@
                                     <input type="radio" value="1" id="youtube" checked name="PlatformType" class="custom-control-input">
                                     <label class="custom-control-label" for="youtube">Youtube</label>
                                 </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Chọn BOT<span class="text-danger">(Vui lòng chọn đúng cấu hình BOT - [4k-1080])</span></label>
+                                <select class="form-control select2" asp-for="ManagerBOTId" id="botSelect">
+                                    <option value="0" data-type="1">--Chọn BOT--</option>
+                                    <option value="0" data-type="2">--Chọn BOT--</option>
+                                    @foreach (var item in bots)
+                                    {
+                                        <option value="@item.BotId" data-type="@((int)item.Type)">@item.BotName (@(item.NumberOfThreadsInRun) / @(item.NumberOfThreads))</option>
+                                    }
+                                </select>
+
+                                <span asp-validation-for="ManagerBOTId" class="text-danger"></span>
                             </div>
 
                             @* <div class="custom-control custom-radio custom-control-inline">
@@ -521,7 +539,7 @@
         function myFunction() {
             $('#StartTimeLive').val('');
             $('#EndTimeLive').val('');
-           
+
         }
         //$('body').on('click', '.btnResetTime', function () {
         //    $('#StartTimeLive').val('');
@@ -700,6 +718,47 @@
 
                 //}
             });
+
+            $('body').on('change', 'input[name="LiveType"]', function () {
+                refeshBOT();
+            })
+
+            function refeshBOT() {
+
+                var selectedType = $('input[name="LiveType"]:checked').val()
+                console.log(selectedType);
+                // // Đặt lại select Type
+                // $('#serverSelect').val();
+                // Ẩn tất cả các tùy chọn
+                $('#botSelect option').hide();
+
+                // Hiển thị tùy chọn dựa trên data-server
+                $('#botSelect option[data-type="' + selectedType + '"]').show();
+                // Chọn tùy chọn đầu tiên trong danh sách hiển thị
+                $('#botSelect option[data-type="' + selectedType + '"]').eq(0).prop('selected', true);
+                // Vô hiệu hóa và kích hoạt lại Select2
+
+
+                // Ẩn tất cả các options trong Supplier select
+                $('#botSelect option').each(function () {
+                    if ($(this).data('type') != selectedType) {
+                        $(this).attr('disabled', 'disabled');
+                    } else {
+                        $(this).removeAttr('disabled');
+                    }
+                });
+                $("#botSelect").select2('destroy').val("").select2();
+                setTimeout(function () {
+                    $(".select2-results__option[aria-disabled='true']").remove();
+                }, 500);
+
+            }
+            setTimeout(function () {
+                refeshBOT();
+            }, 500);
+            setInterval(function () {
+                $(".select2-results__option[aria-disabled='true']").remove();
+            }, 100);
         });
     </script>
 }

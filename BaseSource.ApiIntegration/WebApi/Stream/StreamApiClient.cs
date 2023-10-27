@@ -2,6 +2,7 @@
 using BaseSource.ViewModels.Stream;
 using BaseSouce.Shared.Extensions;
 using BaseSource.Shared.Constants;
+using BaseSource.ViewModels.ManagerBOT;
 
 namespace BaseSource.ApiIntegration.WebApi.Stream
 {
@@ -23,6 +24,12 @@ namespace BaseSource.ApiIntegration.WebApi.Stream
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
             return await client.DeleteAsync<ApiResult<string>>($"/api/stream/{id}");
+        }
+
+        public async Task<ApiResult<List<UserBotDto>>> GetBotOfUserAsync()
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            return await client.GetAsync<ApiResult<List<UserBotDto>>>("/api/stream/bots");
         }
 
         public async Task<ApiResult<PagedResult<StreamClientInfoDto>>> GetByFilterAsync(StreamClientRequestDto model)

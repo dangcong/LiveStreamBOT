@@ -34,6 +34,13 @@ namespace BaseSource.AppUI.Controllers
 
             var report = await _streamApiClient.GetReport();
             ViewBag.Report = report.ResultObj;
+
+            var bots = await _streamApiClient.GetBotOfUserAsync();
+            if (bots == null || !bots.IsSuccessed)
+            {
+                return NotFound();
+            }
+            ViewBag.Bots = bots.ResultObj;
             return View();
         }
 
@@ -58,6 +65,12 @@ namespace BaseSource.AppUI.Controllers
                     return NotFound();
                 }
                 ViewBag.PackageInfo = packageInfo.ResultObj;
+                var bots = await _streamApiClient.GetBotOfUserAsync();
+                if (bots == null || !bots.IsSuccessed)
+                {
+                    return NotFound();
+                }
+                ViewBag.Bots = bots.ResultObj;
                 return View(model);
 
             }
@@ -75,7 +88,12 @@ namespace BaseSource.AppUI.Controllers
                     return NotFound();
                 }
                 ViewBag.PackageInfo = packageInfo.ResultObj;
-
+                var bots = await _streamApiClient.GetBotOfUserAsync();
+                if (bots == null || !bots.IsSuccessed)
+                {
+                    return NotFound();
+                }
+                ViewBag.Bots = bots.ResultObj;
                 ModelState.AddModelError("", result?.Message ?? "Không thể tạo luồng stream!");
                 return View(model);
             }
@@ -156,6 +174,12 @@ namespace BaseSource.AppUI.Controllers
             {
                 return NotFound();
             }
+            var bots = await _streamApiClient.GetBotOfUserAsync();
+            if (bots == null || !bots.IsSuccessed)
+            {
+                return NotFound();
+            }
+            ViewBag.Bots = bots.ResultObj;
             return View(result.ResultObj);
         }
 
@@ -175,6 +199,12 @@ namespace BaseSource.AppUI.Controllers
             var result = await _streamApiClient.UpdateAsync(id, model);
             if (result == null || !result.IsSuccessed)
             {
+                var bots = await _streamApiClient.GetBotOfUserAsync();
+                if (bots == null || !bots.IsSuccessed)
+                {
+                    return NotFound();
+                }
+                ViewBag.Bots = bots.ResultObj;
                 ModelState.AddModelError("", result?.Message ?? "Không thể sửa luồng stream!");
                 return View(model);
             }

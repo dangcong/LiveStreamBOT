@@ -52,7 +52,7 @@
                                 <select class="form-control select2" asp-for="ManagerBOTId" id="botSelect">
                                     <option value="0" data-type="1">--Chọn BOT--</option>
                                     <option value="0" data-type="2">--Chọn BOT--</option>
-                            
+
                                     @foreach (var item in bots)
                                     {
                                         <option value="@item.BotId" data-type="@((int)item.Type)">@item.BotName (@(item.NumberOfThreadsInRun) / @(item.NumberOfThreads))</option>
@@ -132,8 +132,13 @@
             $('#EndTimeLive').val('');
         }
         $('body').on('change', 'input[name="LiveType"]', function () {
+            refeshBOT();
+
+        })
+        function refeshBOT() {
+
             var selectedType = $('input[name="LiveType"]:checked').val()
-            console.log(selectedType);
+
             // // Đặt lại select Type
             // $('#serverSelect').val();
             // Ẩn tất cả các tùy chọn
@@ -159,10 +164,10 @@
                 $(".select2-results__option[aria-disabled='true']").remove();
             }, 500);
 
-        })
+        }
         setTimeout(function () {
             refeshBOT();
-        }, 500);
+        }, 1000);
         setInterval(function () {
             $(".select2-results__option[aria-disabled='true']").remove();
         }, 100);

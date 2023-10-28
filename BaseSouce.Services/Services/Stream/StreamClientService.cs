@@ -436,10 +436,6 @@ namespace BaseSouce.Services.Services.Stream
                 var userCurrent = await _repositoryUser.GetFirstOrDefaultAsync(
                     predicate: x => x.Id == userId, disableTracking: true);
 
-                //var streamEntity = await _repositoryStream.GetFirstOrDefaultAsync(
-                //   predicate: x => x.UserId == userId && x.Id == id,
-                //   include: x => x.Include(i => i.ManagerBOT),
-                //   disableTracking: false);
 
                 var streamEntity = await _repositoryStream.Queryable()
                     .Include(x => x.ManagerBOT)
@@ -451,10 +447,6 @@ namespace BaseSouce.Services.Services.Stream
                 {
                     return new KeyValuePair<bool, string>(false, "Luồng không tồn tại, vui lòng thử lại!");
                 }
-
-                //_logger.LogInformation($"Stream Info [streamName:[{streamEntity.StreamName}] " +
-                //  $"- BotName:[{streamEntity.ManagerBOT?.Name}] " +
-                //  $"- Connection:[{streamEntity.ManagerBOT?.ConnectionId}]]");
 
                 var userBots = await _repositoryUserBOT.Queryable()
                     .Include(x => x.ManagerBOT).ThenInclude(i => i.StreamHistorys)
@@ -512,44 +504,6 @@ namespace BaseSouce.Services.Services.Stream
                     }
                 }
 
-
-                //_logger.LogInformation($"BOT New [botId:[{botId}]- BotIdString:[{botIdString}]]");
-
-
-
-                //check connection bot
-
-                //get bot connect 
-                //var botConnect = await _repositoryUserBOT.GetFirstOrDefaultAsync(
-                //    predicate: x => x.UserId == userId && x.ManagerBOT.Status == ManagerBOTStatus.Connected,
-                //    include: x => x.Include(i => i.ManagerBOT),
-                //    selector: x => new
-                //    {
-                //        Status = x.ManagerBOT.Status,
-                //        BotId = x.ManagerBOTId,
-                //        BotStringId = x.ManagerBOT.BotId,
-                //        //ConnectionId = x.ManagerBOT.ConnectionId
-                //    });
-
-                //if (botConnect == null)
-                //{
-                //    return new KeyValuePair<bool, string>(false, "BOT không có hoặc không tồn tại, vui lòng thử lại!");
-                //}
-
-
-                //var botCurrent = await _repositoryBOT.GetFirstOrDefaultAsync(
-                //    predicate: x => x.Id == streamEntity.ManagerBOTId);
-
-                //if (botCurrent == null)
-                //{
-                //    return new KeyValuePair<bool, string>(false, "BOT không tồn tại, vui lòng thử lại!");
-                //}
-
-                //if (botConnect.Status == ManagerBOTStatus.Disconnected)
-                //{
-                //    return new KeyValuePair<bool, string>(false, "BOT đang Disconnect, vui lòng thử lại!");
-                //}
-
                 streamEntity.Status = StreamStatus.Streaming;
                 streamEntity.BotId = botIdString;
                 streamEntity.ManagerBOTId = botId;
@@ -560,11 +514,6 @@ namespace BaseSouce.Services.Services.Stream
                 streamEntity = await _repositoryStream.Queryable()
                     .Include(x => x.ManagerBOT)
                     .Where(x => x.UserId == userId && x.Id == id).FirstOrDefaultAsync();
-
-                //_logger.LogInformation($"Stream Info [streamName:[{streamEntity.StreamName}] " +
-                //    $"- BotName:[{streamEntity.ManagerBOT?.Name}] " +
-                //    $"- Connection:[{streamEntity.ManagerBOT?.ConnectionId}]]");
-
 
                 ///send data to BOT
                 var result = await SendDataToBOTAsync(streamEntity);

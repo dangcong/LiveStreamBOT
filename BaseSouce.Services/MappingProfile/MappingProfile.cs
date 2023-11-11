@@ -38,6 +38,10 @@ namespace BaseSouce.Services.MappingProfile
             CreateMap<ManagerBOT, ManagerBotInfoDto>()
                 .ForMember(dest => dest.TotalUser,
                 options => options.MapFrom(source => source.UserManagerBOTs.DistinctBy(x=>x.UserId).Count()))
+                .ForMember(dest => dest.Manager,
+                options => options.MapFrom(source => source.Manager.UserName))
+                 .ForMember(dest => dest.UserManager,
+                options => options.MapFrom(source => source.UserManager))
                 .ForMember(dest => dest.NumberOfThreadsInRun,
                 options => options.MapFrom(source => source.StreamHistorys.Where(x => x.Status == StreamStatus.Streaming).Count()));
 
@@ -53,6 +57,7 @@ namespace BaseSouce.Services.MappingProfile
                .ForMember(dest => dest.BotGroup, options => options.MapFrom(source => source.ManagerBOT.Group))
                .ForMember(dest => dest.BotName, options => options.MapFrom(source => source.ManagerBOT.Name))
                .ForMember(dest => dest.UserName, options => options.MapFrom(source => source.AppUser.UserName))
+               .ForMember(dest => dest.UserManager, options => options.MapFrom(source => source.AppUser.Manager.UserManager))
                .ForMember(dest => dest.Email, options => options.MapFrom(source => source.AppUser.Email));
             #endregion
 

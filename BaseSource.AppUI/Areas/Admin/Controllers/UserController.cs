@@ -37,7 +37,14 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
                 return NotFound();
 
             }
+            var managers = await _userAdminApiClient.GetAllManager();
+            if (managers == null || !managers.IsSuccessed)
+            {
+                return NotFound();
 
+            }
+
+            ViewBag.Managers = managers.ResultObj;
             ViewBag.Report = report.ResultObj;
             return View(result.ResultObj.Items);
         }
@@ -102,7 +109,7 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> ResetPassword(ResetPasswordAdminDto model)
         {
-            
+
             var result = await _userAdminApiClient.ResetPassword(model);
             if (result == null || !result.IsSuccessed)
             {
@@ -213,19 +220,38 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            var managers = await _userAdminApiClient.GetAllManager();
+            if (managers == null || !managers.IsSuccessed)
+            {
+                return NotFound();
+
+            }
+
+            ViewBag.Managers = managers.ResultObj;
             return View();
         }
 
         [HttpPost]
         public async Task<IActionResult> Create(UserCreateAdminDto model)
         {
+            if (!User.IsInRole("Admin"))
+            {
+                model.UserManager = UserId;
+            }
             var result = await _userAdminApiClient.Create(model);
             if (result == null || !result.IsSuccessed)
             {
+                var managers = await _userAdminApiClient.GetAllManager();
+                if (managers == null || !managers.IsSuccessed)
+                {
+                    return NotFound();
 
-                ModelState.AddModelError("", result?.ResultObj ?? "Tạo mới tài khoản không thành công");
+                }
+
+                ViewBag.Managers = managers.ResultObj;
+                ModelState.AddModelError("", result?.Message ?? "Tạo mới tài khoản không thành công");
                 return View(model);
             }
             return RedirectToAction("Index");
@@ -238,12 +264,12 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             if (result == null || !result.IsSuccessed)
             {
 
-               // ModelState.AddModelError("", result?.ResultObj ?? "Tạo mới tài khoản không thành công");
+                // ModelState.AddModelError("", result?.ResultObj ?? "Tạo mới tài khoản không thành công");
                 return RedirectToAction("Index");
             }
             return RedirectToAction("Index");
         }
 
-       
+
     }
 }

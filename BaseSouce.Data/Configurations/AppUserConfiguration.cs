@@ -42,6 +42,8 @@ namespace BaseSouce.Data.Configurations
                 .WithOne(e => e.User)
                 .HasForeignKey(ur => ur.UserId)
                 .IsRequired();
+
+          
         }
     }
 }

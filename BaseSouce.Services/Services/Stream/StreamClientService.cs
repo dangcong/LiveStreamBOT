@@ -566,8 +566,6 @@ namespace BaseSouce.Services.Services.Stream
                         }
                     }
                 }
-
-
                 return new KeyValuePair<bool, string>(true, string.Empty);
 
             }

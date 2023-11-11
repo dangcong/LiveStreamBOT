@@ -79,6 +79,7 @@ namespace BaseSource.ViewModels.Stream
         public string UserId { get; set; }
         public string UserName { get; set; }
         public string Email { get; set; }
+        public string UserManager { get; set; }
         public int ManagerBOTId { get; set; }
         public string BotId { get; set; }
         public string BotName { get; set; }
@@ -105,7 +106,7 @@ namespace BaseSource.ViewModels.Stream
 
     public class StreamAdminRequestDto : PageQuery
     {
-
+        public string Manager { get; set; }
     }
 
     public class StreamInfoUserDto

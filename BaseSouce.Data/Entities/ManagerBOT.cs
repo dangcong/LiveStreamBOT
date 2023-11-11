@@ -25,8 +25,10 @@ namespace BaseSouce.Data.Entities
         public LiveType? LiveType { get; set; }
 
         public bool IsUsed { get; set; }
-        
+        public string  UserManager { get; set; }
 
+
+        public AppUser Manager { get; set; }
         public ICollection<StreamHistory > StreamHistorys { get; set; }
         public ICollection<UserManagerBOT > UserManagerBOTs { get; set; }
     }

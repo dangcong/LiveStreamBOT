@@ -18,7 +18,7 @@ namespace BaseSource.API.ControllersAdmin
         [Route("/api/admin/users")]
         public async Task<IActionResult> GetAll([FromQuery] UserAdminRequestDto model)
         {
-            var result = await _userAdminService.GetUserByFilterAsync(model);
+            var result = await _userAdminService.GetUserByFilterAsync(UserId, model, IsAdmin);
             return Ok(new ApiSuccessResult<object>(result));
         }
 
@@ -26,7 +26,7 @@ namespace BaseSource.API.ControllersAdmin
         [Route("/api/admin/user/all")]
         public async Task<IActionResult> GetAllUser()
         {
-            var result = await _userAdminService.GetAllAsync();
+            var result = await _userAdminService.GetAllAsync(UserId, IsAdmin);
             return Ok(new ApiSuccessResult<object>(result));
         }
 
@@ -46,7 +46,7 @@ namespace BaseSource.API.ControllersAdmin
         [Route("telegram")]
         public async Task<IActionResult> UpdateTelegam(UpdateTelegramDto model)
         {
-            var result = await _userAdminService.UpdateTelegramUserAsync(model);
+            var result = await _userAdminService.UpdateTelegramUserAsync(model, IsAdmin);
             if (result.Key)
             {
                 return Ok(new ApiSuccessResult<string>(string.Empty));
@@ -175,5 +175,6 @@ namespace BaseSource.API.ControllersAdmin
             }
             return Ok(new ApiErrorResult<string>(result.Value));
         }
+
     }
 }

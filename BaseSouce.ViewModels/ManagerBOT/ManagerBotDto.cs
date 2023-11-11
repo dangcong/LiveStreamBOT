@@ -17,6 +17,7 @@ namespace BaseSource.ViewModels.ManagerBOT
         public string BotId { get; set; }
         public string Name { get; set; }
         public string Group { get; set; }
+
     }
 
     public class ManagerBotUpdateDto : ManagerBotCreateDto
@@ -26,6 +27,7 @@ namespace BaseSource.ViewModels.ManagerBOT
         public int NumberOfThreads { get; set; }
         public int Retry { get; set; }
         public LiveType? LiveType { get; set; }
+        public string UserManager { get; set; }
     }
 
     public class ManagerBotInfoDto
@@ -34,6 +36,8 @@ namespace BaseSource.ViewModels.ManagerBOT
         public string BotId { get; set; }
         public string Name { get; set; }
         public string Group { get; set; }
+        public string Manager { get; set; }
+        public string UserManager { get; set; }
         public ManagerBOTStatus Status { get; set; }
         public DateTime CreatedTime { get; set; }
         public DateTime? DeletedTime { get; set; }
@@ -52,7 +56,7 @@ namespace BaseSource.ViewModels.ManagerBOT
     }
     public class ManagerBOTRequestDto : PageQuery
     {
-
+        public string Manager { get; set; }
     }
 
     public class UserBotDto

@@ -3,6 +3,7 @@
     ViewData["Title"] = "Danh sách người dùng";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
     var report = ViewBag.Report as StreamReportAdminDto;
+    var managers = ViewBag.Managers as List<UserAdminInfoDto>;
     var index = 1;
 }
 <section class="section">
@@ -16,7 +17,7 @@
     </div>
 
     <div class="section-body">
-        <h2 class="section-title">Danh sách người dùng</h2>
+
         <div class=" row">
             <div class="col-lg-12 col-md-12 col-sm-12">
                 <div class="card card-statistic-2">
@@ -71,6 +72,7 @@
                                         <th>STT</th>
                                         <th>Người dùng</th>
                                         <th>Mật khẩu</th>
+                                        <th>Manager</th>
                                         <th>Luồng 1080(Đang chạy/Tổng)</th>
                                         <th>Luồng 4K(Đang chạy/Tổng)</th>
                                         <th>Số BOT</th>
@@ -93,6 +95,7 @@
                                             {
                                                 <td></td>
                                             }
+                                            <td>@item.Manager</td>
                                             <td><span class="badge badge-success">@(item.NumberOfThreads1080InRun)/@(item.NumberOfThreads1080)</span> </td>
                                             <td><span class="badge badge-danger">@(item.NumberOfThreads4KInRun)/@(item.NumberOfThreads4K)</span></td>
                                             <td>@item.TotalBOT</td>
@@ -101,19 +104,20 @@
                                             <td>
                                                 <button class="btn btn-primary btnTelegram" data-tele="@item.LinkTelegram"
                                                         data-id="@item.Id"
+                                                        data-manager="@item.UserManager"
                                                 @*data-toggle="modal" data-target="#telegramModal"*@>
-                                                    Cập nhật ID
+                                                    Edit
                                                 </button>
                                                 <a class="btn btn-success" href="/admin/stream/user?userId=@(item.Id)&username=@(item.UserName)">DS Stream</a>
                                                 <a class="btn btn-success" href="/admin/user/managerBot?userId=@(item.Id)&username=@(item.UserName)">DS BOT</a>
                                                 <button class="btn btn-danger btnDelete" data-id="@item.Id"
                                                 @*data-toggle="modal" data-target="#deleteUserModal"*@>
-                                                    Delete
+                                                    Xóa
                                                 </button>
                                                 <button class="btn btn-warning btnResetPassword"
                                                         data-id="@item.Id"
                                                         data-user="@item.UserName">
-                                                    Reset Mật khẩu
+                                                    Reset Pass
                                                 </button>
                                             </td>
 
@@ -135,7 +139,7 @@
         <div class="modal-content">
             <form method="post" id="formTelegram" action="/admin/User/UpdateTelegram">
                 <div class="modal-header">
-                    <h5 class="modal-title">Cập nhật ID</h5>
+                    <h5 class="modal-title">Cập nhật </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -154,6 +158,24 @@
                             <span class="text-danger"></span>
                         </div>
                     </div>
+                    @if (User.IsInRole("Admin"))
+                    {
+                        <div class="form-group mb-4">
+                            <label class="">Manager <span class="text-danger">(Nếu người dùng là Manager, không chọn dòng này)</span></label>
+                            <div class="">
+                                <div class="">
+                                    <select name="UserManager" required class="form-control select2">
+                                        <option>-- Chọn ---</option>
+                                        @foreach (var item in managers)
+                                        {
+                                            <option value="@item.Id">@item.UserName</option>
+                                        }
+                                    </select>
+
+                                </div>
+                            </div>
+                        </div>
+                    }
                 </div>
                 <div class="modal-footer bg-whitesmoke br">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -292,8 +314,11 @@
 
                 let id = $(this).attr('data-id');
                 let telegrams = $(this).attr('data-tele');
+                let manager = $(this).attr('data-manager');
+                console.log(manager);
                 $('#formTelegram input[name="UserId"]').val(id);
                 $('#formTelegram input[name="Telegram"]').val(telegrams);
+                $('#formTelegram select[name="UserManager"]').val(manager);
             });
 
             $('body').on('click', '.btnResetPassword', function () {

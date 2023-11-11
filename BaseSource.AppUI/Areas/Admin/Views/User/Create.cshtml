@@ -2,6 +2,7 @@
 @{
     ViewData["Title"] = "Tạo mới người dùng";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    var managers = ViewBag.Managers as List<UserAdminInfoDto>;
 }
 <section class="section">
     <div class="section-header">
@@ -30,8 +31,8 @@
                                     <div class="form-group mb-4">
                                         <label class="">UserName</label>
                                         <div class="">
-                                            
-                                            <input asp-for="UserName"  placeholder="Nhập username người dùng" class="form-control" />
+
+                                            <input asp-for="UserName" placeholder="Nhập username người dùng" class="form-control" />
                                             <span asp-validation-for="UserName" class="text-danger"></span>
                                         </div>
                                     </div>
@@ -44,27 +45,45 @@
                                     </div>
 
                                     @*<div class="form-group mb-4">
-                                        <label class="">Số luồng 1080 tối đa</label>
-                                        <div class="">
-                                            <input type="number" min="1" asp-for="NumberOfThreads1080" class="form-control" />
-                                            <span asp-validation-for="NumberOfThreads1080" class="text-danger"></span>
-                                        </div>
+                                    <label class="">Số luồng 1080 tối đa</label>
+                                    <div class="">
+                                    <input type="number" min="1" asp-for="NumberOfThreads1080" class="form-control" />
+                                    <span asp-validation-for="NumberOfThreads1080" class="text-danger"></span>
+                                    </div>
                                     </div>
 
                                     <div class="form-group mb-4">
-                                        <label class="">Số luồng 4k tối đa</label>
-                                        <div class="">
-                                            <input type="number" min="1" asp-for="NumberOfThreads4K" class="form-control" />
-                                            <span asp-validation-for="NumberOfThreads4K" class="text-danger"></span>
-                                        </div>
+                                    <label class="">Số luồng 4k tối đa</label>
+                                    <div class="">
+                                    <input type="number" min="1" asp-for="NumberOfThreads4K" class="form-control" />
+                                    <span asp-validation-for="NumberOfThreads4K" class="text-danger"></span>
+                                    </div>
                                     </div>*@
                                     <div class="form-group mb-4">
                                         <label class="">Telegram</label>
                                         <div class="">
-                                            <input  asp-for="LinkTelegram" class="form-control" />
+                                            <input asp-for="LinkTelegram" class="form-control" />
                                             <span asp-validation-for="LinkTelegram" class="text-danger"></span>
                                         </div>
                                     </div>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <div class="form-group mb-4">
+                                            <label class="">Managers</label>
+                                            <div class="">
+                                                <select class="form-control select2" required asp-for="UserManager" >
+                                                    <option value="">-- Chọn Manager --</option>
+                                                   @foreach (var item in managers)
+                                                    {
+                                                        <option value="@item.Id">@item.UserName</option>
+                                                    }
+                                                </select>
+                                            
+                                                <span asp-validation-for="UserManager" class="text-danger"></span>
+                                            </div>
+                                        </div>
+                                    }
+
                                 </div>
 
                             </div>

@@ -103,6 +103,7 @@ namespace BaseSouce.Services.Services.BOT
                         RAM = model.RamUsage,
                         DiskTotal = model.DiskInfo.Total,
                         DiskUsed = model.DiskInfo.Used,
+                        //UserManager = model.UserManager,
 
                     });
                 }
@@ -159,6 +160,7 @@ namespace BaseSouce.Services.Services.BOT
                 }
                 botCurrent.DeletedTime = DateTime.Now;
                 botCurrent.Status = ManagerBOTStatus.Disconnected;
+                botCurrent.UserManager = null;
                 _repository.Update(botCurrent);
 
                 //remove thread of users
@@ -233,17 +235,29 @@ namespace BaseSouce.Services.Services.BOT
             }
         }
 
-        public async Task<IPagedList<ManagerBotInfoDto>> GetBOTByFilterAsync(ManagerBOTRequestDto model)
+        public async Task<IPagedList<ManagerBotInfoDto>> GetBOTByFilterAsync(string userId, ManagerBOTRequestDto model, bool isAdmin = false)
         {
             var _repositoryUserBot = _unitOfWork.GetRepository<UserManagerBOT>();
 
             var _repository = _unitOfWork.GetRepository<Data.Entities.ManagerBOT>();
             var query = _repository.Queryable().AsNoTracking();
             query = query.Where(x => x.DeletedTime == null);
+            if (!isAdmin)
+            {
+                query = query.Where(x => x.UserManager == userId);
+            }
+            else
+            {
+                if (!string.IsNullOrWhiteSpace(model.Manager))
+                {
+                    query = query.Where(x => x.UserManager == model.Manager);
+                }
+            }
+
             var data = await _repository.GetStagesPagedListAsync(
                 stages: query,
                 selector: x => _mapper.Map<ManagerBotInfoDto>(x),
-                include: x => x.Include(i => i.StreamHistorys).Include(i => i.UserManagerBOTs),
+                include: x => x.Include(i => i.StreamHistorys).Include(x => x.Manager).Include(i => i.UserManagerBOTs),
                 orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                 pageIndex: model.Page, pageSize: model.PageSize);
 
@@ -330,11 +344,14 @@ namespace BaseSouce.Services.Services.BOT
 
         }
 
-        public async Task<KeyValuePair<bool, string>> UpdateBOTAsync(int id, ManagerBotUpdateDto model)
+        public async Task<KeyValuePair<bool, string>> UpdateBOTAsync(int id, ManagerBotUpdateDto model, bool isAdmin = false)
         {
             try
             {
                 var _repository = _unitOfWork.GetRepository<ManagerBOT>();
+
+                var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
+                var _repositoryUserBot = _unitOfWork.GetRepository<UserManagerBOT>();
 
                 var botCurrent = await _repository.GetFirstOrDefaultAsync(
                     predicate: x => x.Id == id, disableTracking: false);
@@ -354,6 +371,40 @@ namespace BaseSouce.Services.Services.BOT
                 botCurrent.NumberOfThreads = model.NumberOfThreads;
                 botCurrent.UpdatedTime = DateTime.Now;
                 botCurrent.LiveType = model.LiveType;
+
+                if (isAdmin)
+                {
+                    if (string.IsNullOrWhiteSpace(botCurrent.UserManager))
+                    {
+                        botCurrent.UserManager = model.UserManager;
+                    }
+                    else if (botCurrent.UserManager != model.UserManager)
+                    {
+                        botCurrent.UserManager = model.UserManager;
+                        //stop all streams
+                        var userOfBots = await _repositoryUserBot.Queryable()
+                            .Where(x => x.ManagerBOTId == botCurrent.Id).ToListAsync();
+
+                        if (userOfBots.Any())
+                        {
+                            var streamsCurrents = await _repositoryStream.Queryable()
+                                .Where(x => x.ManagerBOTId == botCurrent.Id).ToListAsync();
+
+                            if (streamsCurrents.Any())
+                            {
+                                foreach (var item in streamsCurrents)
+                                {
+                                    item.Status = StreamStatus.Stop;
+                                    item.ManagerBOTId = null;
+                                }
+                                _repositoryStream.Update(streamsCurrents);
+                            }
+                            _repositoryUserBot.Delete(userOfBots);
+                            //
+                        }
+                    }
+                }
+
 
                 _repository.Update(botCurrent);
 

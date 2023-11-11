@@ -3,7 +3,9 @@
     ViewData["Title"] = "Danh sách BOT";
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
     var report = ViewBag.Report as StreamReportAdminDto;
+    var managers = ViewBag.Managers as List<UserAdminInfoDto>;
     var index = 1;
+
 }
 
 <section class="section">
@@ -61,7 +63,7 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                        <h4>@ViewData["Title"]</h4>
+                   
 
                     </div>
                     <div class="card-body">
@@ -73,6 +75,7 @@
                                         <th>BotID</th>
                                         <th>Loại</th>
                                         <th>Name</th>
+                                        <th>Manager</th>
                                         <th>Group</th>
                                         <th>Status</th>
                                         <th>Ngày tạo</th>
@@ -103,8 +106,20 @@
                                                 }
                                             </td>
                                             <td>@item.Name</td>
+                                            <td>@item.Manager</td>
                                             <td>@item.Group</td>
-                                            <td>@item.Status</td>
+                                            <td>
+                                                @switch (item.Status)
+                                                {
+                                                    case ManagerBOTStatus.Connected:
+                                                        <span class="badge badge-success">Connected</span>
+                                                        break;
+                                                    case ManagerBOTStatus.Disconnected:
+                                                        <span class="badge badge-danger">Connected</span>
+                                                        break;
+                                                }
+                                                @item.Status
+                                            </td>
                                             <td>@item.CreatedTime.ToString("dd/MM/yyyy HH:mm:ss")</td>
                                             <td><span>@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads)</span> </td>
                                             <td>@item.TotalUser</td>
@@ -114,11 +129,10 @@
                                             <td><span class="badge badge-success">@((item.DiskUsed / 1024.0 / 1024 / 1024).ToString("n2"))GB/@((item.DiskTotal / 1024.0 / 1024 / 1024).ToString("n2"))GB</span></td>
                                             <td>
                                                 <a class="btn btn-info" href="/admin/bot/group?id=@(item.Id)">DS User</a>
-                                                <a class="btn btn-primary" href="/admin/bot/edit/@(item.Id)">Sửa</a>
+                                                @*  <a class="btn btn-primary" href="/admin/bot/edit/@(item.Id)">Sửa</a> *@
                                                 @if (item.IsUsed)
                                                 {
                                                     <button class="btn btn-danger btn-stop"
-                                                    @*data-toggle="modal" data-target="#stopModal"*@
                                                             data-id="@item.Id">
                                                         Stop
                                                     </button>
@@ -131,10 +145,23 @@
                                                         Start
                                                     </button>
                                                 }
-                                                <button class="btn btn-danger btn-Delete"
-                                                @*data-toggle="modal" data-target="#deleteModal" *@
+                                                @if (User.IsInRole("Admin"))
+                                                {
+                                                    <button class="btn btn-danger btn-Delete"
+                                                    @*data-toggle="modal" data-target="#deleteModal" *@
+                                                            data-id="@item.Id">
+                                                        Xóa
+                                                    </button>
+                                                }
+
+                                                <button class="btn btn-warning btn-Edit"
+                                                        data-name="@item.Name"
+                                                        data-group="@item.Group"
+                                                        data-manager="@item.UserManager"
+                                                        data-type="@((int?)item.LiveType)"
                                                         data-id="@item.Id">
-                                                    Xóa
+
+                                                    Edit
                                                 </button>
                                             </td>
                                         </tr>
@@ -169,6 +196,91 @@
                 </form>
 
             </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" tabindex="-1" role="dialog" id="editModal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Cập nhật BOT </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form method="post" action="/admin/bot/edit" id="formEdit">
+                <div class="modal-body">
+
+                    <div class="row">
+
+                        <div class="col-12">
+
+                            <div class="form-group mb-4">
+                                <label class="">Tên BOT</label>
+                                <div class="">
+                                    <input name="Id" type="hidden" />
+                                    <input name="Name" required value="" placeholder="Tên BOT" class="form-control" />
+
+                                </div>
+                            </div>
+                            <div class="form-group mb-4">
+                                <label class="">Group</label>
+                                <div class="">
+                                    <input name="Group" value="" placeholder="Group" class="form-control" />
+                                </div>
+                            </div>
+                            <div class="form-group mb-4">
+                                <label class="">Chọn loại</label>
+                                <div class="">
+                                    <select name="LiveType" required class="form-control">
+                                        <option>-- Chọn ---</option>
+                                        <option value="1">Loại 1080</option>
+                                        <option value="2">Loại 4K</option>
+                                    </select>
+
+                                </div>
+                            </div>
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <div class="form-group mb-4">
+                                    <label class="">Manager</label>
+                                    <div class="">
+                                        <div class="">
+                                            <select name="UserManager" required class="form-control select2">
+                                                <option>-- Chọn ---</option>
+                                                @foreach (var item in managers)
+                                                {
+                                                    <option value="@item.Id">@item.UserName</option>
+                                                }
+                                            </select>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+
+
+                        </div>
+
+                    </div>
+                    @*  <div class="form-group row mb-4">
+                    <label class="col-form-label text-md-right col-12 col-md-4 col-lg-4"></label>
+                    <div class="buttons col-sm-12 col-md-8">
+                    @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                    <button type="submit" class="btn btn-info btn-lg btn-icon btn-setting"><i class="fas fa-check"></i>&ensp;Cập nhật</button>
+                    </div>
+                    </div> *@
+
+                </div>
+                <div class="modal-footer bg-whitesmoke br">
+
+                    <input name="Id" type="hidden" />
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger">Xác nhận </button>
+
+
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -244,6 +356,17 @@
                 $('#deleteForm input[name="Id"]').val(id);
 
             });
+            $('body').on('click', '.btn-Edit', function () {
+                console.log('click');
+                $('#editModal').modal('show');
+                $('#formEdit input[name="Id"]').val($(this).attr('data-id'));
+                $('#formEdit input[name="Name"]').val($(this).attr('data-name'));
+                $('#formEdit input[name="Group"]').val($(this).attr('data-group'));
+                $('#formEdit select[name="LiveType"]').val($(this).attr('data-type'));
+                $('#formEdit select[name="UserManager"]').val($(this).attr('data-manager'));
+                // let id = $(this).attr('data-id');
+                // $('#deleteForm input[name="Id"]').val(id);
+            })
         });
     </script>
 }

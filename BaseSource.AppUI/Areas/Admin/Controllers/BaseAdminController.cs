@@ -5,7 +5,7 @@ using System.Security.Claims;
 
 namespace BaseSource.AppUI.Areas.Admin.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Manager")]
     [Area("Admin")]
     public class BaseAdminController : Controller
     {

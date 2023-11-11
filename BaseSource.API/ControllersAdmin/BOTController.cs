@@ -18,7 +18,7 @@ namespace BaseSource.API.ControllersAdmin
         [Route("/api/admin/bots")]
         public async Task<IActionResult> GetAll([FromQuery] ManagerBOTRequestDto model)
         {
-            var result = await _managerBOTService.GetBOTByFilterAsync(model);
+            var result = await _managerBOTService.GetBOTByFilterAsync(UserId, model, IsAdmin);
             return Ok(new ApiSuccessResult<IPagedList<ManagerBotInfoDto>>(result));
         }
 
@@ -46,7 +46,7 @@ namespace BaseSource.API.ControllersAdmin
         [Route("{id:int:min(1)}")]
         public async Task<IActionResult> Update(int id, [FromBody] ManagerBotUpdateDto model)
         {
-            var result = await _managerBOTService.UpdateBOTAsync(id, model);
+            var result = await _managerBOTService.UpdateBOTAsync(id, model, IsAdmin);
             if (result.Key)
             {
                 return Ok(new ApiSuccessResult<string>(string.Empty));
@@ -69,9 +69,9 @@ namespace BaseSource.API.ControllersAdmin
             var result = await _managerBOTService.DeleteAsync(id);
             if (result.Key)
             {
-                 return Ok(new ApiSuccessResult<string>(string.Empty));
+                return Ok(new ApiSuccessResult<string>(string.Empty));
             }
-           return Ok(new ApiErrorResult<string>(string.Empty));
+            return Ok(new ApiErrorResult<string>(string.Empty));
         }
     }
 }

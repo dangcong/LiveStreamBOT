@@ -17,7 +17,7 @@ namespace BaseSource.API.ControllersAdmin
         [Route("/api/admin/streams")]
         public async Task<IActionResult> GetAll([FromQuery] StreamAdminRequestDto model)
         {
-            var result = await _streamAdminService.GetByFilterAsync(model);
+            var result = await _streamAdminService.GetByFilterAsync(UserId, model, IsAdmin);
             return Ok(new ApiSuccessResult<object>(result));
         }
 
@@ -28,7 +28,7 @@ namespace BaseSource.API.ControllersAdmin
             var result = await _streamAdminService.GetStreamByIdAsync(id);
             return Ok(new ApiSuccessResult<object>(result));
         }
-        
+
         [HttpGet]
         [Route("bot/{id:int:min(1)}")]
         public async Task<IActionResult> GetAllByBotId(int id)
@@ -50,7 +50,7 @@ namespace BaseSource.API.ControllersAdmin
         [Route("report")]
         public async Task<IActionResult> GetReportStream()
         {
-            var result = await _streamAdminService.GetReportStreamAsync();
+            var result = await _streamAdminService.GetReportStreamAsync(UserId,IsAdmin);
             return Ok(new ApiSuccessResult<object>(result));
 
         }

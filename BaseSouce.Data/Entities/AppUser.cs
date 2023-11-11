@@ -1,6 +1,6 @@
 ﻿using BaseSource.Data.Entities;
 using Microsoft.AspNetCore.Identity;
-
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BaseSouce.Data.Entities
 {
@@ -19,6 +19,11 @@ namespace BaseSouce.Data.Entities
         public DateTime? DeletedTime { get; set; }
         public DateTime? UpdatedTime { get; set; }
         public string UserUpdate { get; set; }
+        public string UserManager { get; set; }
+
+        [ForeignKey("UserManager")]
+
+        public AppUser Manager { get; set; }
 
         public ICollection<AppUserRole> UserRoles { get; set; }
         public ICollection<AppUserClaim> Claims { get; set; }
@@ -31,5 +36,6 @@ namespace BaseSouce.Data.Entities
         public ICollection<ManagerGroup> UserGroups { get; set; }
 
         public ICollection<UserManagerBOT> UserManagerBOTs { get; set; }
+        public ICollection<ManagerBOT> ManagerBOTs { get; set; }
     }
 }

@@ -44,7 +44,15 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
 
             }
 
+            var managers = await _userAdminApiClient.GetAllManager();
+            if (managers == null || !managers.IsSuccessed)
+            {
+                return NotFound();
+
+            }
+
             ViewBag.Report = report.ResultObj;
+            ViewBag.Managers = managers.ResultObj;
             return View(result.ResultObj);
         }
 

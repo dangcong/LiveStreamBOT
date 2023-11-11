@@ -58,7 +58,7 @@ namespace BaseSource.Data.Migrations
                         new
                         {
                             Id = "c1105ce5-9dbc-49a9-a7d5-c963b6daa62a",
-                            ConcurrencyStamp = "de6e3578-4f6a-478e-a649-b4341395affd",
+                            ConcurrencyStamp = "0c2f9968-1d1f-403c-ba19-bfa692bc4c2a",
                             Description = "Administrator role",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -170,6 +170,9 @@ namespace BaseSource.Data.Migrations
                     b.Property<DateTime?>("UpdatedTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserManager")
+                        .HasColumnType("nvarchar(128)");
+
                     b.Property<string>("UserName")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -187,6 +190,8 @@ namespace BaseSource.Data.Migrations
                         .HasDatabaseName("UserNameIndex")
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
+                    b.HasIndex("UserManager");
+
                     b.ToTable("AppUsers", (string)null);
 
                     b.HasData(
@@ -194,7 +199,7 @@ namespace BaseSource.Data.Migrations
                         {
                             Id = "ffded6b0-3769-4976-841b-69459049a62d",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "bdff738a-f320-4925-a2e8-faf72c8a2f93",
+                            ConcurrencyStamp = "1859981f-329c-410b-b450-3e9c5d99fa53",
                             CreatedTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
@@ -203,7 +208,7 @@ namespace BaseSource.Data.Migrations
                             NormalizedUserName = "superadmin",
                             NumberOfThreads1080Create = 0,
                             NumberOfThreads4KCreate = 0,
-                            PasswordHash = "AQAAAAEAACcQAAAAEGgFyGg5ZgQ17h6KNA0E43VqjNNhEP01T5aTSFH7ncTN//jB1fYUV9X9K3Rbrr3ZWQ==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEKBhoxUH87PfWTQkSXOqCBG85wZ6LilsOzK82vOYnvKuXLfmeHEfP9bjJ7eHUWUTvw==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -358,7 +363,12 @@ namespace BaseSource.Data.Migrations
                     b.Property<DateTime?>("UpdatedTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("UserManager")
+                        .HasColumnType("nvarchar(128)");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("UserManager");
 
                     b.ToTable("ManagerBOTs", (string)null);
                 });
@@ -704,6 +714,15 @@ namespace BaseSource.Data.Migrations
                     b.Navigation("Role");
                 });
 
+            modelBuilder.Entity("BaseSouce.Data.Entities.AppUser", b =>
+                {
+                    b.HasOne("BaseSouce.Data.Entities.AppUser", "Manager")
+                        .WithMany()
+                        .HasForeignKey("UserManager");
+
+                    b.Navigation("Manager");
+                });
+
             modelBuilder.Entity("BaseSouce.Data.Entities.AppUserClaim", b =>
                 {
                     b.HasOne("BaseSouce.Data.Entities.AppUser", "User")
@@ -754,6 +773,15 @@ namespace BaseSource.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("BaseSouce.Data.Entities.ManagerBOT", b =>
+                {
+                    b.HasOne("BaseSouce.Data.Entities.AppUser", "Manager")
+                        .WithMany("ManagerBOTs")
+                        .HasForeignKey("UserManager");
+
+                    b.Navigation("Manager");
                 });
 
             modelBuilder.Entity("BaseSouce.Data.Entities.Order", b =>
@@ -843,6 +871,8 @@ namespace BaseSource.Data.Migrations
                     b.Navigation("AppUserLogins");
 
                     b.Navigation("Claims");
+
+                    b.Navigation("ManagerBOTs");
 
                     b.Navigation("ManagerGroups");
 

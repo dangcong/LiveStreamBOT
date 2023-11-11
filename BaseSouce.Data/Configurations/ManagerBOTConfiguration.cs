@@ -11,7 +11,7 @@ namespace BaseSouce.Data.Configurations
             builder.ToTable("ManagerBOTs");
 
             builder.HasKey(x => x.Id);
-
+            builder.HasOne(x => x.Manager).WithMany(x => x.ManagerBOTs).HasForeignKey(x => x.UserManager);
         }
     }
 }

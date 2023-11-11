@@ -26,11 +26,14 @@ namespace BaseSource.ViewModels.UserAdmin
         public int TotalBOT { get; set; }
         public DateTime? UpdatedTime { get; set; }
         public string UserUpdate { get; set; }
+        public string UserManager { get; set; }
+        public string Manager { get; set; }
     }
     public class UserAdminRequestDto : PageQuery
     {
         public string UserName { get; set; }
         public bool IsOrder { get; set; }
+        public string Manager { get; set; }
     }
     public class UserGroupDto
     {
@@ -87,6 +90,7 @@ namespace BaseSource.ViewModels.UserAdmin
         public int NumberOfThreads1080 { get; set; }
         public int NumberOfThreads4K { get; set; }
         public string LinkTelegram { get; set; }
+        public string UserManager { get; set; }
     }
     public class UserManagerBotUpdateDto
     {
@@ -108,5 +112,6 @@ namespace BaseSource.ViewModels.UserAdmin
     {
         public string UserId { get; set; }
         public string Telegram { get; set; }
+        public string UserManager { get; set; }
     }
 }

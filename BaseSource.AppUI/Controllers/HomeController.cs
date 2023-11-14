@@ -22,9 +22,9 @@ namespace BaseSource.AppUI.Controllers
         [Authorize]
         public IActionResult Index()
         {
-            if (User.IsInRole("Admin"))
+            if (User.IsInRole("Admin") || User.IsInRole("Manager"))
             {
-                return Redirect("/admin");
+                return Redirect("/admin/user/index");
             }
             return Redirect("/stream/create");
 

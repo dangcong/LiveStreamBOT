@@ -71,10 +71,10 @@
                                     <tr>
                                         <th>STT</th>
                                         <th>BotID</th>
+                                        <th>Action</th>
                                         <th>Manager</th>
                                         <th>Loại</th>
                                         <th>Name</th>
-
                                         <th>Group</th>
                                         <th>Status</th>
                                         <th>Ngày tạo</th>
@@ -84,7 +84,7 @@
                                         <th>RAM</th>
                                         <th>Bandwidth</th>
                                         <th>Space</th>
-                                        <th>Action</th>
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -93,40 +93,6 @@
                                         <tr>
                                             <td>@(index++)</td>
                                             <td> <span class="text-sm" style="font-size:10px">@item.BotId</span></td>
-                                            <td>@item.Manager</td>
-                                            <td>
-                                                @switch (item.LiveType)
-                                                {
-                                                    case LiveType._1080:
-                                                        <span class="badge badge-success">1080</span>
-                                                        break;
-                                                    case LiveType._4K:
-                                                        <span class="badge badge-danger">4k</span>
-                                                        break;
-                                                }
-                                            </td>
-                                            <td>@item.Name</td>
-
-                                            <td>@item.Group</td>
-                                            <td>
-                                                @switch (item.Status)
-                                                {
-                                                    case ManagerBOTStatus.Connected:
-                                                        <span class="badge badge-success">Connected</span>
-                                                        break;
-                                                    case ManagerBOTStatus.Disconnected:
-                                                        <span class="badge badge-danger">Disconnected</span>
-                                                        break;
-                                                }
-                                                
-                                            </td>
-                                            <td>@item.CreatedTime.ToString("dd/MM/yyyy HH:mm:ss")</td>
-                                            <td><span>@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads)</span> </td>
-                                            <td>@item.TotalUser</td>
-                                            <td>@((item.CPU * 100).ToString("n2"))%</td>
-                                            <td>@((item.RAM * 100).ToString("n2"))%</td>
-                                            <td>@item.Bandwidth.ToString("n2") KB/s</td>
-                                            <td><span class="badge badge-success">@((item.DiskUsed / 1024.0 / 1024 / 1024).ToString("n2"))GB/@((item.DiskTotal / 1024.0 / 1024 / 1024).ToString("n2"))GB</span></td>
                                             <td>
                                                 <a class="btn btn-info" href="/admin/bot/group?id=@(item.Id)">DS User</a>
                                                 @*  <a class="btn btn-primary" href="/admin/bot/edit/@(item.Id)">Sửa</a> *@
@@ -164,6 +130,41 @@
                                                     Edit
                                                 </button>
                                             </td>
+                                            <td>@item.Manager</td>
+                                            <td>
+                                                @switch (item.LiveType)
+                                                {
+                                                    case LiveType._1080:
+                                                        <span class="badge badge-success">1080</span>
+                                                        break;
+                                                    case LiveType._4K:
+                                                        <span class="badge badge-danger">4k</span>
+                                                        break;
+                                                }
+                                            </td>
+                                            <td>@item.Name</td>
+
+                                            <td>@item.Group</td>
+                                            <td>
+                                                @switch (item.Status)
+                                                {
+                                                    case ManagerBOTStatus.Connected:
+                                                        <span class="badge badge-success">Connected</span>
+                                                        break;
+                                                    case ManagerBOTStatus.Disconnected:
+                                                        <span class="badge badge-danger">Disconnected</span>
+                                                        break;
+                                                }
+
+                                            </td>
+                                            <td>@item.CreatedTime.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                                            <td><span>@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads)</span> </td>
+                                            <td>@item.TotalUser</td>
+                                            <td>@((item.CPU * 100).ToString("n2"))%</td>
+                                            <td>@((item.RAM * 100).ToString("n2"))%</td>
+                                            <td>@item.Bandwidth.ToString("n2") KB/s</td>
+                                            <td><span class="badge badge-success">@((item.DiskUsed / 1024.0 / 1024 / 1024).ToString("n2"))GB/@((item.DiskTotal / 1024.0 / 1024 / 1024).ToString("n2"))GB</span></td>
+
                                         </tr>
 
                                     }

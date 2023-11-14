@@ -70,6 +70,7 @@
                                 <thead>
                                     <tr>
                                         <th>STT</th>
+                                        <th>Action</th>
                                         <th>Vai trò</th>
                                         <th>Người dùng</th>
                                         <th>Mật khẩu</th>
@@ -79,7 +80,7 @@
                                         <th>Số BOT</th>
                                         <th>Telegram</th>
                                         <th>Teleram QL</th>
-                                        <th>Action</th>
+
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -87,6 +88,25 @@
                                     {
                                         <tr>
                                             <td>@(index++)</td>
+                                            <td>
+                                                <button class="btn btn-primary btnTelegram" data-tele="@item.LinkTelegram"
+                                                        data-id="@item.Id"
+                                                        data-manager="@item.UserManager"
+                                                @*data-toggle="modal" data-target="#telegramModal"*@>
+                                                    Edit
+                                                </button>
+                                                <a class="btn btn-success" href="/admin/stream/user?userId=@(item.Id)&username=@(item.UserName)">DS Stream</a>
+                                                <a class="btn btn-success" href="/admin/user/managerBot?userId=@(item.Id)&username=@(item.UserName)">DS BOT</a>
+                                                <button class="btn btn-danger btnDelete" data-id="@item.Id"
+                                                @*data-toggle="modal" data-target="#deleteUserModal"*@>
+                                                    Xóa
+                                                </button>
+                                                <button class="btn btn-warning btnResetPassword"
+                                                        data-id="@item.Id"
+                                                        data-user="@item.UserName">
+                                                    Reset Pass
+                                                </button>
+                                            </td>
                                             <td>
                                                 @if (item.Roles.Any(x => x == "Admin"))
                                                 {
@@ -116,25 +136,7 @@
                                             <td>@item.TotalBOT</td>
                                             <td><span class="badge badge-primary">@item.TelegramAPI</span></td>
                                             <td><span class="badge badge-danger">@item.LinkTelegram</span></td>
-                                            <td>
-                                                <button class="btn btn-primary btnTelegram" data-tele="@item.LinkTelegram"
-                                                        data-id="@item.Id"
-                                                        data-manager="@item.UserManager"
-                                                @*data-toggle="modal" data-target="#telegramModal"*@>
-                                                    Edit
-                                                </button>
-                                                <a class="btn btn-success" href="/admin/stream/user?userId=@(item.Id)&username=@(item.UserName)">DS Stream</a>
-                                                <a class="btn btn-success" href="/admin/user/managerBot?userId=@(item.Id)&username=@(item.UserName)">DS BOT</a>
-                                                <button class="btn btn-danger btnDelete" data-id="@item.Id"
-                                                @*data-toggle="modal" data-target="#deleteUserModal"*@>
-                                                    Xóa
-                                                </button>
-                                                <button class="btn btn-warning btnResetPassword"
-                                                        data-id="@item.Id"
-                                                        data-user="@item.UserName">
-                                                    Reset Pass
-                                                </button>
-                                            </td>
+
 
                                         </tr>
                                     }

@@ -228,7 +228,7 @@ namespace BaseSouce.Services.Services.UserAdmin
             {
                 query = query.Where(x => x.UserManager == userId || x.Id == userId);
             }
-            return await _repository.Queryable().AsNoTracking().Where(x => x.DeletedTime == null)
+            return await query.Where(x => x.DeletedTime == null)
                 .Select(x => new UserAdminInfoDto
                 {
                     Id = x.Id,

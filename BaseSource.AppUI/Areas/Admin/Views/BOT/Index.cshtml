@@ -63,8 +63,6 @@
             <div class="col-12">
                 <div class="card">
                     <div class="card-header">
-                   
-
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">
@@ -73,9 +71,10 @@
                                     <tr>
                                         <th>STT</th>
                                         <th>BotID</th>
+                                        <th>Manager</th>
                                         <th>Loại</th>
                                         <th>Name</th>
-                                        <th>Manager</th>
+
                                         <th>Group</th>
                                         <th>Status</th>
                                         <th>Ngày tạo</th>
@@ -94,6 +93,7 @@
                                         <tr>
                                             <td>@(index++)</td>
                                             <td> <span class="text-sm" style="font-size:10px">@item.BotId</span></td>
+                                            <td>@item.Manager</td>
                                             <td>
                                                 @switch (item.LiveType)
                                                 {
@@ -106,7 +106,7 @@
                                                 }
                                             </td>
                                             <td>@item.Name</td>
-                                            <td>@item.Manager</td>
+
                                             <td>@item.Group</td>
                                             <td>
                                                 @switch (item.Status)
@@ -115,10 +115,10 @@
                                                         <span class="badge badge-success">Connected</span>
                                                         break;
                                                     case ManagerBOTStatus.Disconnected:
-                                                        <span class="badge badge-danger">Connected</span>
+                                                        <span class="badge badge-danger">Disconnected</span>
                                                         break;
                                                 }
-                                                @item.Status
+                                                
                                             </td>
                                             <td>@item.CreatedTime.ToString("dd/MM/yyyy HH:mm:ss")</td>
                                             <td><span>@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads)</span> </td>

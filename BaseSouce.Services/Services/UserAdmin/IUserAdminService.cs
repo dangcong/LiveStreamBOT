@@ -7,7 +7,9 @@ namespace BaseSouce.Services.Services.UserAdmin
     {
         Task<IPagedList<UserAdminInfoDto>> GetUserByFilterAsync(string userId, UserAdminRequestDto model, bool isAdmin = false);
         Task<KeyValuePair<bool, string>> UpdateManagerAsync(string userName);
+        Task<KeyValuePair<bool, string>> UpdateAdminAsync(string userName);
         Task<List<UserAdminInfoDto>> GetUserManagerAsync();
+        Task<List<UserAdminInfoDto>> GetUserAdminAsync();
         Task<KeyValuePair<bool, string>> UpdateUserGroupAsync(UserGroupAddDto model);
         Task<List<UserGroupDto>> GetAllUserOfManagerAsync(string userId);
         Task<KeyValuePair<bool, string>> ResetPassowrdAsync(ResetPasswordAdminDto model);

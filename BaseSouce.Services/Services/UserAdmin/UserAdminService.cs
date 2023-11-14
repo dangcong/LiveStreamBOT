@@ -1,13 +1,18 @@
 ﻿using BaseSouce.Data.EF;
 using BaseSouce.Data.Entities;
+using BaseSouce.Services.HubServices;
 using BaseSouce.Services.Services.Stream;
 using BaseSouce.Shared.Enums;
 using BaseSouce.Shared.Helpers;
+using BaseSouce.SharedSignalrData.Classes;
+using BaseSouce.SharedSignalrData.Enums;
+using BaseSouce.SharedSignalrData.Interfaces;
 using BaseSource.Data.Entities;
 using BaseSource.ViewModels.UserAdmin;
 using EFCore.UnitOfWork;
 using EFCore.UnitOfWork.PageList;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -19,14 +24,17 @@ namespace BaseSouce.Services.Services.UserAdmin
         private readonly RoleManager<AppRole> _roleManager;
         private readonly ILogger<UserAdminService> _logger;
         private readonly IStreamClientService _streamClientService;
+        private readonly IHubContext<BotHub, IBotClientHub> _botContextHub;
         public UserAdminService(IUnitOfWork<BaseSourceDbContext> unitOfWork,
              RoleManager<AppRole> roleManager, ILogger<UserAdminService> logger
-            , IStreamClientService streamClientService)
+            , IStreamClientService streamClientService
+            , IHubContext<BotHub, IBotClientHub> botContextHub)
         {
             _unitOfWork = unitOfWork;
             _roleManager = roleManager;
             _logger = logger;
             _streamClientService = streamClientService;
+            _botContextHub = botContextHub;
 
 
         }
@@ -218,7 +226,7 @@ namespace BaseSouce.Services.Services.UserAdmin
             var query = _repository.Queryable().AsNoTracking();
             if (!isAdmin)
             {
-                query = query.Where(x => x.UserManager == userId);
+                query = query.Where(x => x.UserManager == userId || x.Id == userId);
             }
             return await _repository.Queryable().AsNoTracking().Where(x => x.DeletedTime == null)
                 .Select(x => new UserAdminInfoDto
@@ -261,6 +269,7 @@ namespace BaseSouce.Services.Services.UserAdmin
                     UserName = x.User.UserName,
                     LiveType = x.LiveType,
                     BotId = x.ManagerBOTId,
+                    Group = x.ManagerBOT.Group,
                     NumberOfThreadsInRun = x.ManagerBOT.StreamHistorys.Where(x => x.UserId == userId && x.Status == StreamStatus.Streaming).Count()
                 }).ToListAsync();
         }
@@ -307,7 +316,8 @@ namespace BaseSouce.Services.Services.UserAdmin
                     UpdatedTime = x.UpdatedTime,
                     UserUpdate = x.UserUpdate,
                     UserManager = x.UserManager,
-                    Manager = x.Manager.UserName
+                    Manager = x.Manager.UserName,
+                    Roles = x.UserRoles.Select(x => x.Role.Name).ToList()
                 }, include: x => x.Include(i => i.StreamHistorys).Include(i => i.UserManagerBOTs).ThenInclude(o => o.ManagerBOT),
                 orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                 pageIndex: model.Page, pageSize: model.PageSize);
@@ -334,6 +344,32 @@ namespace BaseSouce.Services.Services.UserAdmin
                     LinkTelegram = x.LinkTelegram,
                     NumberOfThreads1080 = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._1080).Sum(i => i.NumberOfThreads),
                     NumberOfThreads4K = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._4K).Sum(i => i.NumberOfThreads),
+                    UserName = x.UserName,
+                    TelegramAPI = x.TelegramAPI
+                }, include: x => x.Include(i => i.StreamHistorys).Include(i => i.UserManagerBOTs).ThenInclude(o => o.ManagerBOT),
+                orderBy: x => x.OrderByDescending(i => i.CreatedTime),
+                pageIndex: 1, pageSize: 1000);
+            return data.Items.ToList();
+        }
+        public async Task<List<UserAdminInfoDto>> GetUserAdminAsync()
+        {
+            var _repository = _unitOfWork.GetRepository<AppUser>();
+            var roleManager = await _roleManager.FindByNameAsync("Admin");
+
+            var query = _repository.Queryable().AsNoTracking();
+
+            query = query.Where(x => x.DeletedTime == null &&
+            x.UserRoles.Any(i => i.RoleId == roleManager.Id));
+
+            var data = await _repository.GetStagesPagedListAsync(
+                stages: query,
+                selector: x => new UserAdminInfoDto
+                {
+                    CreatedTime = x.CreatedTime,
+                    Email = x.Email,
+                    Id = x.Id,
+                    LinkFB = x.LinkFB,
+                    LinkTelegram = x.LinkTelegram,
                     UserName = x.UserName,
                     TelegramAPI = x.TelegramAPI
                 }, include: x => x.Include(i => i.StreamHistorys).Include(i => i.UserManagerBOTs).ThenInclude(o => o.ManagerBOT),
@@ -480,6 +516,40 @@ namespace BaseSouce.Services.Services.UserAdmin
             return new KeyValuePair<bool, string>(true, string.Empty);
         }
 
+        public async Task<KeyValuePair<bool, string>> UpdateAdminAsync(string userName)
+        {
+            var _repository = _unitOfWork.GetRepository<AppUser>();
+
+            var roleManager = await _roleManager.FindByNameAsync("Admin");
+
+            var userCurrent = await _repository.GetFirstOrDefaultAsync(
+                predicate: x => x.UserName == userName,
+                include: x => x.Include(i => i.UserRoles),
+                disableTracking: false);
+
+            if (userCurrent != null)
+            {
+                var isRoleCurrent = userCurrent.UserRoles.FirstOrDefault(x => x.RoleId == roleManager.Id);
+                if (isRoleCurrent != null)
+                {
+                    userCurrent.UserRoles.Remove(isRoleCurrent);
+                }
+                else
+                {
+                    userCurrent.UserRoles.Add(new AppUserRole
+                    {
+                        RoleId = roleManager.Id,
+                        UserId = userCurrent.Id,
+                    });
+                }
+
+                _repository.Update(userCurrent);
+
+                await _unitOfWork.SaveChangesAsync();
+            }
+            return new KeyValuePair<bool, string>(true, string.Empty);
+        }
+
         public async Task<KeyValuePair<bool, string>> UpdateTelegramUserAsync(UpdateTelegramDto model, bool isAdmin = false)
         {
             try
@@ -506,7 +576,7 @@ namespace BaseSouce.Services.Services.UserAdmin
                     if (userOfBots.Any())
                     {
                         var streamsCurrents = await _repositoryStream.Queryable()
-                            .Where(x => x.UserId == model.UserId).ToListAsync();
+                            .Where(x => x.UserId == model.UserId && x.Status != StreamStatus.Stop).ToListAsync();
 
                         if (streamsCurrents.Any())
                         {
@@ -516,10 +586,20 @@ namespace BaseSouce.Services.Services.UserAdmin
                                 item.ManagerBOTId = null;
                             }
                             _repositoryStream.Update(streamsCurrents);
+                            await _unitOfWork.SaveChangesAsync();
+
+                            foreach (var item in streamsCurrents)
+                            {
+                                await _botContextHub.Clients.All.RenderAsync(new RenderCommand
+                                {
+                                    ItemId = item.Id,
+                                    Command = Command.Cancel
+                                });
+                            }
                         }
                         _repositoryUserBot.Delete(userOfBots);
                     }
-                    userCurrent.UserManager= model.UserManager;
+                    userCurrent.UserManager = model.UserManager;
                 }
                 _repository.Update(userCurrent);
                 await _unitOfWork.SaveChangesAsync();

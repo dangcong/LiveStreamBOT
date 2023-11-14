@@ -92,6 +92,15 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             }
             return View(result.ResultObj);
         }
+        public async Task<IActionResult> Admins()
+        {
+            var result = await _userAdminApiClient.GetAllAdmin();
+            if (result == null || !result.IsSuccessed)
+            {
+                return NotFound();
+            }
+            return View(result.ResultObj);
+        }
 
         [HttpPost]
         public async Task<IActionResult> UpdateRoleManager(string userName)
@@ -103,6 +112,19 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
                 //return Json(new { code = ErrorCodeJson.ErrorMess, err = result?.Message ?? "Cập nhật không thành công!" });
             }
             return RedirectToAction("Manager");
+            // return Json(new { code = ErrorCodeJson.Success });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateRoleAdmin(string userName)
+        {
+            var result = await _userAdminApiClient.UpdateRoleAdmin(userName);
+            if (result == null || !result.IsSuccessed)
+            {
+                return RedirectToAction("Admins");
+                //return Json(new { code = ErrorCodeJson.ErrorMess, err = result?.Message ?? "Cập nhật không thành công!" });
+            }
+            return RedirectToAction("Admins");
             // return Json(new { code = ErrorCodeJson.Success });
         }
 

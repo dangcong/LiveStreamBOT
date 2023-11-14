@@ -37,6 +37,7 @@
                                     <tr>
                                         <th>STT</th>
                                         <th>BotName</th>
+                                        <th>Group</th>
                                         <th>Loại</th>
                                         <th>Số luồng Chạy/Tổng</th>
                                         <th>Action</th>
@@ -48,6 +49,7 @@
                                         <tr>
                                             <td>@(index++)</td>
                                             <td> <a href="/admin/bot/group?id=@(item.BotId)"> <span class="text-danger"><strong>@item.BotName</strong></span></a></td>
+                                           <td>@item.Group</td>
                                             <td>
                                                 @switch (item.LiveType)
                                                 {
@@ -179,7 +181,7 @@
                                 <option value="0">-- Chọn bot --</option>
                                 @foreach (var item in bot4k)
                                 {
-                                    <option value="@item.Id">@item.Name (@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads))</option>
+                                    <option value="@item.Id">@item.Name - @(item.Group)(@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads))</option>
                                 }
 
                             </select>
@@ -193,7 +195,7 @@
                                 <option value="0">-- Chọn bot --</option>
                                 @foreach (var item in bot1080)
                                 {
-                                    <option value="@item.Id">@item.Name (@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads))</option>
+                                    <option value="@item.Id">@item.Name - @(item.Group)(@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads))</option>
                                 }
 
                             </select>

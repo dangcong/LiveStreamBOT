@@ -68,5 +68,6 @@ namespace BaseSource.ViewModels.ManagerBOT
         public int NumberOfThreads { get; set; }
         public int NumberOfThreadsInRun { get; set; }
         public string UserId { get; set; }
+        public string Group { get; set; }
     }
 }

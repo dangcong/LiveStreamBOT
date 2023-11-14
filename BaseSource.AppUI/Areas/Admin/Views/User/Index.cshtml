@@ -70,11 +70,12 @@
                                 <thead>
                                     <tr>
                                         <th>STT</th>
+                                        <th>Vai trò</th>
                                         <th>Người dùng</th>
                                         <th>Mật khẩu</th>
                                         <th>Manager</th>
-                                        <th>Luồng 1080(Đang chạy/Tổng)</th>
-                                        <th>Luồng 4K(Đang chạy/Tổng)</th>
+                                        <th>Luồng 1080(Chạy/Tổng)</th>
+                                        <th>Luồng 4K(Chạy/Tổng)</th>
                                         <th>Số BOT</th>
                                         <th>Telegram</th>
                                         <th>Teleram QL</th>
@@ -86,6 +87,20 @@
                                     {
                                         <tr>
                                             <td>@(index++)</td>
+                                            <td>
+                                                @if (item.Roles.Any(x => x == "Admin"))
+                                                {
+                                                    <span class="badge badge-danger">@(string.Join(",", item.Roles))</span>
+                                                }
+                                                else if (item.Roles.Any(x => x == "Manager"))
+                                                {
+                                                    <span class="badge badge-warning">Manager</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-success">User</span>
+                                                }
+                                            </td>
                                             <td>@item.UserName</td>
                                             @if (!string.IsNullOrEmpty(item.UserUpdate))
                                             {

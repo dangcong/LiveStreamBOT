@@ -28,6 +28,7 @@ namespace BaseSource.ViewModels.UserAdmin
         public string UserUpdate { get; set; }
         public string UserManager { get; set; }
         public string Manager { get; set; }
+        public List<string> Roles { get; set; }
     }
     public class UserAdminRequestDto : PageQuery
     {
@@ -79,6 +80,7 @@ namespace BaseSource.ViewModels.UserAdmin
         public int NumberOfThreadsInRun { get; set; }
         public string BotName { get; set; }
         public int BotId { get; set; }
+        public string Group { get; set; }
         public string UserName { get; set; }
         public LiveType? LiveType { get; set; }
     }

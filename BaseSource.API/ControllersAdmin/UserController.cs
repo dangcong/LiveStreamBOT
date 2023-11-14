@@ -61,6 +61,13 @@ namespace BaseSource.API.ControllersAdmin
             var result = await _userAdminService.GetUserManagerAsync();
             return Ok(new ApiSuccessResult<object>(result));
         }
+        [HttpGet]
+        [Route("admins")]
+        public async Task<IActionResult> GetAllAdmin()
+        {
+            var result = await _userAdminService.GetUserAdminAsync();
+            return Ok(new ApiSuccessResult<object>(result));
+        }
 
         [HttpGet]
         [Route("manager/users")]
@@ -75,6 +82,17 @@ namespace BaseSource.API.ControllersAdmin
         public async Task<IActionResult> UpdateRoleManager(string userName)
         {
             var result = await _userAdminService.UpdateManagerAsync(userName);
+            if (result.Key)
+            {
+                return Ok(new ApiSuccessResult<string>(string.Empty));
+            }
+            return Ok(new ApiErrorResult<string>(result.Value));
+        }
+        [HttpPost]
+        [Route("admin/role")]
+        public async Task<IActionResult> UpdateAdminManager(string userName)
+        {
+            var result = await _userAdminService.UpdateAdminAsync(userName);
             if (result.Key)
             {
                 return Ok(new ApiSuccessResult<string>(string.Empty));

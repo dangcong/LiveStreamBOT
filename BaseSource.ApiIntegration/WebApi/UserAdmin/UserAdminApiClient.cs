@@ -50,6 +50,11 @@ namespace BaseSource.ApiIntegration.WebApi.UserAdmin
             return await client.GetAsync<ApiResult<List<UserAdminInfoDto>>>($"/api/admin/user/managers");
         }
 
+        public async Task<ApiResult<List<UserAdminInfoDto>>> GetAllAdmin()
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            return await client.GetAsync<ApiResult<List<UserAdminInfoDto>>>($"/api/admin/user/admins");
+        }
         public async Task<ApiResult<List<UserGroupDto>>> GetAllUserOfManager(string userId)
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
@@ -90,6 +95,11 @@ namespace BaseSource.ApiIntegration.WebApi.UserAdmin
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
             return await client.PostAsync<ApiResult<string>>($"/api/admin/user/manager/role?userName={userName}");
+        }
+        public async Task<ApiResult<string>> UpdateRoleAdmin(string userName)
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            return await client.PostAsync<ApiResult<string>>($"/api/admin/user/admin/role?userName={userName}");
         }
 
         public async Task<ApiResult<string>> UpdateTelegram(UpdateTelegramDto model)

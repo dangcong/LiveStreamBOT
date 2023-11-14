@@ -13,6 +13,8 @@ using EFCore.UnitOfWork;
 using EFCore.UnitOfWork.PageList;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.SignalR;
+using BaseSouce.Services.HubServices;
 
 namespace BaseSouce.Services.Services.BOT
 {
@@ -22,11 +24,13 @@ namespace BaseSouce.Services.Services.BOT
         private readonly ILogger<ManagerBOTService> _logger;
         private readonly IMapper _mapper;
         private readonly IStreamClientService _streamService;
+        private readonly IHubContext<BotHub, IBotClientHub> _botContextHub;
 
         public ManagerBOTService(IUnitOfWork<BaseSourceDbContext> unitOfWork,
             ILogger<ManagerBOTService> logger,
             IMapper mapper,
-            IStreamClientService streamService)
+            IStreamClientService streamService
+            , IHubContext<BotHub, IBotClientHub> botContextHub)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
@@ -318,7 +322,8 @@ namespace BaseSouce.Services.Services.BOT
                     UserName = x.User.UserName,
                     Type = x.LiveType,
                     UserId = x.UserId,
-                    BotId = x.ManagerBOTId
+                    BotId = x.ManagerBOTId,
+                    
                 }).ToListAsync();
             if (data != null && data.Any())
             {
@@ -388,7 +393,11 @@ namespace BaseSouce.Services.Services.BOT
                         if (userOfBots.Any())
                         {
                             var streamsCurrents = await _repositoryStream.Queryable()
-                                .Where(x => x.ManagerBOTId == botCurrent.Id).ToListAsync();
+                                .Where(x => x.ManagerBOTId == botCurrent.Id
+                                && x.RenderStatus != RenderStatus.Cancelled
+                                && x.RenderStatus != RenderStatus.Error
+                                && x.RenderStatus != RenderStatus.Ended
+                                ).ToListAsync();
 
                             if (streamsCurrents.Any())
                             {
@@ -398,15 +407,24 @@ namespace BaseSouce.Services.Services.BOT
                                     item.ManagerBOTId = null;
                                 }
                                 _repositoryStream.Update(streamsCurrents);
+                                await _unitOfWork.SaveChangesAsync();
+                                foreach (var item in streamsCurrents)
+                                {
+                                    await _botContextHub.Clients.All.RenderAsync(new RenderCommand
+                                    {
+                                        ItemId = item.Id,
+                                        Command = Command.Cancel
+                                    });
+                                }
                             }
                             _repositoryUserBot.Delete(userOfBots);
-                            //
                         }
                     }
                 }
 
 
                 _repository.Update(botCurrent);
+
 
                 await _unitOfWork.SaveChangesAsync();
 

@@ -4,6 +4,7 @@ using BaseSource.ApiIntegration.WebApi.UserAdmin;
 using BaseSource.Shared.Constants;
 using BaseSource.ViewModels.ManagerBOT;
 using BaseSource.ViewModels.UserAdmin;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BaseSource.AppUI.Areas.Admin.Controllers
@@ -83,6 +84,7 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             }
         }
 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Manager()
         {
             var result = await _userAdminApiClient.GetAllManager();
@@ -92,6 +94,7 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             }
             return View(result.ResultObj);
         }
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Admins()
         {
             var result = await _userAdminApiClient.GetAllAdmin();

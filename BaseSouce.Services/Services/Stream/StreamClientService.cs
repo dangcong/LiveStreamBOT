@@ -902,7 +902,8 @@ namespace BaseSouce.Services.Services.Stream
                     BotName = x.ManagerBOT.Name,
                     NumberOfThreads = x.NumberOfThreads,
                     NumberOfThreadsInRun = x.ManagerBOT.StreamHistorys.Where(i => i.Status == StreamStatus.Streaming && i.UserId == userId).Count(),
-                    Type = x.ManagerBOT.LiveType
+                    Type = x.ManagerBOT.LiveType,
+                    Group = x.ManagerBOT.Group
                 }).ToListAsync();
 
         }

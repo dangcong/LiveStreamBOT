@@ -171,7 +171,7 @@
                                     <option value="0" data-type="2">--Chọn BOT--</option>
                                     @foreach (var item in bots)
                                     {
-                                        <option value="@item.BotId" data-type="@((int)item.Type)">@item.BotName (@(item.NumberOfThreadsInRun) / @(item.NumberOfThreads))</option>
+                                        <option value="@item.BotId" data-type="@((int)item.Type)">@item.BotName - @(item.Group)(@(item.NumberOfThreadsInRun) / @(item.NumberOfThreads))</option>
                                     }
                                 </select>
 

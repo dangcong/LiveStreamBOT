@@ -1,11 +1,6 @@
 ﻿using BaseSource.Data.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BaseSource.Data.Configurations
 {
@@ -25,6 +20,8 @@ namespace BaseSource.Data.Configurations
             builder.Property(x => x.ErrorMessage).HasMaxLength(200);
 
             builder.HasOne(x => x.AppUser).WithMany(x => x.StreamHistorys).HasForeignKey(x => x.UserId);
+
+            builder.HasOne(x => x.ManagerBOTBackup).WithMany(x => x.StreamHistoryBackups).HasForeignKey(x => x.ManagerBOTBackupId);
         }
     }
 }

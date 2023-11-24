@@ -27,9 +27,11 @@ namespace BaseSouce.Data.Entities
         public bool IsUsed { get; set; }
         public string  UserManager { get; set; }
 
-
+        public bool IsBackup { get; set; }
+        public string Telegrams { get; set; }
         public AppUser Manager { get; set; }
         public ICollection<StreamHistory > StreamHistorys { get; set; }
+        public ICollection<StreamHistory> StreamHistoryBackups { get; set; }
         public ICollection<UserManagerBOT > UserManagerBOTs { get; set; }
     }
 }

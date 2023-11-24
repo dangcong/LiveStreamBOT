@@ -26,10 +26,20 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
         }
         public async Task<IActionResult> Index()
         {
+
+            var managerChooses = new List<string>();
+            string managerSelect = HttpContext.Session.GetString("Manangers");
+            if (!string.IsNullOrWhiteSpace(managerSelect))
+            {
+                managerChooses = managerSelect.Split(",").ToList();
+            }
+
+            ViewBag.ManagerChooses = managerChooses;
             var result = await _managerBOTApiClient.GetBOTByFilterAsync(new ManagerBOTRequestDto
             {
                 Page = 1,
-                PageSize = 800
+                PageSize = 800,
+                Managers = User.IsInRole("Admin") ? managerSelect : string.Empty
             });
             if (result == null || !result.IsSuccessed)
             {
@@ -126,14 +136,14 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var users = await _userAdminApiClient.GetAll();
+            var users = await _userAdminApiClient.GetAll(string.Empty);
             ViewBag.Users = users.ResultObj;
             ViewBag.BotId = id;
             return View(result.ResultObj);
         }
 
         [HttpPost]
- 
+
         public async Task<IActionResult> AddBotToUser(UserAddBotAdminDto model)
         {
             var result = await _userAdminApiClient.AddBot(model);

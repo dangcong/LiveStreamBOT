@@ -1,6 +1,8 @@
-﻿@model StreamClientInfoDto
+﻿@using BaseSource.ViewModels.ManagerBOT;
+@model StreamClientInfoDto
 @{
     ViewData["Title"] = "Thông tin luồng live";
+    var bots = ViewBag.Bots as List<UserBotDto>;
 }
 
 <section class="section">
@@ -17,7 +19,7 @@
             <div class="col-12 col-md-12 col-lg-12">
 
                 <div class="card">
-                    <form asp-action="Edit" class="needs-validation" novalidate="">
+                    <form method="post" asp-action="UpdateBotBackup" class="needs-validation" novalidate="">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                         <input asp-for="Id" type="hidden" />
                         <div class="card-header">
@@ -26,18 +28,39 @@
                         <div class="card-body">
                             <div class="section-title">Cấu hình</div>
                             <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" id="live1080" value="1" checked="@(Model.LiveType==LiveType._1080)" name="LiveType" class="custom-control-input">
+                                <input type="radio" disabled id="live1080" value="1" checked="@(Model.LiveType==LiveType._1080)" name="LiveType" class="custom-control-input">
                                 <label class="custom-control-label" for="live1080">Live 1080</label>
                             </div>
                             <div class="custom-control custom-radio custom-control-inline">
-                                <input type="radio" id="live4k" value="2" checked="@(Model.LiveType==LiveType._4K)" name="LiveType" class="custom-control-input">
+                                <input type="radio" disabled id="live4k" value="2" checked="@(Model.LiveType==LiveType._4K)" name="LiveType" class="custom-control-input">
                                 <label class="custom-control-label" for="live4k">Live 4k</label>
                             </div>
                             <div class="form-group">
                                 <label>Tên luồng live</label>
-                                <input asp-for="StreamName" placeholder="Đặt tên để gợi nhớ" class="form-control" required="">
+                                <input asp-for="StreamName" placeholder="Đặt tên để gợi nhớ" class="form-control" required>
                                 <span asp-validation-for="StreamName" class="text-danger"></span>
                             </div>
+                            <div class="form-group">
+                                <label>Thời gian chờ Backup <span class="text-danger">(Phút)</span></label>
+                                <input class="form-control"  min="0" value="0" required asp-for="TimeBackup" type="number" />
+                                <span asp-validation-for="TimeBackup" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Bot Backup</label>
+                                <select class="form-control select2" asp-for="ManagerBotBackupId">
+                                    @foreach (var item in bots)
+                                    {
+                                        if (item.Type == LiveType._Backup)
+                                        {
+                                            <option value="@item.BotId">@item.BotName - @(item.Group)(@(item.NumberOfThreadsInRun) / @(item.NumberOfThreadsBackup)  / @(item.NumberOfThreads))</option>
+                                        }
+
+                                    }
+                                </select>
+
+                                <span asp-validation-for="ManagerBotBackupId" class="text-danger"></span>
+                            </div>
+
                             <div style="display:none">
                                 <div class="section-title">Nền tảng</div>
                                 <div class="custom-control custom-radio custom-control-inline">
@@ -52,52 +75,53 @@
                             </div>*@
                             <div class="form-group">
                                 <label>Khóa luồng</label>
-                                <input class="form-control" required asp-for="StreamKey" />
+                                <input class="form-control" required disabled asp-for="StreamKey" />
                                 <span asp-validation-for="StreamKey" class="text-danger"></span>
                             </div>
 
                             <div class="form-group">
                                 <label>RTMP</label>
-                                <input class="form-control" required asp-for="RTMP" />
+                                <input class="form-control" disabled required asp-for="RTMP" />
                                 <span asp-validation-for="RTMP" class="text-danger"></span>
                             </div>
 
                             <div class="form-group">
                                 <label>Link Video</label>
-                                <input class="form-control" required asp-for="Video" rows="1" />
+                                <input class="form-control" disabled required asp-for="Video" rows="1" />
                                 <span asp-validation-for="Video" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label>Link Audio</label>
-                                <input class="form-control" asp-for="Audio" rows="1" />
+                                <input class="form-control" disabled asp-for="Audio" rows="1" />
                                 <span asp-validation-for="Audio" class="text-danger"></span>
                             </div>
                             @*<div class="form-group">
-                                <label class="d-block">Cài đặt</label>
-                                <div class="form-check">
-                                    <input class="form-check-input" asp-for="IsForever" type="checkbox" id="defaultCheck1">
-                                    <label class="form-check-label" for="defaultCheck1">
-                                        Live 24/7(vĩnh viễn)
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" asp-for="IsLiveNow" type="checkbox" id="defaultCheck3">
-                                    <label class="form-check-label" for="defaultCheck3">
-                                        Live ngay bây giờ
-                                    </label>
-                                </div>
+                            <label class="d-block">Cài đặt</label>
+                            <div class="form-check">
+                            <input class="form-check-input" asp-for="IsForever" type="checkbox" id="defaultCheck1">
+                            <label class="form-check-label" for="defaultCheck1">
+                            Live 24/7(vĩnh viễn)
+                            </label>
+                            </div>
+                            <div class="form-check">
+                            <input class="form-check-input" asp-for="IsLiveNow" type="checkbox" id="defaultCheck3">
+                            <label class="form-check-label" for="defaultCheck3">
+                            Live ngay bây giờ
+                            </label>
+                            </div>
                             </div>*@
-                             <div class="section-title">Hẹn lịch -  <span class="text-danger"> * Lưu ý: Live 24.7 thì không chọn thời gian kết thúc</span></div>
+                            <div class="section-title">Hẹn lịch -  <span class="text-danger"> * Lưu ý: Live 24.7 thì không chọn thời gian kết thúc</span></div>
                             <div class="form-group">
                                 <label>Thời gian bắt đầu</label>
-                                <input type="datetime-local" asp-for="StartTimeLive" class="form-control col-6" placeholder="Thời gian bắt đầu">
+                                <input type="datetime-local" disabled asp-for="StartTimeLive" class="form-control col-6" placeholder="Thời gian bắt đầu">
                             </div>
                             <div class="form-group">
                                 <label>Thời gian kết thúc</label>
-                                <input type="datetime-local" asp-for="EndTimeLive" class="form-control col-6" placeholder="Thời gian kết thúc">
+                                <input type="datetime-local" disabled asp-for="EndTimeLive" class="form-control col-6" placeholder="Thời gian kết thúc">
                             </div>
+                            <button class="btn btn-primary"> Cập nhật</button>
                         </div>
-                        
+
                     </form>
                 </div>
             </div>

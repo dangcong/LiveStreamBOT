@@ -4,16 +4,44 @@
     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
     var report = ViewBag.Report as StreamReportAdminDto;
     var managers = ViewBag.Managers as List<UserAdminInfoDto>;
+    var managerChoose = ViewBag.ManagerChooses as List<string>;
     var index = 1;
 }
+<style>
+    @@media (max-width: 767px) {
+        .card .card-stats .card-stats-items {
+            display: flow;
+        }
+
+        .card .card-stats .card-stats-item {
+            width: 100%;
+        }
+    }
+
+</style>
 <section class="section">
     <div class="section-header">
-        <h1>Danh sách người dùng</h1>
-        <div class="section-header-breadcrumb">
-            <div class="breadcrumb-item active"><a href="#">Home</a></div>
-            <div class="breadcrumb-item"><a href="#">Danh sách người dùng</a></div>
-            <div class="breadcrumb-item">Danh sách</div>
-        </div>
+        @if (User.IsInRole("Admin"))
+        {
+            <h1>Chọn manager</h1>
+
+            <div class="section-header-breadcrumb w-75">
+                <select class="form-control select2" id="managerChoose" multiple>
+                    @foreach (var item in managers)
+                    {
+                        <option value="@item.Id" selected="@(managerChoose.Any(x=>x==item.Id))">@item.UserName</option>
+                    }
+                </select>
+                <button class="btn btn-primary ml-1" onclick="reloadPage()">Search</button>
+            </div>
+        }
+        else
+        {
+            <h1>Danh sách người dùng</h1>
+           
+        }
+
+
     </div>
 
     <div class="section-body">
@@ -27,25 +55,44 @@
                         </div>
                         <div class="card-stats-items">
                             <div class="card-stats-item">
-                                <div class="card-stats-item-count"><span class="badge badge-success">@(report.NumberOfThreads1080InRun)/@(report.NumberOfThreads1080)</span></div>
-                                <div class="card-stats-item-label">Tổng số luồng 1080(Đang chạy/Tổng)</div>
+                                <div class="card-stats-item-count">
+                                    <span>
+                                        @(report.NumberOfThreads1080InRun)/@(report.NumberOfThreads1080)/@(report.TotalBOT1080)
+                                    </span>
+                                </div>
+                                <div class="card-stats-item-label">
+                                    <span class="badge badge-success">1080(Đang chạy/Tổng/BOT)</span>
+                                </div>
                             </div>
                             <div class="card-stats-item">
-                                <div class="card-stats-item-count"><span class="badge badge-danger">@(report.NumberOfThreads4KInRun)/@(report.NumberOfThreads4K)</span></div>
-                                <div class="card-stats-item-label">Tổng số luồng 4k(Đang chạy/Tổng)</div>
+                                <div class="card-stats-item-count">
+                                    <span>
+                                        @(report.NumberOfThreads4KInRun)/@(report.NumberOfThreads4K)/@(report.TotalBOT4k)
+                                    </span>
+                                </div>
+                                <div class="card-stats-item-label">
+                                    <span class="badge badge-danger"> 4k(Đang chạy/Tổng/BOT)</span>
+                                </div>
                             </div>
                             <div class="card-stats-item">
-                                <div class="card-stats-item-count">@report.TotalBOT</div>
-                                <div class="card-stats-item-label">Tổng BOT</div>
+                                <div class="card-stats-item-count">
+                                    <span>
+                                        @(report.NumberOfThreadsBackupInRun)/@(report.NumberOfThreadsBackupPending)/@(report.NumberOfThreadsBackup)/@(report.TotalBOT4k)
+                                    </span>
+                                </div>
+                                <div class="card-stats-item-label">
+                                    <span class="badge badge-warning">Backup(Đang chạy/Chờ/Tổng/BOT)</span>
+                                </div>
+                            </div>
+                            <div class="card-stats-item">
+                                <div class="card-stats-item-count">@(report.TotalBOTConnected)/@(report.TotalBOTDisconnected)</div>
+                                <div class="card-stats-item-label"> <span class="badge badge-primary">Connected/Disconnected</span></div>
                             </div>
                             <div class="card-stats-item">
                                 <div class="card-stats-item-count">@report.TotalUser</div>
-                                <div class="card-stats-item-label">Tổng User</div>
+                                <div class="card-stats-item-label"> <span class="badge badge-info">Tổng User</span></div>
                             </div>
-                            <div class="card-stats-item">
-                                <div class="card-stats-item-count">@report.TotalManager</div>
-                                <div class="card-stats-item-label">Tổng TK Quản lý</div>
-                            </div>
+
                         </div>
                     </div>
                     <div>
@@ -75,8 +122,9 @@
                                         <th>Người dùng</th>
                                         <th>Mật khẩu</th>
                                         <th>Manager</th>
-                                        <th>Luồng 1080(Chạy/Tổng)</th>
-                                        <th>Luồng 4K(Chạy/Tổng)</th>
+                                        <th>Luồng 1080(Chạy/Tổng/BOT)</th>
+                                        <th>Luồng 4K(Chạy/Tổng/BOT)</th>
+                                        <th> Backup(Chạy/Chờ/Tổng/BOT)</th>
                                         <th>Số BOT</th>
                                         <th>Telegram</th>
                                         <th>Teleram QL</th>
@@ -131,8 +179,21 @@
                                                 <td></td>
                                             }
                                             <td>@item.Manager</td>
-                                            <td><span class="badge badge-success">@(item.NumberOfThreads1080InRun)/@(item.NumberOfThreads1080)</span> </td>
-                                            <td><span class="badge badge-danger">@(item.NumberOfThreads4KInRun)/@(item.NumberOfThreads4K)</span></td>
+                                            <td>
+                                                <span class="badge badge-success">
+                                                    @(item.NumberOfThreads1080InRun)/@(item.NumberOfThreads1080)/@(item.TotalBot1080)
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-danger">
+                                                    @(item.NumberOfThreads4KInRun)/@(item.NumberOfThreads4K)/@(item.TotalBot4k)
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-warning">
+                                                    @(item.NumberOfThreadsBackupInRun)/@(item.NumberOfThreadsBackupPending)/@(item.NumberOfThreadsBackup)/@(item.TotalBotBackup)
+                                                </span>
+                                            </td>
                                             <td>@item.TotalBOT</td>
                                             <td><span class="badge badge-primary">@item.TelegramAPI</span></td>
                                             <td><span class="badge badge-danger">@item.LinkTelegram</span></td>
@@ -151,7 +212,7 @@
 </section>
 
 
-<div class="modal fade"  role="dialog" id="telegramModal">
+<div class="modal fade" role="dialog" id="telegramModal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <form method="post" id="formTelegram" action="/admin/User/UpdateTelegram">
@@ -332,7 +393,7 @@
                 let id = $(this).attr('data-id');
                 let telegrams = $(this).attr('data-tele');
                 let manager = $(this).attr('data-manager');
-                console.log(manager);
+
                 $('#formTelegram input[name="UserId"]').val(id);
                 $('#formTelegram input[name="Telegram"]').val(telegrams);
                 $('#formTelegram select[name="UserManager"]').val(manager);
@@ -351,6 +412,8 @@
                 //$('#formTelegram input[name="UserId"]').val(id);
                 //$('#formTelegram input[name="Telegram"]').val(telegrams);
             });
+
+
 
 
         });

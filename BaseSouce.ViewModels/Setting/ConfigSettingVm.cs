@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BaseSource.ViewModels.Setting
+﻿namespace BaseSource.ViewModels.Setting
 {
     public class ConfigSettingVm
     {
@@ -14,5 +8,6 @@ namespace BaseSource.ViewModels.Setting
         public string BankAccountName { get; set; }
         public string LinkFBAdmin { get; set; }
         public string LinkYoutube { get; set; }
+        public string Telegrams { get; set; }
     }
 }

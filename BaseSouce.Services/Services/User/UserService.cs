@@ -278,14 +278,24 @@ namespace BaseSouce.Services.Services.User
 
                         NumberOfThreads = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._1080).Sum(i => i.NumberOfThreads),
                         NumberOfThreadsCreated = x.NumberOfThreads1080Create,
-                        Name = "Live 1080"
+                        Name = "Live 1080",
+                        TotalBOT = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._1080).Count(),
+
 
                     },
                     PackageLive4k = new PackageLiveInfoDto
                     {
                         NumberOfThreads = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._4K).Sum(i => i.NumberOfThreads),
                         NumberOfThreadsCreated = x.NumberOfThreads4KCreate,
-                        Name = "Live 4k"
+                        Name = "Live 4k",
+                        TotalBOT = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._4K).Count()
+                    },
+                    PackageLiveBackup = new PackageLiveInfoDto
+                    {
+                        NumberOfThreads = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._Backup).Sum(i => i.NumberOfThreads),
+                        NumberOfThreadsCreated = x.NumberOfThreads4KCreate,
+                        Name = "Live Backup",
+                        TotalBOT = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._Backup).Count()
                     },
                 }, include: x => x.Include(i => i.UserManagerBOTs).ThenInclude(o => o.ManagerBOT));
             var streamHistorys = await _repositoryStream.Queryable()
@@ -311,6 +321,15 @@ namespace BaseSouce.Services.Services.User
                     .Where(x => x.Type == LiveType._4K).Select(x => x.NumberOfThreadsInRun).FirstOrDefault();
                 packageInfo.PackageLive4k.NumberOfThreadsCreatedInRun = streamHistorys
                     .Where(x => x.Type == LiveType._4K).Select(x => x.NumberOfThreadsInCreated).FirstOrDefault();
+            }
+            if (packageInfo.PackageLiveBackup != null)
+            {
+                packageInfo.PackageLiveBackup.NumberOfThreadsInRun = streamHistorys
+                .Where(x => x.Type == LiveType._Backup).Select(x => x.NumberOfThreadsInRun).FirstOrDefault();
+                packageInfo.PackageLiveBackup.NumberOfThreadsCreatedInRun = streamHistorys
+                    .Where(x => x.Type == LiveType._Backup).Select(x => x.NumberOfThreadsInCreated).FirstOrDefault();
+                packageInfo.PackageLiveBackup.TotalPending = await _repositoryStream.Queryable().AsNoTracking()
+                    .Where(x => x.UserId == userId && x.LiveType != LiveType._Backup && x.ManagerBOTBackupId != null).CountAsync();
             }
 
             return packageInfo;

@@ -43,9 +43,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BaseSource.AppUI", "BaseSou
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BaseSource.API", "BaseSource.API\BaseSource.API.csproj", "{4725F2AD-C83E-4B44-95AF-0942BED11D0D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseSouce.Services", "BaseSouce.Services\BaseSouce.Services.csproj", "{149287DE-C71F-497F-B94A-88E0C03431E3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BaseSouce.Services", "BaseSouce.Services\BaseSouce.Services.csproj", "{149287DE-C71F-497F-B94A-88E0C03431E3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BaseSource.ApiIntegration", "BaseSource.ApiIntegration\BaseSource.ApiIntegration.csproj", "{11F96A34-5B05-4953-8A6D-13419AC398F9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BaseSource.ApiIntegration", "BaseSource.ApiIntegration\BaseSource.ApiIntegration.csproj", "{11F96A34-5B05-4953-8A6D-13419AC398F9}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1CDB7ED0-ADF5-442E-B74F-90614670B222}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

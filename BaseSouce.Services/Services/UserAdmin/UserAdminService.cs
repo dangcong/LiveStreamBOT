@@ -219,7 +219,7 @@ namespace BaseSouce.Services.Services.UserAdmin
             }
         }
 
-        public async Task<List<UserAdminInfoDto>> GetAllAsync(string userId, bool isAdmin = false)
+        public async Task<List<UserAdminInfoDto>> GetAllAsync(string userId, bool isAdmin = false, string managers = "")
         {
             var _repository = _unitOfWork.GetRepository<AppUser>();
 
@@ -227,6 +227,15 @@ namespace BaseSouce.Services.Services.UserAdmin
             if (!isAdmin)
             {
                 query = query.Where(x => x.UserManager == userId || x.Id == userId);
+            }
+            var lstManagers = new List<string>();
+            if (!string.IsNullOrWhiteSpace(managers))
+            {
+                lstManagers = managers.Split(',').ToList();
+            }
+            if (lstManagers.Any())
+            {
+                query = query.Where(x => lstManagers.Any(i => i == x.UserManager));
             }
             return await query.Where(x => x.DeletedTime == null)
                 .Select(x => new UserAdminInfoDto
@@ -285,6 +294,15 @@ namespace BaseSouce.Services.Services.UserAdmin
                 {
                     query = query.Where(x => x.UserManager == model.Manager);
                 }
+                var lstManagers = new List<string>();
+                if (!string.IsNullOrWhiteSpace(model.Managers))
+                {
+                    lstManagers = model.Managers.Split(',').ToList();
+                }
+                if (lstManagers.Any())
+                {
+                    query = query.Where(x => lstManagers.Any(i => i == x.UserManager));
+                }
             }
             else
             {
@@ -308,11 +326,17 @@ namespace BaseSouce.Services.Services.UserAdmin
                     Password = x.Password,
                     NumberOfThreads1080 = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._1080).Sum(i => i.NumberOfThreads),
                     NumberOfThreads4K = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._4K).Sum(i => i.NumberOfThreads),
+                    NumberOfThreadsBackup = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._Backup).Sum(i => i.NumberOfThreads),
                     UserName = x.UserName,
                     TelegramAPI = x.TelegramAPI,
                     NumberOfThreads4KInRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._4K && i.Status == StreamStatus.Streaming).Count(),
                     NumberOfThreads1080InRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._1080 && i.Status == StreamStatus.Streaming).Count(),
+                    NumberOfThreadsBackupInRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._Backup && i.Status == StreamStatus.Streaming).Count(),
                     TotalBOT = x.UserManagerBOTs.Count(),
+                    TotalBot1080 = x.UserManagerBOTs.Where(x => x.LiveType == LiveType._1080).Count(),
+                    TotalBot4k = x.UserManagerBOTs.Where(x => x.LiveType == LiveType._4K).Count(),
+                    TotalBotBackup = x.UserManagerBOTs.Where(x => x.LiveType == LiveType._Backup).Count(),
+                    NumberOfThreadsBackupPending = x.StreamHistorys.Where(i => i.ManagerBOTBackupId.GetValueOrDefault() > 0).Count(),
                     UpdatedTime = x.UpdatedTime,
                     UserUpdate = x.UserUpdate,
                     UserManager = x.UserManager,
@@ -406,7 +430,7 @@ namespace BaseSouce.Services.Services.UserAdmin
                     return new KeyValuePair<bool, string>(false, "Số luồng không hợp lệ!");
                 }
                 var _repositoryBOT = _unitOfWork.GetRepository<ManagerBOT>();
-                var botId = model.Bot1080.GetValueOrDefault() > 0 ? model.Bot1080 : model.Bot4k;
+                var botId = model.Bot1080.GetValueOrDefault() > 0 ? model.Bot1080 : model.Bot4k.GetValueOrDefault() > 0 ? model.Bot4k : model.BotBackup;
                 if (botId == null)
                 {
                     return new KeyValuePair<bool, string>(false, "BOT Không tồn tại!");
@@ -725,6 +749,39 @@ namespace BaseSouce.Services.Services.UserAdmin
                     if (bot4kCurrent != null)
                     {
                         _repositoryUserBot.Delete(bot4kCurrent);
+                    }
+
+                }
+
+                if (model.BotBackup != null && model.BotBackup > 0)
+                {
+                    var botBackupCurrent = await _repositoryUserBot.GetFirstOrDefaultAsync(
+                        predicate: x => x.UserId == model.UserId && (x.LiveType == LiveType._Backup), disableTracking: false);
+
+                    if (botBackupCurrent != null)
+                    {
+                        botBackupCurrent.ManagerBOTId = model.BotBackup.GetValueOrDefault();
+                        _repositoryUserBot.Update(botBackupCurrent);
+                    }
+                    else
+                    {
+                        _repositoryUserBot.Insert(new UserManagerBOT
+                        {
+                            CreatedTime = DateTime.Now,
+                            LiveType = LiveType._4K,
+                            ManagerBOTId = model.BotBackup.GetValueOrDefault(),
+                            UserId = model.UserId
+                        });
+                    }
+                }
+                else
+                {
+                    var botBackupCurrent = await _repositoryUserBot.GetFirstOrDefaultAsync(
+                        predicate: x => x.UserId == model.UserId && (x.LiveType == LiveType._Backup), disableTracking: false);
+
+                    if (botBackupCurrent != null)
+                    {
+                        _repositoryUserBot.Delete(botBackupCurrent);
                     }
 
                 }

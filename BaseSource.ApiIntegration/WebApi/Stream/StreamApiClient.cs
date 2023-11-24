@@ -68,6 +68,12 @@ namespace BaseSource.ApiIntegration.WebApi.Stream
             return await client.PutAsync<ApiResult<string>>($"/api/stream/{id}", model);
         }
 
+        public async Task<ApiResult<string>> UpdateBotBackupAsync(StreamBackupUpdateDto model)
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            return await client.PostAsync<ApiResult<string>>($"/api/stream/update/botbackup", model);
+        }
+
         public async Task<ApiResult<string>> ValidateLink(StreamLinkDto model)
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);

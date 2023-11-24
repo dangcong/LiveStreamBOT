@@ -6,7 +6,7 @@ namespace BaseSource.ApiIntegration.WebApi.UserAdmin
     public interface IUserAdminApiClient
     {
         Task<ApiResult<PagedResult<UserAdminInfoDto>>> GetUserByFilter(UserAdminRequestDto model);
-        Task<ApiResult<List<UserAdminInfoDto>>> GetAll();
+        Task<ApiResult<List<UserAdminInfoDto>>> GetAll(string managers);
         Task<ApiResult<string>> UpdateUserGroup(UserGroupAddDto model);
         Task<ApiResult<List<UserGroupDto>>> GetAllUserOfManager(string userId);
         Task<ApiResult<List<UserAdminInfoDto>>> GetAllManager();

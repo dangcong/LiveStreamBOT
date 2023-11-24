@@ -24,9 +24,9 @@ namespace BaseSource.API.ControllersAdmin
 
         [HttpGet]
         [Route("/api/admin/user/all")]
-        public async Task<IActionResult> GetAllUser()
+        public async Task<IActionResult> GetAllUser([FromQuery] string managers)
         {
-            var result = await _userAdminService.GetAllAsync(UserId, IsAdmin);
+            var result = await _userAdminService.GetAllAsync(UserId, IsAdmin, managers);
             return Ok(new ApiSuccessResult<object>(result));
         }
 

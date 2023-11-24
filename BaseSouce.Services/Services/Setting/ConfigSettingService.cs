@@ -45,11 +45,13 @@ namespace BaseSouce.Services.Services.Setting
                     settingEntity.LinkFBAdmin = model.LinkFBAdmin;
                     settingEntity.BankName = model.BankName;
                     settingEntity.BankAccountName = model.BankAccountName;
+                    settingEntity.Telegrams = model.Telegrams;
                     _repository.Update(settingEntity);
-                   await _unitOfWork.SaveChangesAsync();
+
+                    await _unitOfWork.SaveChangesAsync();
                 }
                 return new KeyValuePair<bool, string>(true, string.Empty);
-                
+
             }
             catch (Exception ex)
             {

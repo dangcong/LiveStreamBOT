@@ -19,6 +19,8 @@ namespace BaseSouce.Services.Services.Stream
         Task<StreamReportDto> GetStreamReportAsync(string userId);
         Task<KeyValuePair<bool, string>> ValidateLinkAsync(string link);
         Task<List<UserBotDto>> GetBotOfUserAsync(string userId);
+        Task<KeyValuePair<bool,string>> UpdateBotBackupAsync(string userId, StreamBackupUpdateDto model);
+        Task CheckLiveBackupAsync();
 
     }
 }

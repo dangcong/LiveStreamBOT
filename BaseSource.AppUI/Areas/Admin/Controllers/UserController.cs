@@ -25,10 +25,19 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> Index()
         {
+            var managerChooses = new List<string>();
+            string managerSelect = HttpContext.Session.GetString("Manangers");
+            if (!string.IsNullOrWhiteSpace(managerSelect))
+            {
+                managerChooses = managerSelect.Split(",").ToList();
+            }
+
+            ViewBag.ManagerChooses = managerChooses;
             var result = await _userAdminApiClient.GetUserByFilter(new UserAdminRequestDto
             {
                 Page = 1,
-                PageSize = 800,
+                PageSize = 1000,
+                Managers = User.IsInRole("Admin") ? managerSelect : string.Empty
                 //UserName = searchValue
             });
             var report = await _streamAdminApiClient.GetReportStream();
@@ -218,6 +227,11 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             if (model.Bot4K == null && model.NumberOfThreads4K > 0)
             {
                 ModelState.AddModelError("", "Chưa chọn BOT 4k");
+                return View(model);
+            }
+            if (model.BotBackup == null && model.NumberOfThreadsBackup > 0)
+            {
+                ModelState.AddModelError("", "Chưa chọn BOT Backup");
                 return View(model);
             }
 

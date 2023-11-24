@@ -73,12 +73,20 @@ namespace BaseSouce.Services.Services.StreamAdmin
                 {
                     query = query.Where(x => x.ManagerBOT.UserManager == model.Manager);
                 }
+                var lstManagers = new List<string>();
+                if (!string.IsNullOrWhiteSpace(model.Managers))
+                {
+                    lstManagers = model.Managers.Split(',').ToList();
+                }
+                if (lstManagers.Any())
+                {
+                    query = query.Where(x => lstManagers.Any(i => i == x.AppUser.UserManager));
+                }
             }
             else
             {
                 query = query.Where(x => x.AppUser.UserManager == userId || x.UserId == userId);
             }
-
 
 
             query = query
@@ -88,13 +96,15 @@ namespace BaseSouce.Services.Services.StreamAdmin
             return await _repository.GetStagesPagedListAsync(
                 stages: query,
                 selector: x => _mapper.Map<StreamAdminInfoDto>(x),
-                include: x => x.Include(i => i.AppUser).ThenInclude(o => o.Manager).Include(i => i.ManagerBOT),
+                include: x => x.Include(i => i.AppUser).ThenInclude(o => o.Manager)
+                .Include(i => i.ManagerBOT)
+                .Include(i => i.ManagerBOTBackup),
                orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                pageIndex: model.Page, pageSize: model.PageSize
                 );
         }
 
-        public async Task<StreamReportAdminDto> GetReportStreamAsync(string userId, bool isAdmin)
+        public async Task<StreamReportAdminDto> GetReportStreamAsync(string userId, bool isAdmin, string managers)
         {
             var _repositoryUser = _unitOfWork.GetRepository<AppUser>();
             var _repositoryBOT = _unitOfWork.GetRepository<ManagerBOT>();
@@ -104,42 +114,147 @@ namespace BaseSouce.Services.Services.StreamAdmin
 
             if (isAdmin)
             {
-                data.TotalBOT = await _repositoryBOT.Queryable().AsNoTracking()
-                .Where(x => x.DeletedTime == null).CountAsync();
+                var lstManagers = new List<string>();
+                if (!string.IsNullOrWhiteSpace(managers))
+                {
+                    lstManagers = managers.Split(',').ToList();
+                }
+                if (lstManagers.Any())
+                {
+                    data.TotalBOTConnected = await _repositoryBOT.Queryable().AsNoTracking()
+                    .Where(x => x.DeletedTime == null && lstManagers.Any(i => i == x.UserManager) && x.Status==ManagerBOTStatus.Connected).CountAsync();
+                    data.TotalBOTDisconnected = await _repositoryBOT.Queryable().AsNoTracking()
+                    .Where(x => x.DeletedTime == null && lstManagers.Any(i => i == x.UserManager) && x.Status == ManagerBOTStatus.Disconnected).CountAsync();
 
-                var streamData = await _repositoryStream.Queryable().AsNoTracking()
-                    .Select(x => new
-                    {
-                        Type = x.LiveType,
-                        Status = x.Status
-                    }).ToListAsync();
+                    var streamData = await _repositoryStream.Queryable().AsNoTracking()
+                        .Where(x => lstManagers.Any(i => i == x.AppUser.UserManager))
+                        .Select(x => new
+                        {
+                            Type = x.LiveType,
+                            Status = x.Status
+                        }).ToListAsync();
 
-                data.NumberOfThreads1080 = await _repositoryUserBot.Queryable()
+                    data.NumberOfThreads1080 = await _repositoryUserBot.Queryable()
+                        .Include(x => x.ManagerBOT)
+                        .Where(x => x.User.DeletedTime == null
+                        && x.ManagerBOT.LiveType == LiveType._1080
+                        && lstManagers.Any(i => i == x.User.UserManager)
+                        ).SumAsync(x => x.NumberOfThreads);
+
+                    data.NumberOfThreads1080InRun = streamData
+                        .Where(x => x.Type == LiveType._1080 && x.Status == StreamStatus.Streaming
+                        ).Count();
+
+
+
+                    data.NumberOfThreads4K = await _repositoryUserBot.Queryable()
+                        .Include(x => x.ManagerBOT).Include(x => x.User)
+                        .Where(x => x.User.DeletedTime == null
+                        && x.ManagerBOT.LiveType == LiveType._4K
+                        && lstManagers.Any(i => i == x.User.UserManager)
+                        ).SumAsync(x => x.NumberOfThreads);
+
+                    data.NumberOfThreads4KInRun = streamData
+                        .Where(x => x.Type == LiveType._4K && x.Status == StreamStatus.Streaming).Count();
+
+                    data.NumberOfThreadsBackup = await _repositoryUserBot.Queryable()
+                        .Include(x => x.ManagerBOT).Include(x => x.User)
+                        .Where(x => x.User.DeletedTime == null
+                        && x.ManagerBOT.LiveType == LiveType._4K
+                        && lstManagers.Any(i => i == x.User.UserManager)
+                        ).SumAsync(x => x.NumberOfThreads);
+
+
+                    data.NumberOfThreadsBackupInRun = streamData
+                        .Where(x => x.Type == LiveType._Backup && x.Status == StreamStatus.Streaming).Count();
+
+                    data.NumberOfThreadsBackupPending = await _repositoryStream.Queryable().AsNoTracking()
+                        .Where(x => lstManagers.Any(i => i == x.AppUser.UserManager) && x.ManagerBOTBackupId.GetValueOrDefault() > 0).CountAsync();
+
+
+
+                    data.TotalBOT1080 = await _repositoryBOT.Queryable().AsNoTracking()
+                    .Where(x => x.DeletedTime == null && x.LiveType == LiveType._1080 && lstManagers.Any(i => i == x.UserManager)).CountAsync();
+
+                    data.TotalBOT4k = await _repositoryBOT.Queryable().AsNoTracking()
+                    .Where(x => x.DeletedTime == null && x.LiveType == LiveType._4K && lstManagers.Any(i => i == x.UserManager)).CountAsync();
+
+                    data.TotalBOTBackup = await _repositoryBOT.Queryable().AsNoTracking()
+                    .Where(x => x.DeletedTime == null && x.LiveType == LiveType._Backup && lstManagers.Any(i => i == x.UserManager)).CountAsync();
+
+
+                    data.TotalUser = await _repositoryUser.Queryable().AsNoTracking()
+                        .Where(x => !x.UserRoles.Any() && x.DeletedTime == null
+                        && lstManagers.Any(i => i == x.UserManager)).CountAsync();
+                    data.TotalManager = lstManagers.Count();
+                }
+                else
+                {
+                    data.TotalBOTConnected = await _repositoryBOT.Queryable().AsNoTracking()
+                    .Where(x => x.DeletedTime == null && x.Status==ManagerBOTStatus.Connected).CountAsync();
+                    data.TotalBOTDisconnected = await _repositoryBOT.Queryable().AsNoTracking()
+                    .Where(x => x.DeletedTime == null && x.Status == ManagerBOTStatus.Disconnected).CountAsync();
+
+                    var streamData = await _repositoryStream.Queryable().AsNoTracking()
+                        .Select(x => new
+                        {
+                            Type = x.LiveType,
+                            Status = x.Status
+                        }).ToListAsync();
+
+                    data.NumberOfThreads1080 = await _repositoryUserBot.Queryable()
+                        .Include(x => x.ManagerBOT).Include(x => x.User)
+                        .Where(x => x.User.DeletedTime == null && x.ManagerBOT.LiveType == LiveType._1080)
+                        .SumAsync(x => x.NumberOfThreads);
+
+                    data.NumberOfThreads1080InRun = streamData
+                        .Where(x => x.Type == LiveType._1080 && x.Status == StreamStatus.Streaming).Count();
+
+                    data.NumberOfThreads4K = await _repositoryUserBot.Queryable()
+                        .Include(x => x.ManagerBOT).Include(x => x.User)
+                        .Where(x => x.User.DeletedTime == null && x.ManagerBOT.LiveType == LiveType._4K)
+                        .SumAsync(x => x.NumberOfThreads);
+
+                    data.NumberOfThreads4KInRun = streamData
+                        .Where(x => x.Type == LiveType._4K && x.Status == StreamStatus.Streaming).Count();
+
+                    data.TotalUser = await _repositoryUser.Queryable().AsNoTracking()
+                        .Where(x => !x.UserRoles.Any() && x.DeletedTime == null).CountAsync();
+                    //data.TotalManager = await _repositoryUser.Queryable().AsNoTracking()
+                    //    .Where(x => x.DeletedTime == null && x.UserRoles.Any(x => x.RoleId == "baea9405-c706-46ea-9f52-6cfa8c83d65f"))
+                    //    .CountAsync();
+
+                    data.NumberOfThreadsBackup = await _repositoryUserBot.Queryable()
                     .Include(x => x.ManagerBOT).Include(x => x.User)
-                    .Where(x => x.User.DeletedTime == null && x.ManagerBOT.LiveType == LiveType._1080)
-                    .SumAsync(x => x.NumberOfThreads);
+                    .Where(x => x.User.DeletedTime == null
+                    && x.ManagerBOT.LiveType == LiveType._4K
+                    ).SumAsync(x => x.NumberOfThreads);
 
-                data.NumberOfThreads1080InRun = streamData
-                    .Where(x => x.Type == LiveType._1080 && x.Status == StreamStatus.Streaming).Count();
+                    data.NumberOfThreadsBackupInRun = streamData
+                    .Where(x => x.Type == LiveType._Backup && x.Status == StreamStatus.Streaming).Count();
 
-                data.NumberOfThreads4K = await _repositoryUserBot.Queryable()
-                    .Include(x => x.ManagerBOT).Include(x => x.User)
-                    .Where(x => x.User.DeletedTime == null && x.ManagerBOT.LiveType == LiveType._4K)
-                    .SumAsync(x => x.NumberOfThreads);
+                    data.NumberOfThreadsBackupPending = await _repositoryStream.Queryable().AsNoTracking()
+                        .Where(x => x.ManagerBOTBackupId.GetValueOrDefault() > 0).CountAsync();
 
-                data.NumberOfThreads4KInRun = streamData
-                    .Where(x => x.Type == LiveType._4K && x.Status == StreamStatus.Streaming).Count();
 
-                data.TotalUser = await _repositoryUser.Queryable().AsNoTracking()
-                    .Where(x => !x.UserRoles.Any() && x.DeletedTime == null).CountAsync();
-                data.TotalManager = await _repositoryUser.Queryable().AsNoTracking()
-                    .Where(x => x.DeletedTime == null && x.UserRoles.Any(x => x.RoleId == "baea9405-c706-46ea-9f52-6cfa8c83d65f"))
-                    .CountAsync();
+
+                    data.TotalBOT1080 = await _repositoryBOT.Queryable().AsNoTracking()
+                    .Where(x => x.DeletedTime == null && x.LiveType == LiveType._1080).CountAsync();
+
+                    data.TotalBOT4k = await _repositoryBOT.Queryable().AsNoTracking()
+                    .Where(x => x.DeletedTime == null && x.LiveType == LiveType._4K).CountAsync();
+
+                    data.TotalBOTBackup = await _repositoryBOT.Queryable().AsNoTracking()
+                    .Where(x => x.DeletedTime == null && x.LiveType == LiveType._Backup).CountAsync();
+                }
+
             }
             else
             {
-                data.TotalBOT = await _repositoryBOT.Queryable().AsNoTracking()
-                    .Where(x => x.DeletedTime == null && x.UserManager == userId).CountAsync();
+                data.TotalBOTConnected = await _repositoryBOT.Queryable().AsNoTracking()
+                    .Where(x => x.DeletedTime == null && x.UserManager == userId && x.Status==ManagerBOTStatus.Connected).CountAsync();
+                data.TotalBOTDisconnected = await _repositoryBOT.Queryable().AsNoTracking()
+                    .Where(x => x.DeletedTime == null && x.UserManager == userId && x.Status == ManagerBOTStatus.Disconnected).CountAsync();
 
                 var streamData = await _repositoryStream.Queryable().AsNoTracking()
                     .Where(x => x.AppUser.UserManager == userId || x.UserId == userId)
@@ -151,9 +266,9 @@ namespace BaseSouce.Services.Services.StreamAdmin
 
                 data.NumberOfThreads1080 = await _repositoryUserBot.Queryable()
                     .Include(x => x.ManagerBOT).Include(x => x.User)
-                    .Where(x =>  x.User.DeletedTime == null 
+                    .Where(x => x.User.DeletedTime == null
                     && x.ManagerBOT.LiveType == LiveType._1080
-                    && (x.User.UserManager == userId || x.UserId==userId))
+                    && (x.User.UserManager == userId || x.UserId == userId))
                     .SumAsync(x => x.NumberOfThreads);
 
                 data.NumberOfThreads1080InRun = streamData
@@ -162,7 +277,7 @@ namespace BaseSouce.Services.Services.StreamAdmin
                 data.NumberOfThreads4K = await _repositoryUserBot.Queryable()
                     .Include(x => x.ManagerBOT).Include(x => x.User)
                     .Where(x => x.User.DeletedTime == null && x.ManagerBOT.LiveType == LiveType._4K
-                    && (x.User.UserManager == userId || x.UserId==userId))
+                    && (x.User.UserManager == userId || x.UserId == userId))
                     .SumAsync(x => x.NumberOfThreads);
 
                 data.NumberOfThreads4KInRun = streamData
@@ -171,6 +286,32 @@ namespace BaseSouce.Services.Services.StreamAdmin
                 data.TotalUser = await _repositoryUser.Queryable().AsNoTracking()
                     .Where(x => x.UserManager == userId && !x.UserRoles.Any() && x.DeletedTime == null).CountAsync();
                 data.TotalManager = 1;
+
+                data.NumberOfThreadsBackup = await _repositoryUserBot.Queryable()
+                    .Include(x => x.ManagerBOT).Include(x => x.User)
+                    .Where(x => x.User.DeletedTime == null
+                    && x.ManagerBOT.LiveType == LiveType._Backup
+                    && (x.User.UserManager == userId || x.UserId == userId))
+                    .SumAsync(x => x.NumberOfThreads);
+
+                data.NumberOfThreadsBackupInRun = streamData
+                .Where(x => x.Type == LiveType._Backup && x.Status == StreamStatus.Streaming).Count();
+
+                data.NumberOfThreadsBackupPending = await _repositoryStream.Queryable().AsNoTracking()
+                    .Where(x => x.ManagerBOTBackupId.GetValueOrDefault() > 0).CountAsync();
+
+
+
+                data.TotalBOT1080 = await _repositoryBOT.Queryable().AsNoTracking()
+                    .Where(x => x.DeletedTime == null && x.UserManager == userId && x.LiveType == LiveType._1080).CountAsync();
+
+                data.TotalBOT4k = await _repositoryBOT.Queryable().AsNoTracking()
+                    .Where(x => x.DeletedTime == null && x.UserManager == userId && x.LiveType == LiveType._4K).CountAsync();
+
+                data.TotalBOTBackup = await _repositoryBOT.Queryable().AsNoTracking()
+                    .Where(x => x.DeletedTime == null && x.UserManager == userId && x.LiveType == LiveType._Backup).CountAsync();
+
+
                 //data.TotalManager = await _repositoryUser.Queryable().AsNoTracking()
                 //    .Where(x => x.UserManager == userId && x.DeletedTime == null && x.UserRoles.Any(x => x.RoleId == "baea9405-c706-46ea-9f52-6cfa8c83d65f"))
                 //    .CountAsync();

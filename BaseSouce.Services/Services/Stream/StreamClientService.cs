@@ -7,7 +7,6 @@ using BaseSouce.Shared.Enums;
 using BaseSouce.SharedSignalrData.Enums;
 using BaseSouce.SharedSignalrData.Classes;
 using BaseSouce.SharedSignalrData.Interfaces;
-using BaseSource.Shared.Enums;
 using BaseSource.Data.Entities;
 using BaseSource.Shared.Helpers;
 using BaseSource.ViewModels.Stream;
@@ -16,10 +15,8 @@ using EFCore.UnitOfWork.PageList;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using TqkLibrary.Net.CloudStorage.GoogleDrive;
 using Telegram.Bot;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 using BaseSouce.Services.Services.ValidateLink;
 using BaseSource.ViewModels.ManagerBOT;
 
@@ -65,11 +62,12 @@ namespace BaseSouce.Services.Services.Stream
                     return $"Chưa nhập {nameof(model.StreamKey)}";
                 }
 
-                if (!Uri.TryCreate(model.RTMP, UriKind.Absolute, out Uri? rtmp))
-                {
-                    return $"{nameof(model.RTMP)} sai định dạng";
-                }
-                Uri uri = new Uri($"{rtmp.ToString().TrimEnd('/')}/{model.StreamKey.Trim()}");
+                //if (!Uri.TryCreate(model.RTMP, UriKind.Absolute, out Uri? rtmp))
+                //{
+                //    return $"{nameof(model.RTMP)} sai định dạng";
+                //}
+                model.RTMP = "";
+                Uri uri = new Uri($"{model.RTMP.ToString().TrimEnd('/')}/{model.StreamKey.Trim()}");
 
                 List<string> renderArguments = new List<string>();
                 {//global
@@ -155,6 +153,133 @@ namespace BaseSouce.Services.Services.Stream
                 _logger.LogInformation($"[Bot ConnectionId:[{model.ManagerBOT.ConnectionId}]]");
                 //await _botContextHub.Clients.Client(model.ManagerBOT.ConnectionId).RenderAsync(renderCommand);
                 await _botContextHub.Clients.Client(model.ManagerBOT.ConnectionId).RenderAsync(renderCommand);
+                return true;
+
+                //if (model.IsLiveNow)
+                //{
+
+                //}
+                //else
+                //{
+                //    //hẹn giờ
+
+
+                //    return true;
+                //}
+            }
+            catch (NotSupportedException nse)
+            {
+                _logger.LogError($"Send data to BOT failed by error:[{nse}]");
+                return $"{nse.Message} chưa hỗ trợ";
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Send data to BOT failed by error:[{ex}]");
+                return $"Lỗi {ex.Message}";
+            }
+        }
+
+
+        public async Task<BoolStringKeyValuePair> SendDataBackupToBOTAsync(StreamHistory model)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(model.StreamKey))
+                {
+                    return $"Chưa nhập {nameof(model.StreamKey)}";
+                }
+
+                //if (!Uri.TryCreate(model.RTMP, UriKind.Absolute, out Uri? rtmp))
+                //{
+                //    return $"{nameof(model.RTMP)} sai định dạng";
+                //}
+                model.RTMP = "rtmp://y.rtmp.youtube.com/live2?backup=1";
+                Uri uri = new Uri($"{model.RTMP.ToString().TrimEnd('/')}/{model.StreamKey.Trim()}");
+
+                List<string> renderArguments = new List<string>();
+                {//global
+                    renderArguments.Add("-y");
+                }
+                {//video
+                    if (!string.IsNullOrWhiteSpace(model.Audio))
+                    {
+                        renderArguments.Add("-an");
+                        renderArguments.Add($"-stream_loop -1");
+                    }
+                    renderArguments.Add("-i video");
+                }
+                if (!string.IsNullOrWhiteSpace(model.Audio))
+                {
+                    renderArguments.Add("-vn");
+                    renderArguments.Add("-i sound");
+                }
+                {//output
+                    renderArguments.Add("-c copy");
+                    renderArguments.Add("-shortest");
+                    renderArguments.Add("-f flv");
+                    //renderArguments.Add("-flvflags no_duration_filesize");
+                    renderArguments.Add("rendered");
+                }
+
+
+
+                List<string> liveStreamArguments = new List<string>();
+                {//input
+                    liveStreamArguments.Add("-re");
+                    //liveStreamArguments.Add($"-stream_loop -1");
+                    liveStreamArguments.Add("-f flv");
+                    liveStreamArguments.Add("-i rendered");
+                }
+
+                {//output
+                    liveStreamArguments.Add("-c copy");
+                    liveStreamArguments.Add("-f flv");
+                    liveStreamArguments.Add("-flvflags no_duration_filesize");
+                    liveStreamArguments.Add($"\"{uri}\"");
+                }
+
+
+                var videoUrlType = _validateLinkService.GetUrlType(model.Video);
+                if (!videoUrlType.HasValue)
+                    return $"Không hỗ trợ kiểu link '{model.Video}'";
+
+                RenderCommand renderCommand = new RenderCommand()
+                {
+                    RenderArguments = string.Join(" ", renderArguments),
+                    LiveStreamArguments = string.Join(" ", liveStreamArguments),
+                    Command = Command.Start,
+                    UtcEndTime = model.EndTimeLive?.ToUniversalTime(),
+                    UtcStartTime = DateTime.Now.ToUniversalTime(),
+                    WorkId = 0,//quan trọng, cần để cancel/update/tạo thư mục
+                    ItemId = model.Id,//quan trọng, cần để cancel/update/tạo thư mục( stream ID)
+                    FileDatas = new List<FileData>()
+                    {
+                        new FileData()
+                        {
+                            Name = "video",
+                            Url = model.Video,
+                            UrlType = videoUrlType.Value,
+                        }
+                    },
+                    FileType = BaseSouce.SharedSignalrData.Enums.FileType.File,
+                };
+
+                if (!string.IsNullOrWhiteSpace(model.Audio))
+                {
+                    var audioUrlType = _validateLinkService.GetUrlType(model.Audio);
+                    if (!audioUrlType.HasValue)
+                        return $"Không hỗ trợ kiểu link '{model.Audio}'";
+
+                    renderCommand.FileDatas.Add(new FileData()
+                    {
+                        Name = "sound",
+                        Url = model.Audio,
+                        UrlType = audioUrlType.Value,
+                    });
+                }
+                _logger.LogInformation($"[Bot ConnectionId:[{model.ManagerBOTBackup.ConnectionId}]]");
+                //await _botContextHub.Clients.Client(model.ManagerBOT.ConnectionId).RenderAsync(renderCommand);
+                await _botContextHub.Clients.Client(model.ManagerBOTBackup.ConnectionId).RenderAsync(renderCommand);
                 return true;
 
                 //if (model.IsLiveNow)
@@ -364,6 +489,8 @@ namespace BaseSouce.Services.Services.Stream
                     LiveType = model.LiveType,
                     ManagerBOTId = model.ManagerBOTId > 0 ? model.ManagerBOTId : null,
                     LiveOrder = model.LiveOrder,
+                    TimeBackup = model.TimeBackup,
+                    ManagerBOTBackupId = model.ManagerBotBackupId.GetValueOrDefault() > 0 ? model.ManagerBotBackupId : null,
                 };
 
                 _repositoryStream.Insert(streamEntityNew);
@@ -414,7 +541,9 @@ namespace BaseSouce.Services.Services.Stream
             return await _repository.GetStagesPagedListAsync(
                 stages: query,
                 selector: x => _mapper.Map<StreamClientInfoDto>(x),
-                include: x => x.Include(i => i.AppUser).Include(i => i.ManagerBOT),
+                include: x => x.Include(i => i.AppUser)
+                .Include(i => i.ManagerBOT)
+                .Include(i => i.ManagerBOTBackup),
                orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                pageIndex: model.Page, pageSize: model.PageSize
                 );
@@ -441,11 +570,27 @@ namespace BaseSouce.Services.Services.Stream
                     .Include(x => x.ManagerBOT)
                     .Where(x => x.UserId == userId && x.Id == id).FirstOrDefaultAsync();
 
-
-
                 if (streamEntity == null)
                 {
                     return new KeyValuePair<bool, string>(false, "Luồng không tồn tại, vui lòng thử lại!");
+                }
+
+                if (streamEntity.StreamBackupId.GetValueOrDefault() > 0)
+                {
+                    //stop live backup
+                    var streamBackup = await _repositoryStream.GetFirstOrDefaultAsync(
+                        predicate: x => x.Id == streamEntity.StreamBackupId.GetValueOrDefault() && x.Status == StreamStatus.Streaming);
+                    if (streamBackup != null)
+                    {
+                        // call BOT cancel
+                        await _botContextHub.Clients.All.RenderAsync(new RenderCommand
+                        {
+                            ItemId = streamBackup.Id,
+                            Command = Command.Cancel
+                        });
+                        _repositoryStream.Delete(streamBackup);
+                        await _unitOfWork.SaveChangesAsync();
+                    }
                 }
 
                 var userBots = await _repositoryUserBOT.Queryable()
@@ -485,10 +630,8 @@ namespace BaseSouce.Services.Services.Stream
                         return new KeyValuePair<bool, string>(false, "BOT không hoạt động hoặc chưa kết nối!");
                     }
                 }
-
                 else
                 {
-
                     foreach (var item in userBots)
                     {
                         if (item.NumberOfThreadsInRun < item.NumberOfThreads)
@@ -507,6 +650,8 @@ namespace BaseSouce.Services.Services.Stream
                 streamEntity.Status = StreamStatus.Streaming;
                 streamEntity.BotId = botIdString;
                 streamEntity.ManagerBOTId = botId;
+                streamEntity.DisconnectedTime = null;
+                streamEntity.IsLiveBackup = false;
 
                 _repositoryStream.Update(streamEntity);
                 await _unitOfWork.SaveChangesAsync();
@@ -611,6 +756,8 @@ namespace BaseSouce.Services.Services.Stream
                 streamEntity.StreamKey = model.StreamKey;
                 streamEntity.LiveOrder = model.LiveOrder;
                 streamEntity.ManagerBOTId = model.ManagerBOTId > 0 ? model.ManagerBOTId : null;
+                streamEntity.TimeBackup = model.TimeBackup;
+                streamEntity.ManagerBOTBackupId = model.ManagerBotBackupId.GetValueOrDefault() > 0 ? model.ManagerBotBackupId : null;
                 _repositoryStream.Update(streamEntity);
 
 
@@ -642,7 +789,6 @@ namespace BaseSouce.Services.Services.Stream
                 }
 
                 var statusOld = streamEntity.RenderStatus;
-
 
                 //
                 streamEntity.RenderStatus = model.RenderStatus;
@@ -893,8 +1039,9 @@ namespace BaseSouce.Services.Services.Stream
         public async Task<List<UserBotDto>> GetBotOfUserAsync(string userId)
         {
             var _repository = _unitOfWork.GetRepository<UserManagerBOT>();
+            var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
 
-            return await _repository.Queryable().AsNoTracking().Include(x => x.ManagerBOT)
+            var data = await _repository.Queryable().AsNoTracking().Include(x => x.ManagerBOT)
                 .Where(x => x.UserId == userId && x.ManagerBOT.Status == ManagerBOTStatus.Connected)
                 .Select(x => new UserBotDto
                 {
@@ -906,6 +1053,177 @@ namespace BaseSouce.Services.Services.Stream
                     Group = x.ManagerBOT.Group
                 }).ToListAsync();
 
+            if (data.Any())
+            {
+                var streamData = await _repositoryStream.Queryable().AsNoTracking()
+                    .Where(x => x.UserId == userId && x.LiveType != LiveType._Backup
+                    && x.ManagerBOTBackupId != null && x.ManagerBOTBackupId > 0).Select(x => x.ManagerBOTBackupId).ToListAsync();
+                foreach (var item in data)
+                {
+                    item.NumberOfThreadsBackup = streamData.Where(x => x.GetValueOrDefault() == item.BotId).Sum().GetValueOrDefault();
+                }
+            }
+            return data;
+        }
+
+        public async Task CheckLiveBackupAsync()
+        {
+            try
+            {
+                //var timeCheckDisconnect = DateTime.Now.ad;
+                var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
+                var _repositoryBot = _unitOfWork.GetRepository<ManagerBOT>();
+
+                var liveDisconnects = await _repositoryStream.Queryable()
+                    .Include(i => i.ManagerBOTBackup).Include(i => i.AppUser)
+                    .Where(x => x.DisconnectedTime != null
+                    && x.ManagerBOTBackupId.GetValueOrDefault() > 0 && x.TimeBackup > 0).ToListAsync();
+                if (liveDisconnects.Any())
+                {
+                    foreach (var item in liveDisconnects)
+                    {
+                        var botId = 0;
+                        var botIdString = string.Empty;
+                        var timeCheckDisconnect = DateTime.Now.AddMinutes(-item.TimeBackup);
+
+                        var botBackup = item.ManagerBOTBackup;
+                        if (botBackup.Status != ManagerBOTStatus.Connected)
+                        {
+                            botBackup = await _repositoryBot.GetFirstOrDefaultAsync(
+                                predicate: x => x.DeletedTime == null
+                                && x.LiveType == LiveType._Backup
+                                && x.Status == ManagerBOTStatus.Connected,
+                                orderBy: x => x.OrderByDescending(i => i.NumberOfThreads));
+
+                        }
+                        if (timeCheckDisconnect > item.DisconnectedTime
+                            && botBackup != null && botBackup.Status == ManagerBOTStatus.Connected)
+                        {
+                            ///send data to BOT
+
+                            var streamClone = new StreamHistory
+                            {
+                                IsLiveBackup = true,
+                                RTMP = "rtmp://y.rtmp.youtube.com/live2?backup=1",
+                                LiveType = LiveType._Backup,
+                                Audio = item.Audio,
+                                ManagerBOTId = botBackup.Id,
+                                PlatformType = item.PlatformType,
+                                RenderStatus = RenderStatus.Created,
+                                StartTimeLive = DateTime.Now,
+                                Status = StreamStatus.Streaming,
+                                LiveOrder = item.LiveOrder,
+                                IsLiveNow = true,
+                                BotId = botBackup.BotId,
+                                IsForever = item.IsForever,
+                                TimeBackup = item.TimeBackup,
+                                StreamKey = item.StreamKey,
+                                EndTimeLive = item.EndTimeLive,
+                                UserId = item.UserId,
+                                StreamName = $"{item.StreamName}_backup",
+                                CreatedTime = DateTime.Now,
+                                Video = item.Video,
+
+                            };
+
+                            _repositoryStream.Insert(streamClone);
+                            await _unitOfWork.SaveChangesAsync();
+
+                            var result = await SendDataToBOTAsync(streamClone);
+                            if (!result)
+                            {
+                                _logger.LogError($"Send data to BOT failed by error:[{result.Value}]");
+
+                                streamClone.Status = StreamStatus.Stop;
+                                _repositoryStream.Update(streamClone);
+                                await _unitOfWork.SaveChangesAsync();
+
+                            }
+                            else
+                            {
+                                var telegramAPI = item.AppUser.TelegramAPI;
+                                //send message telegram
+                                if (!string.IsNullOrEmpty(telegramAPI))
+                                {
+                                    var liveType = streamClone.EndTimeLive != null ? "11h" : "24/7";
+                                    var timer = streamClone.StartTimeLive != null ?
+                                        streamClone.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
+                                        : "Ngay bây giờ";
+                                    var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
+                                    _ = _telegramBotClient
+                                    .SendTextMessageAsync(new ChatId(telegramAPI),
+                                    $"User: {item.AppUser.UserName}{Environment.NewLine}"
+                                    + $"Tên luồng:{streamClone.StreamName}{Environment.NewLine}"
+                                    + $"Live:{streamClone.LiveType} {Environment.NewLine}"
+                                    + $"Kiểu live: {liveType}{Environment.NewLine}"
+                                    + $"{textTimer}:{timer}");
+                                }
+
+                                if (!string.IsNullOrEmpty(item.AppUser.LinkTelegram))
+                                {
+                                    var liveType = streamClone.EndTimeLive != null ? "11h" : "24/7";
+                                    var timer = streamClone.StartTimeLive != null ?
+                                        streamClone.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
+                                        : "Ngay bây giờ";
+                                    var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
+                                    var idTeles = item.AppUser.LinkTelegram.Split(',');
+                                    if (idTeles.Length > 0)
+                                    {
+                                        foreach (var idTele in idTeles)
+                                        {
+                                            _ = _telegramBotClient
+                                           .SendTextMessageAsync(new ChatId(idTele.Trim()),
+                                           $"User: {item.AppUser.UserName}{Environment.NewLine}"
+                                           + $"Tên luồng:{streamClone.StreamName}{Environment.NewLine}"
+                                           + $"Live:{streamClone.LiveType} {Environment.NewLine}"
+                                           + $"Kiểu live: {liveType}{Environment.NewLine}"
+                                           + $"{textTimer}:{timer}");
+                                        }
+                                    }
+                                }
+                            }
+                            item.DisconnectedTime = null;
+                            item.IsLiveBackup = true;
+                            item.StreamBackupId = streamClone.Id;
+                        }
+                        _repositoryStream.Update(liveDisconnects);
+                        await _unitOfWork.SaveChangesAsync();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Check live backup failed by error:[{ex}]");
+
+            }
+        }
+
+
+        public async Task<KeyValuePair<bool, string>> UpdateBotBackupAsync(string userId, StreamBackupUpdateDto model)
+        {
+            try
+            {
+                var _repository = _unitOfWork.GetRepository<StreamHistory>();
+
+                var streamCurrent = await _repository.GetFirstOrDefaultAsync(
+                    predicate: x => x.Id == model.Id && x.UserId == userId, disableTracking: false);
+                if (streamCurrent == null)
+                {
+                    return new KeyValuePair<bool, string>(false, "Dữ liệu không tồn tại!");
+                }
+                streamCurrent.StreamName = model.StreamName;
+                streamCurrent.ManagerBOTBackupId = model.ManagerBOTBackupId.GetValueOrDefault() > 0 ? model.ManagerBOTBackupId : null;
+                streamCurrent.TimeBackup = model.TimeBackup;
+                _repository.Update(streamCurrent);
+                await _unitOfWork.SaveChangesAsync();
+
+                return new KeyValuePair<bool, string>(true, string.Empty);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Update botBackup failed by error:[{ex}]");
+                return new KeyValuePair<bool, string>(false, $"Cập nhật không thành công:[{ex.Message}]");
+            }
         }
     }
 }

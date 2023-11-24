@@ -186,6 +186,13 @@ namespace BaseSource.AppUI.Controllers
         [HttpGet]
         public async Task<IActionResult> Info(int id)
         {
+            var bots = await _streamApiClient.GetBotOfUserAsync();
+            if (bots == null || !bots.IsSuccessed)
+            {
+                return NotFound();
+            }
+            ViewBag.Bots = bots.ResultObj;
+
             var result = await _streamApiClient.GetById(id);
             if (result == null || !result.IsSuccessed)
             {
@@ -193,6 +200,15 @@ namespace BaseSource.AppUI.Controllers
             }
             return View(result.ResultObj);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateBotBackup(StreamBackupUpdateDto model)
+        {
+            var result = await _streamApiClient.UpdateBotBackupAsync(model);
+
+            return RedirectToAction("Info", new { id = model.Id });
+        }
+
         [HttpPost]
         public async Task<IActionResult> Edit(int id, StreamUpdateDto model)
         {

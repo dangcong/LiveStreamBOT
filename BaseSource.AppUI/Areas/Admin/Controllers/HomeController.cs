@@ -11,5 +11,14 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             return Redirect("/admin/user/index");
             //return View();
         }
+
+        [HttpPost]
+        [Route("/admin/updateSession")]
+        public IActionResult UpdateSession(List<string> managers)
+        {
+            // Lưu giá trị vào session
+            HttpContext.Session.SetString("Manangers", string.Join(",", managers));
+            return Json(string.Empty);
+        }
     }
 }

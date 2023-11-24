@@ -86,10 +86,11 @@
                         {
                             <li><a class="nav-link" href="/admin/user/manager"><i class="fas fa-users"></i> <span>Danh sách TK Quản lý</span></a></li>
                             <li><a class="nav-link" href="/admin/user/admins"><i class="fas fa-users"></i> <span>Danh sách Admin</span></a></li>
+                            <li><a class="nav-link" href="/admin/setting/edit"><i class="fas fa-columns"></i> <span>Telegrams BOT</span></a></li>
                         }
 
                         <li><a class="nav-link" href="/account/profile"><i class="fas fa-user"></i> <span>Cá nhân</span></a></li>
-                        @*<li><a class="nav-link" href="/admin/setting/edit"><i class="fas fa-columns"></i> <span>Cài đặt Hệ thống</span></a></li>*@
+
                     </ul>
                 </aside>
             </div>
@@ -127,7 +128,21 @@
     <!-- Page Specific JS File -->
     <script src="~/admin-themes/assets/js/page/modules-datatables.js"></script>
     <script>
+        $('body').on('change', '#managerChoose', function () {
+            let val = $(this).val();
+            $.ajax({
+                type: "POST",
+                url: "/admin/UpdateSession",
+                data: { managers: val },
+                success: function (response) {
 
+
+                }
+            });
+        })
+        function reloadPage() {
+            location.reload();
+        }
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 

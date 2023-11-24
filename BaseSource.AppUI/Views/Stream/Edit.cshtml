@@ -55,7 +55,10 @@
 
                                     @foreach (var item in bots)
                                     {
-                                        <option value="@item.BotId" data-type="@((int)item.Type)">@item.BotName - @(item.Group)(@(item.NumberOfThreadsInRun) / @(item.NumberOfThreads))</option>
+                                        @if (item.Type != LiveType._Backup)
+                                        {
+                                            <option value="@item.BotId" data-type="@((int)item.Type)">@item.BotName - @(item.Group)(@(item.NumberOfThreadsInRun) / @(item.NumberOfThreadsBackup)  / @(item.NumberOfThreads))</option>
+                                        }
                                     }
                                 </select>
 
@@ -73,10 +76,30 @@
 
                             <div class="form-group">
                                 <label>RTMP</label>
-                                <input class="form-control" required asp-for="RTMP" />
+                                <input class="form-control" required disabled asp-for="RTMP" />
                                 <span asp-validation-for="RTMP" class="text-danger"></span>
                             </div>
+                            <div class="form-group">
+                                <label>Thời gian chờ Backup <span class="text-danger">(Phút)</span></label>
+                                <input class="form-control" value="0" min="0" required asp-for="TimeBackup" type="number" />
+                                <span asp-validation-for="TimeBackup" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Chọn BOT Backup<span class="text-danger">(Nếu không Backup thì để trống)</span></label>
+                                <select class="form-control select2" asp-for="ManagerBotBackupId">
+                                    <option value="0" data-type="3">--Chọn BOT--</option>
+                                    @foreach (var item in bots)
+                                    {
+                                        if (item.Type == LiveType._Backup)
+                                        {
+                                            <option value="@item.BotId" data-type="@((int)item.Type)">@item.BotName - @(item.Group)(@(item.NumberOfThreadsInRun) / @(item.NumberOfThreadsBackup) / @(item.NumberOfThreads))</option>
+                                        }
 
+                                    }
+                                </select>
+
+                                <span asp-validation-for="ManagerBotBackupId" class="text-danger"></span>
+                            </div>
                             <div class="form-group">
                                 <label>Link Video</label>
                                 <input class="form-control" required asp-for="Video" rows="1" />

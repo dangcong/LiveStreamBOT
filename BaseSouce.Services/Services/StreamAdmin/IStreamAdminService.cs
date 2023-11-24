@@ -9,7 +9,7 @@ namespace BaseSouce.Services.Services.StreamAdmin
         Task<IPagedList<StreamAdminInfoDto>> GetByFilterAsync(string userId, StreamAdminRequestDto model, bool isAdmin = false);
         Task<IPagedList<StreamAdminInfoDto>> GetByBotIdAsync(int botId);
         Task<List<StreamAdminInfoDto>> GetAllByUserIdAsync(string userId);
-        Task<StreamReportAdminDto> GetReportStreamAsync(string userId, bool isAdmin);
+        Task<StreamReportAdminDto> GetReportStreamAsync(string userId, bool isAdmin,string managers);
         Task<StreamClientInfoDto> GetStreamByIdAsync(int id);
     }
 }

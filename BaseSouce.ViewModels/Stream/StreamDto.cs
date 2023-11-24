@@ -17,7 +17,7 @@ namespace BaseSource.ViewModels.Stream
         public int ManagerBOTId { get; set; }
         public string BotId { get; set; }
         public string StreamKey { get; set; }
-        public string RTMP { get; set; }
+        public string RTMP { get; set; } = "rtmp://x.rtmp.youtube.com/live2";
         public string StreamName { get; set; }
         public LiveType LiveType { get; set; }
         public string Video { get; set; }
@@ -32,6 +32,8 @@ namespace BaseSource.ViewModels.Stream
         public DateTime? Updatedtime { get; set; }
         public StreamStatus Status { get; set; }
         public PlatformType PlatformType { get; set; }
+        public int? ManagerBotBackupId { get; set; }
+        public int TimeBackup { get; set; }
     }
 
 
@@ -43,7 +45,11 @@ namespace BaseSource.ViewModels.Stream
         public string Email { get; set; }
         public string BotName { get; set; }
         public string Group { get; set; }
+        public string BotBackupName { get; set; }
+        public string BackupGroup { get; set; }
         public int ManagerBOTId { get; set; }
+        public int? ManagerBotBackupId { get; set; }
+        public int TimeBackup { get; set; }
         public string BotId { get; set; }
         public string StreamKey { get; set; }
         public string RTMP { get; set; }
@@ -84,7 +90,9 @@ namespace BaseSource.ViewModels.Stream
         public int ManagerBOTId { get; set; }
         public string BotId { get; set; }
         public string BotName { get; set; }
+        public string BotBackupName { get; set; }
         public string BotGroup { get; set; }
+        public string BotBackupGroup { get; set; }
         public string StreamKey { get; set; }
         public string RTMP { get; set; }
         public string StreamName { get; set; }
@@ -108,6 +116,7 @@ namespace BaseSource.ViewModels.Stream
     public class StreamAdminRequestDto : PageQuery
     {
         public string Manager { get; set; }
+        public string Managers { get; set; }
     }
 
     public class StreamInfoUserDto
@@ -146,8 +155,22 @@ namespace BaseSource.ViewModels.Stream
         public int NumberOfThreads1080InRun { get; set; }
         public int NumberOfThreads4K { get; set; }
         public int NumberOfThreads4KInRun { get; set; }
-        public int TotalBOT { get; set; }
+        public int TotalBOTConnected { get; set; }
+        public int TotalBOTDisconnected { get; set; }
+        public int TotalBOT1080 { get; set; }
+        public int TotalBOT4k { get; set; }
+        public int TotalBOTBackup { get; set; }
+        public int NumberOfThreadsBackup { get; set; }
+         public int NumberOfThreadsBackupPending { get; set; }
+        public int NumberOfThreadsBackupInRun { get; set; }
         public int TotalUser { get; set; }
         public int TotalManager { get; set; }
+    }
+    public class StreamBackupUpdateDto
+    {
+        public int Id { get; set; }
+        public string StreamName { get; set; }
+        public int? ManagerBOTBackupId { get; set; }
+        public int TimeBackup { get; set; }
     }
 }

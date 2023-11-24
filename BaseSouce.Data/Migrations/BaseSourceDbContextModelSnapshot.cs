@@ -58,7 +58,7 @@ namespace BaseSource.Data.Migrations
                         new
                         {
                             Id = "c1105ce5-9dbc-49a9-a7d5-c963b6daa62a",
-                            ConcurrencyStamp = "0c2f9968-1d1f-403c-ba19-bfa692bc4c2a",
+                            ConcurrencyStamp = "c6186fc7-eea1-4c2c-b28e-5cc96901f8ad",
                             Description = "Administrator role",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -199,7 +199,7 @@ namespace BaseSource.Data.Migrations
                         {
                             Id = "ffded6b0-3769-4976-841b-69459049a62d",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "1859981f-329c-410b-b450-3e9c5d99fa53",
+                            ConcurrencyStamp = "bcaf5fc2-ed36-45bc-afa8-4b6b2877a1dc",
                             CreatedTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
@@ -208,7 +208,7 @@ namespace BaseSource.Data.Migrations
                             NormalizedUserName = "superadmin",
                             NumberOfThreads1080Create = 0,
                             NumberOfThreads4KCreate = 0,
-                            PasswordHash = "AQAAAAEAACcQAAAAEKBhoxUH87PfWTQkSXOqCBG85wZ6LilsOzK82vOYnvKuXLfmeHEfP9bjJ7eHUWUTvw==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEHxU8p35Un9OZhDn8wJ6s20ZoFnVXAtKGcEl/X84OSKEIK6P/FJovg+8LcKBNJwy3A==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -339,6 +339,9 @@ namespace BaseSource.Data.Migrations
                     b.Property<string>("Group")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsBackup")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsUsed")
                         .HasColumnType("bit");
 
@@ -359,6 +362,9 @@ namespace BaseSource.Data.Migrations
 
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint");
+
+                    b.Property<string>("Telegrams")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("UpdatedTime")
                         .HasColumnType("datetime2");
@@ -521,6 +527,10 @@ namespace BaseSource.Data.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
+                    b.Property<string>("Telegrams")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.HasKey("Id");
 
                     b.ToTable("ConfigSystems", (string)null);
@@ -565,11 +575,17 @@ namespace BaseSource.Data.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
+                    b.Property<string>("BotBackupId")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("BotId")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<DateTime>("CreatedTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DisconnectedTime")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime?>("EndTime")
@@ -585,6 +601,9 @@ namespace BaseSource.Data.Migrations
                     b.Property<bool>("IsForever")
                         .HasColumnType("bit");
 
+                    b.Property<bool>("IsLiveBackup")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsLiveNow")
                         .HasColumnType("bit");
 
@@ -593,6 +612,9 @@ namespace BaseSource.Data.Migrations
 
                     b.Property<byte>("LiveType")
                         .HasColumnType("tinyint");
+
+                    b.Property<int?>("ManagerBOTBackupId")
+                        .HasColumnType("int");
 
                     b.Property<int?>("ManagerBOTId")
                         .HasColumnType("int");
@@ -613,12 +635,18 @@ namespace BaseSource.Data.Migrations
                     b.Property<byte>("Status")
                         .HasColumnType("tinyint");
 
+                    b.Property<int?>("StreamBackupId")
+                        .HasColumnType("int");
+
                     b.Property<string>("StreamKey")
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("StreamName")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("TimeBackup")
+                        .HasColumnType("int");
 
                     b.Property<DateTime?>("Updatedtime")
                         .HasColumnType("datetime2");
@@ -631,6 +659,8 @@ namespace BaseSource.Data.Migrations
                         .HasColumnType("nvarchar(200)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ManagerBOTBackupId");
 
                     b.HasIndex("ManagerBOTId");
 
@@ -829,6 +859,10 @@ namespace BaseSource.Data.Migrations
 
             modelBuilder.Entity("BaseSource.Data.Entities.StreamHistory", b =>
                 {
+                    b.HasOne("BaseSouce.Data.Entities.ManagerBOT", "ManagerBOTBackup")
+                        .WithMany("StreamHistoryBackups")
+                        .HasForeignKey("ManagerBOTBackupId");
+
                     b.HasOne("BaseSouce.Data.Entities.ManagerBOT", "ManagerBOT")
                         .WithMany("StreamHistorys")
                         .HasForeignKey("ManagerBOTId");
@@ -840,6 +874,8 @@ namespace BaseSource.Data.Migrations
                     b.Navigation("AppUser");
 
                     b.Navigation("ManagerBOT");
+
+                    b.Navigation("ManagerBOTBackup");
                 });
 
             modelBuilder.Entity("BaseSource.Data.Entities.UserManagerBOT", b =>
@@ -891,6 +927,8 @@ namespace BaseSource.Data.Migrations
 
             modelBuilder.Entity("BaseSouce.Data.Entities.ManagerBOT", b =>
                 {
+                    b.Navigation("StreamHistoryBackups");
+
                     b.Navigation("StreamHistorys");
 
                     b.Navigation("UserManagerBOTs");

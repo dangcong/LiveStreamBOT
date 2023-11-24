@@ -15,6 +15,8 @@ namespace BaseSource.ApiIntegration.WebApi.Stream
         Task<ApiResult<StreamReportDto>> GetReport();
         Task<ApiResult<string>> ValidateLink(StreamLinkDto model);
         Task<ApiResult<List<UserBotDto>>> GetBotOfUserAsync();
-        
+
+        Task<ApiResult<string>> UpdateBotBackupAsync(StreamBackupUpdateDto model);
+
     }
 }

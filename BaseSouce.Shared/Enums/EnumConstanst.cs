@@ -15,6 +15,7 @@ namespace BaseSouce.Shared.Enums
     {
         _1080 = 1,
         _4K = 2,
+        _Backup = 3
     }
     public enum PlatformType : byte
     {

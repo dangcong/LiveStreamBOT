@@ -21,6 +21,7 @@ namespace BaseSource.Data.Configurations
             builder.Property(x => x.BankAccountName).HasMaxLength(50);
             builder.Property(x => x.LinkFBAdmin).HasMaxLength(500);
             builder.Property(x => x.LinkYoutube).HasMaxLength(500);
+            builder.Property(x => x.Telegrams).HasMaxLength(500);
         }
     }
 }

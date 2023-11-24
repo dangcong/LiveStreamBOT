@@ -66,6 +66,7 @@ namespace BaseSouce.Services.HubServices
             {
                 var _repositoryBot = _unitOfWork.GetRepository<ManagerBOT>();
                 var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
+                var _repositorySetting = _unitOfWork.GetRepository<ConfigSystem>();
 
                 var botCurrent = await _repositoryBot.GetFirstOrDefaultAsync(
                     predicate: x => x.ConnectionId == Context.ConnectionId, disableTracking: false);
@@ -79,10 +80,13 @@ namespace BaseSouce.Services.HubServices
 
                     if (streamsCurrents.Any())
                     {
+
                         foreach (var item in streamsCurrents)
                         {
 
                             item.Status = StreamStatus.Disconnet;
+                            item.DisconnectedTime = DateTime.Now;
+                            item.IsLiveBackup = false;
 
                             if (!string.IsNullOrEmpty(item.AppUser.TelegramAPI))
                             {
@@ -97,11 +101,34 @@ namespace BaseSouce.Services.HubServices
                                 + $"Disconnect:{timer}");
                             }
 
+
+
                         }
                         _repositoryStream.Update(streamsCurrents);
                     }
                     _repositoryBot.Update(botCurrent);
                     await _unitOfWork.SaveChangesAsync();
+
+                    var setting = await _repositorySetting.GetFirstOrDefaultAsync();
+                    if (!string.IsNullOrEmpty(setting.Telegrams))
+                    {
+
+                        var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                        var idTeles = setting.Telegrams.Split(',');
+                        if (idTeles.Length > 0)
+                        {
+                            foreach (var item in idTeles)
+                            {
+                                _ = _telegramBotClient
+                               .SendTextMessageAsync(new ChatId(item.Trim()),
+                               $"BotName: {botCurrent.Name}{Environment.NewLine}"
+                               + $"Group:{botCurrent.Group}{Environment.NewLine}"
+                               + $"Manager:{botCurrent.Manager?.UserName} {Environment.NewLine}"
+                               + $"Live: {botCurrent.LiveType}{Environment.NewLine}"
+                               + $"Disconnected:{timer}");
+                            }
+                        }
+                    }
                 }
 
             }

@@ -22,8 +22,8 @@ namespace BaseSouce.Services.Services.UserAdmin
         Task<KeyValuePair<bool, string>> DeleteUserManagerBot(int id);
         Task<KeyValuePair<bool, string>> UpdateUserManagetBotAsync(UserManagerBotUpdateDto model);
         Task<KeyValuePair<bool, string>> InsertBOTOfUserAsync(UserAddBOTAdminDto model);
-        Task<KeyValuePair<bool, string>> UpdateTelegramUserAsync(UpdateTelegramDto model,bool isAdmin=false);
-        Task<List<UserAdminInfoDto>> GetAllAsync(string userId, bool isAdmin = false);
+        Task<KeyValuePair<bool, string>> UpdateTelegramUserAsync(UpdateTelegramDto model, bool isAdmin = false);
+        Task<List<UserAdminInfoDto>> GetAllAsync(string userId, bool isAdmin = false, string managers = "");
         Task<KeyValuePair<bool, string>> AddUserToBotAsync(UserAddBotAdminDto model);
 
     }

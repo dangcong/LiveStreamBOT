@@ -1,5 +1,6 @@
 ﻿using BaseSource.ApiIntegration.WebApi.Setting;
 using BaseSource.ViewModels.Setting;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BaseSource.AppUI.Areas.Admin.Controllers
@@ -12,6 +13,7 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
             _configSettingApiClient = configSettingApiClient;
         }
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Edit()
         {
             var result = await _configSettingApiClient.GetSetting();

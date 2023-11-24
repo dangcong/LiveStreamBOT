@@ -57,6 +57,7 @@ namespace BaseSource.ViewModels.ManagerBOT
     public class ManagerBOTRequestDto : PageQuery
     {
         public string Manager { get; set; }
+        public string Managers { get; set; }
     }
 
     public class UserBotDto
@@ -66,6 +67,7 @@ namespace BaseSource.ViewModels.ManagerBOT
         public LiveType? Type { get; set; }
         public int BotId { get; set; }
         public int NumberOfThreads { get; set; }
+        public int NumberOfThreadsBackup { get; set; }
         public int NumberOfThreadsInRun { get; set; }
         public string UserId { get; set; }
         public string Group { get; set; }

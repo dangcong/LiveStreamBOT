@@ -15,6 +15,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.SignalR;
 using BaseSouce.Services.HubServices;
+using Telegram.Bot;
+using Telegram.Bot.Types;
 
 namespace BaseSouce.Services.Services.BOT
 {
@@ -25,17 +27,21 @@ namespace BaseSouce.Services.Services.BOT
         private readonly IMapper _mapper;
         private readonly IStreamClientService _streamService;
         private readonly IHubContext<BotHub, IBotClientHub> _botContextHub;
+        private readonly ITelegramBotClient _telegramBotClient;
 
         public ManagerBOTService(IUnitOfWork<BaseSourceDbContext> unitOfWork,
             ILogger<ManagerBOTService> logger,
             IMapper mapper,
             IStreamClientService streamService
-            , IHubContext<BotHub, IBotClientHub> botContextHub)
+            , IHubContext<BotHub, IBotClientHub> botContextHub
+            , ITelegramBotClient telegramBotClient
+            )
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
             _mapper = mapper;
             _streamService = streamService;
+            _telegramBotClient = telegramBotClient;
         }
 
         public async Task<KeyValuePair<bool, string>> ChangeUsedAsync(int id)
@@ -87,6 +93,7 @@ namespace BaseSouce.Services.Services.BOT
         {
             try
             {
+                var _repositorySetting = _unitOfWork.GetRepository<ConfigSystem>();
                 var _repository = _unitOfWork.GetRepository<Data.Entities.ManagerBOT>();
 
                 var botCurrent = await _repository.GetFirstOrDefaultAsync(
@@ -95,7 +102,7 @@ namespace BaseSouce.Services.Services.BOT
 
                 if (botCurrent == null)
                 {
-                    _repository.Insert(new ManagerBOT
+                    botCurrent = new ManagerBOT
                     {
                         BotId = model.BotId,
                         CreatedTime = DateTime.Now,
@@ -107,9 +114,9 @@ namespace BaseSouce.Services.Services.BOT
                         RAM = model.RamUsage,
                         DiskTotal = model.DiskInfo.Total,
                         DiskUsed = model.DiskInfo.Used,
-                        //UserManager = model.UserManager,
-
-                    });
+                    
+                    };
+                    _repository.Insert(botCurrent);
                 }
                 else
                 {
@@ -127,6 +134,27 @@ namespace BaseSouce.Services.Services.BOT
                 }
 
                 await _unitOfWork.SaveChangesAsync();
+
+                var setting = await _repositorySetting.GetFirstOrDefaultAsync();
+                if (!string.IsNullOrEmpty(setting.Telegrams))
+                {
+
+                    var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                    var idTeles = setting.Telegrams.Split(',');
+                    if (idTeles.Length > 0)
+                    {
+                        foreach (var item in idTeles)
+                        {
+                            _ = _telegramBotClient
+                           .SendTextMessageAsync(new ChatId(item.Trim()),
+                           $"BotName: {botCurrent.Name}{Environment.NewLine}"
+                           + $"Group:{botCurrent.Group}{Environment.NewLine}"
+                           + $"Manager:{botCurrent.Manager?.UserName} {Environment.NewLine}"
+                           + $"Live: {botCurrent.LiveType}{Environment.NewLine}"
+                           + $"Connected:{timer}");
+                        }
+                    }
+                }
 
                 return new KeyValuePair<bool, string>(true, string.Empty);
             }
@@ -226,6 +254,7 @@ namespace BaseSouce.Services.Services.BOT
                             item.Status = StreamStatus.Stop;
                         }
                         _repositoryStream.Update(streamsCurrents);
+
                     }
                     _repositoryBot.Update(botCurrent);
                     await _unitOfWork.SaveChangesAsync();
@@ -255,6 +284,15 @@ namespace BaseSouce.Services.Services.BOT
                 if (!string.IsNullOrWhiteSpace(model.Manager))
                 {
                     query = query.Where(x => x.UserManager == model.Manager);
+                }
+                var lstManagers = new List<string>();
+                if (!string.IsNullOrWhiteSpace(model.Managers))
+                {
+                    lstManagers = model.Managers.Split(',').ToList();
+                }
+                if (lstManagers.Any())
+                {
+                    query = query.Where(x => lstManagers.Any(i => i == x.UserManager));
                 }
             }
 
@@ -323,7 +361,7 @@ namespace BaseSouce.Services.Services.BOT
                     Type = x.LiveType,
                     UserId = x.UserId,
                     BotId = x.ManagerBOTId,
-                    
+
                 }).ToListAsync();
             if (data != null && data.Any())
             {
@@ -421,8 +459,6 @@ namespace BaseSouce.Services.Services.BOT
                         }
                     }
                 }
-
-
                 _repository.Update(botCurrent);
 
 
@@ -442,7 +478,7 @@ namespace BaseSouce.Services.Services.BOT
         {
             try
             {
-                var _repository = _unitOfWork.GetRepository<Data.Entities.ManagerBOT>();
+                var _repository = _unitOfWork.GetRepository<ManagerBOT>();
 
                 var botCurrent = await _repository.GetFirstOrDefaultAsync(
                     predicate: x => x.Id == id, disableTracking: false);
@@ -458,7 +494,6 @@ namespace BaseSouce.Services.Services.BOT
             }
             catch (Exception ex)
             {
-
                 _logger.LogError($"Update status ManagetBOT failed by error:[{ex}]");
                 return new KeyValuePair<bool, string>(false, "Cập nhật trạng thái BOT không thành công!");
             }

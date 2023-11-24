@@ -1,13 +1,6 @@
 ﻿using BaseSouce.Data.Entities;
 using BaseSouce.Shared.Enums;
 using BaseSouce.SharedSignalrData.Enums;
-using BaseSouce.SharedSignalrData.Classes;
-using BaseSouce.SharedSignalrData.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BaseSource.Data.Entities
 {
@@ -17,6 +10,8 @@ namespace BaseSource.Data.Entities
         public string UserId { get; set; }
         public int? ManagerBOTId { get; set; }
         public string BotId { get; set; }
+        public int? ManagerBOTBackupId { get; set; }
+        public string BotBackupId { get; set; }
         public string StreamKey { get; set; }
         public string RTMP { get; set; }
         public string StreamName { get; set; }
@@ -31,14 +26,17 @@ namespace BaseSource.Data.Entities
         public DateTime CreatedTime { get; set; }
         public DateTime? EndTime { get; set; }
         public DateTime? Updatedtime { get; set; }
+        public DateTime? DisconnectedTime { get; set; }
+        public bool IsLiveBackup { get; set; }
+        public int? StreamBackupId { get; set; }
         public StreamStatus Status { get; set; }
-
+        public int TimeBackup { get; set; }
         public PlatformType PlatformType { get; set; }
-
         public RenderStatus RenderStatus { get; set; }
         public string ErrorMessage { get; set; }
 
         public ManagerBOT ManagerBOT { get; set; }
         public AppUser AppUser { get; set; }
+        public ManagerBOT ManagerBOTBackup { get; set; }
     }
 }

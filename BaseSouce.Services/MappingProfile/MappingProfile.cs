@@ -50,11 +50,15 @@ namespace BaseSouce.Services.MappingProfile
             #region Stream History
 
             CreateMap<StreamHistory, StreamClientInfoDto>()
+                .ForMember(dest => dest.BotBackupName, options => options.MapFrom(source => source.ManagerBOTBackup.Name))
+                .ForMember(dest => dest.BackupGroup, options => options.MapFrom(source => source.ManagerBOTBackup.Group))
                 .ForMember(dest => dest.BotName, options => options.MapFrom(source => source.ManagerBOT.Name))
                 .ForMember(dest => dest.Group, options => options.MapFrom(source => source.ManagerBOT.Group));
 
 
             CreateMap<StreamHistory, StreamAdminInfoDto>()
+                .ForMember(dest => dest.BotBackupName, options => options.MapFrom(source => source.ManagerBOTBackup.Name))
+                .ForMember(dest => dest.BotBackupGroup, options => options.MapFrom(source => source.ManagerBOTBackup.Group))
                .ForMember(dest => dest.BotGroup, options => options.MapFrom(source => source.ManagerBOT.Group))
                .ForMember(dest => dest.BotName, options => options.MapFrom(source => source.ManagerBOT.Name))
                .ForMember(dest => dest.UserName, options => options.MapFrom(source => source.AppUser.UserName))

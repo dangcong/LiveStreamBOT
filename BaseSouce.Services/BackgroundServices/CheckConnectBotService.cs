@@ -4,11 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BaseSouce.Services.BackgroundServices
 {
@@ -51,27 +46,27 @@ namespace BaseSouce.Services.BackgroundServices
 
         private async void DoWork(object state)
         {
-            //using var _db = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<BaseSourceDbContext>();
+            using var _db = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<BaseSourceDbContext>();
 
-            //var bots = await _db.ManagerBOTs.ToListAsync();
-            //var timeCurrent = DateTime.Now.AddSeconds(-30);
-            //foreach (var bot in bots)
-            //{
-            //    if (bot.UpdatedTime == null || timeCurrent > bot.UpdatedTime)
-            //    {
-            //        bot.Status = ManagerBOTStatus.Disconnected;
+            var bots = await _db.ManagerBOTs.ToListAsync();
+            var timeCurrent = DateTime.Now.AddSeconds(-300);
+            foreach (var bot in bots)
+            {
+                if (bot.UpdatedTime == null || timeCurrent > bot.UpdatedTime)
+                {
+                     bot.Status = ManagerBOTStatus.Disconnected;
 
-            //        //var streamsCurrents = _db.StreamHistorys.Where(x => x.ManagerBOTId == bot.Id).ToList();
-            //        //if (streamsCurrents != null && streamsCurrents.Any())
-            //        //{
-            //        //    foreach (var item in streamsCurrents)
-            //        //    {
-            //        //        item.Status = StreamStatus.Stop;
-            //        //    }
-            //        //}
-            //        await _db.SaveChangesAsync();
-            //    }
-            //}
+                    var streamsCurrents = _db.StreamHistorys.Where(x => x.ManagerBOTId == bot.Id && x.Status == StreamStatus.Streaming).ToList();
+                    if (streamsCurrents != null && streamsCurrents.Any())
+                    {
+                        foreach (var item in streamsCurrents)
+                        {
+                            item.DisconnectedTime = DateTime.Now;
+                        }
+                    }
+                    await _db.SaveChangesAsync();
+                }
+            }
 
         }
 

@@ -48,11 +48,13 @@ namespace BaseSource.API.ControllersAdmin
 
         [HttpGet]
         [Route("report")]
-        public async Task<IActionResult> GetReportStream()
+        public async Task<IActionResult> GetReportStream([FromQuery] string managers)
         {
-            var result = await _streamAdminService.GetReportStreamAsync(UserId,IsAdmin);
+            var result = await _streamAdminService.GetReportStreamAsync(UserId, IsAdmin, managers);
             return Ok(new ApiSuccessResult<object>(result));
 
         }
+
+       
     }
 }

@@ -9,6 +9,19 @@
     var bots = ViewBag.Bots as List<UserBotDto>;
 
 }
+<style>
+    @@media (max-width: 767px) {
+        .card .card-stats .card-stats-items {
+            display: flow;
+        }
+
+        .card .card-stats .card-stats-item {
+            width: 100%;
+        }
+      
+    }
+
+</style>
 
 <section class="section">
     <div class="section-header">
@@ -20,114 +33,202 @@
         </div>
     </div>
     <div class="section-body">
-        <div class="row">
-            <div class="col-12">
+        <div class=" row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
                 <div class="card card-statistic-2">
                     <div class="card-stats">
-                        <div class="card-stats-title ">
-                            <h5>
-                                <strong>Gói cước 1080 Hiện tại: @(packageInfo.PackageLive1080?.Name ?? "Chưa đăng ký")</strong>
-                            </h5>
-                        </div>
-                        @if (packageInfo.PackageLive1080 != null && !string.IsNullOrEmpty(packageInfo.PackageLive1080.Name))
-                        {
-                            <div class="card-stats-items">
-                                <div class="card-stats-item">
-                                    <div class="card-stats-item-count text-success">
-                                        <strong>@(packageInfo.PackageLive1080.NumberOfThreadsInRun)/@(packageInfo.PackageLive1080.NumberOfThreads)</strong>
-                                    </div>
-                                    <div class="card-stats-item-label text-danger"> <strong>Số luồng 1080 đang chạy / Số luồng cấp phép</strong></div>
-                                </div>
-                                @*<div class="card-stats-item">
-                            <div class="card-stats-item-count text-danger">
-                            <strong>N/A</strong>
-                            </div>
-                            <div class="card-stats-item-label text-danger"><strong>Thời hạn</strong></div>
-                            </div>*@
-                                <div class="card-stats-item">
-                                    <div class="card-stats-item-count text-primary">
-                                        <strong>@packageInfo.PackageLive1080.NumberOfThreadsCreatedInRun</strong>
-                                    </div>
-                                    <div class="card-stats-item-label text-danger"><strong>Số luồng đã tạo</strong></div>
-                                </div>
-                            </div>
-                        }
-                        else
-                        {
-                            <div class="card-stats-items">
-                                <div class="card-stats-item">
-                                    <div class="card-stats-item-count text-success"><strong>N/A</strong></div>
-                                    <div class="card-stats-item-label text-danger"> <strong>Số luồng 1080 đang chạy / Số luồng cấp phép</strong></div>
-                                </div>
-                                @*<div class="card-stats-item">
-                            <div class="card-stats-item-count text-danger"><strong>N/A</strong></div>
-                            <div class="card-stats-item-label text-danger"><strong>Thời hạn</strong></div>
-                            </div>*@
-                                <div class="card-stats-item">
-                                    <div class="card-stats-item-count text-primary"><strong>N/A</strong></div>
-                                    <div class="card-stats-item-label text-danger"><strong>Số luồng đã tạo</strong></div>
-                                </div>
-                            </div>
-                        }
-
-                    </div>
-                    <hr />
-                    <div class="card-stats">
                         <div class="card-stats-title">
-                            <h5>
-                                <strong>Gói cước 4K Hiện tại:@(packageInfo.PackageLive4k?.Name ?? "Chưa đăng ký") </strong>
-                            </h5>
-
+                            Báo cáo
                         </div>
-                        @if (packageInfo.PackageLive4k != null && !string.IsNullOrEmpty(packageInfo.PackageLive4k.Name))
-                        {
-                            <div class="card-stats-items">
-                                <div class="card-stats-item">
-                                    <div class="card-stats-item-count text-success">
-                                        <strong>@(packageInfo.PackageLive4k.NumberOfThreadsInRun)/@(packageInfo.PackageLive4k.NumberOfThreads)</strong>
+                        <div class="card-stats-items">
+                            <div class="card-stats-item">
+                                @if (packageInfo.PackageLive1080 != null)
+                                {
+
+                                    <div class="card-stats-item-count">
+                                        <span>
+                                            @(packageInfo.PackageLive1080.NumberOfThreadsInRun)/@(packageInfo.PackageLive1080.NumberOfThreads)/@(packageInfo.PackageLive1080.TotalBOT)
+                                        </span>
                                     </div>
-                                    <div class="card-stats-item-label text-danger"> <strong>Số luồng 4K đang chạy / Số luồng cấp phép</strong></div>
-                                </div>
-                                @* <div class="card-stats-item">
-                            <div class="card-stats-item-count text-danger">
-                            <strong>N/A</strong>
-                            </div>
-                            <div class="card-stats-item-label text-danger"><strong>Thời hạn</strong></div>
-                            </div>*@
-                                <div class="card-stats-item">
-                                    <div class="card-stats-item-count text-primary">
-                                        <strong>@packageInfo.PackageLive4k.NumberOfThreadsCreatedInRun</strong>
+                                }
+                                else
+                                {
+                                    <div class="card-stats-item-count">
+                                        <span>
+                                            0/0/0
+                                        </span>
                                     </div>
-                                    <div class="card-stats-item-label text-danger"><strong>Số luồng đã tạo</strong></div>
+                                }
+
+                                <div class="card-stats-item-label">
+                                    <span class="badge badge-success">1080(Chạy/Tổng/BOT)</span>
                                 </div>
                             </div>
-                        }
-                        else
-                        {
-                            <div class="card-stats-items">
-                                <div class="card-stats-item">
-                                    <div class="card-stats-item-count text-success"><strong>N/A</strong></div>
-                                    <div class="card-stats-item-label text-danger"> <strong>Số luồng 4K đang chạy / Số luồng cấp phép</strong></div>
-                                </div>
-                                @*  <div class="card-stats-item">
-                            <div class="card-stats-item-count text-danger"><strong>N/A</strong></div>
-                            <div class="card-stats-item-label text-danger"><strong>Thời hạn</strong></div>
-                            </div>*@
-                                <div class="card-stats-item">
-                                    <div class="card-stats-item-count text-primary"><strong>N/A</strong></div>
-                                    <div class="card-stats-item-label text-danger"><strong>Số luồng đã tạo</strong></div>
+                            <div class="card-stats-item">
+                                @if (packageInfo.PackageLive4k != null)
+                                {
+
+                                    <div class="card-stats-item-count">
+                                        <span>
+                                            @(packageInfo.PackageLive4k.NumberOfThreadsInRun)/@(packageInfo.PackageLive4k.NumberOfThreads)/@(packageInfo.PackageLive4k.TotalBOT)
+                                        </span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="card-stats-item-count">
+                                        <span>
+                                            0/0/0
+                                        </span>
+                                    </div>
+                                }
+
+                                <div class="card-stats-item-label">
+                                    <span class="badge badge-danger">4K(Chạy/Tổng/BOT)</span>
                                 </div>
                             </div>
-                        }
+                            <div class="card-stats-item">
+                                @if (packageInfo.PackageLiveBackup != null)
+                                {
+
+                                    <div class="card-stats-item-count">
+                                        <span>
+                                            @(packageInfo.PackageLiveBackup.NumberOfThreadsInRun)/@(packageInfo.PackageLiveBackup.TotalPending)/@(packageInfo.PackageLiveBackup.NumberOfThreads)/@(packageInfo.PackageLive4k.TotalBOT)
+                                        </span>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="card-stats-item-count">
+                                        <span>
+                                            0/0/0/0
+                                        </span>
+                                    </div>
+                                }
+
+                                <div class="card-stats-item-label">
+                                    <span class="badge badge-warning">Backup(Chạy/Chờ/Tổng/BOT)</span>
+                                </div>
+                            </div>
+                            <div class="card-stats-item">
+                                <div class="card-stats-item-count">@(packageInfo.PackageLive1080.NumberOfThreadsCreated)/@(packageInfo.PackageLive4k.NumberOfThreadsCreated)</div>
+                                <div class="card-stats-item-label"> <span class="badge badge-primary">Tổng Luồng(1080/4k)</span></div>
+                            </div>
+                            @*  <div class="card-stats-item">
+                            <div class="card-stats-item-count">@report.TotalBOT</div>
+                            <div class="card-stats-item-label"> <span class="badge badge-primary">Tổng BOT</span></div>
+                            </div>
+                            <div class="card-stats-item">
+                            <div class="card-stats-item-count">@report.TotalUser</div>
+                            <div class="card-stats-item-label"> <span class="badge badge-warning">Tổng User</span></div>
+                            </div>
+                            <div class="card-stats-item">
+                            <div class="card-stats-item-count">@report.TotalManager</div>
+                            <div class="card-stats-item-label"> <span class="badge badge-info">Tổng TK Quản lý</span></div>
+                            </div> *@
+                        </div>
                     </div>
                     <div>
                         <br />
+                        <span></span>
                     </div>
+
 
                 </div>
             </div>
+        </div>
+        @*  <div class="row">
+        <div class="col-12">
+        <div class="card card-statistic-2">
+        <div class="card-stats">
+        <div class="card-stats-title ">
+        <h5>
+        <strong>Gói cước 1080 Hiện tại: @(packageInfo.PackageLive1080?.Name ?? "Chưa đăng ký")</strong>
+        </h5>
+        </div>
+        @if (packageInfo.PackageLive1080 != null && !string.IsNullOrEmpty(packageInfo.PackageLive1080.Name))
+        {
+        <div class="card-stats-items">
+        <div class="card-stats-item">
+        <div class="card-stats-item-count text-success">
+        <strong>@(packageInfo.PackageLive1080.NumberOfThreadsInRun)/@(packageInfo.PackageLive1080.NumberOfThreads)</strong>
+        </div>
+        <div class="card-stats-item-label text-danger"> <strong>Số luồng 1080 đang chạy / Số luồng cấp phép</strong></div>
+        </div>
+
+        <div class="card-stats-item">
+        <div class="card-stats-item-count text-primary">
+        <strong>@packageInfo.PackageLive1080.NumberOfThreadsCreatedInRun</strong>
+        </div>
+        <div class="card-stats-item-label text-danger"><strong>Số luồng đã tạo</strong></div>
+        </div>
+        </div>
+        }
+        else
+        {
+        <div class="card-stats-items">
+        <div class="card-stats-item">
+        <div class="card-stats-item-count text-success"><strong>N/A</strong></div>
+        <div class="card-stats-item-label text-danger"> <strong>Số luồng 1080 đang chạy / Số luồng cấp phép</strong></div>
+        </div>
+
+        <div class="card-stats-item">
+        <div class="card-stats-item-count text-primary"><strong>N/A</strong></div>
+        <div class="card-stats-item-label text-danger"><strong>Số luồng đã tạo</strong></div>
+        </div>
+        </div>
+        }
 
         </div>
+        <hr />
+        <div class="card-stats">
+        <div class="card-stats-title">
+        <h5>
+        <strong>Gói cước 4K Hiện tại:@(packageInfo.PackageLive4k?.Name ?? "Chưa đăng ký") </strong>
+        </h5>
+
+        </div>
+        @if (packageInfo.PackageLive4k != null && !string.IsNullOrEmpty(packageInfo.PackageLive4k.Name))
+        {
+        <div class="card-stats-items">
+        <div class="card-stats-item">
+        <div class="card-stats-item-count text-success">
+        <strong>@(packageInfo.PackageLive4k.NumberOfThreadsInRun)/@(packageInfo.PackageLive4k.NumberOfThreads)</strong>
+        </div>
+        <div class="card-stats-item-label text-danger"> <strong>Số luồng 4K đang chạy / Số luồng cấp phép</strong></div>
+        </div>
+
+        <div class="card-stats-item">
+        <div class="card-stats-item-count text-primary">
+        <strong>@packageInfo.PackageLive4k.NumberOfThreadsCreatedInRun</strong>
+        </div>
+        <div class="card-stats-item-label text-danger"><strong>Số luồng đã tạo</strong></div>
+        </div>
+        </div>
+        }
+        else
+        {
+        <div class="card-stats-items">
+        <div class="card-stats-item">
+        <div class="card-stats-item-count text-success"><strong>N/A</strong></div>
+        <div class="card-stats-item-label text-danger"> <strong>Số luồng 4K đang chạy / Số luồng cấp phép</strong></div>
+        </div>
+
+        <div class="card-stats-item">
+        <div class="card-stats-item-count text-primary"><strong>N/A</strong></div>
+        <div class="card-stats-item-label text-danger"><strong>Số luồng đã tạo</strong></div>
+        </div>
+        </div>
+        }
+        </div>
+        <div>
+        <br />
+        </div>
+
+        </div>
+        </div>
+
+        </div> *@
         <div class="row">
             <div class="col-12 col-md-12 col-lg-12">
 
@@ -171,7 +272,11 @@
                                     <option value="0" data-type="2">--Chọn BOT--</option>
                                     @foreach (var item in bots)
                                     {
-                                        <option value="@item.BotId" data-type="@((int)item.Type)">@item.BotName - @(item.Group)(@(item.NumberOfThreadsInRun) / @(item.NumberOfThreads))</option>
+                                        if (item.Type != LiveType._Backup)
+                                        {
+                                            <option value="@item.BotId" data-type="@((int)item.Type)">@item.BotName - @(item.Group)(@(item.NumberOfThreadsInRun) / @(item.NumberOfThreadsBackup)  / @(item.NumberOfThreads))</option>
+                                        }
+
                                     }
                                 </select>
 
@@ -188,12 +293,32 @@
                                 <span asp-validation-for="StreamKey" class="text-danger"></span>
                             </div>
 
-                            <div class="form-group">
+                            <div class="form-group" style=" display:none">
                                 <label>RTMP</label>
-                                <input class="form-control" required asp-for="RTMP" rows="1" />
+                                <input class="form-control" asp-for="RTMP" rows="1" />
                                 <span asp-validation-for="RTMP" class="text-danger"></span>
                             </div>
+                            <div class="form-group">
+                                <label>Thời gian chờ Backup <span class="text-danger">(Phút)</span></label>
+                                <input class="form-control" value="0"  min="0" required asp-for="TimeBackup" type="number" />
+                                <span asp-validation-for="TimeBackup" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Chọn BOT Backup<span class="text-danger">(Nếu không Backup thì để trống)</span></label>
+                                <select class="form-control select2" asp-for="ManagerBotBackupId" >
+                                    <option value="0" data-type="3">--Chọn BOT--</option>
+                                    @foreach (var item in bots)
+                                    {
+                                        if (item.Type == LiveType._Backup)
+                                        {
+                                            <option value="@item.BotId" data-type="@((int)item.Type)">@item.BotName - @(item.Group)(@(item.NumberOfThreadsInRun) / @(item.NumberOfThreadsBackup) / @(item.NumberOfThreads))</option>
+                                        }
 
+                                    }
+                                </select>
+
+                                <span asp-validation-for="ManagerBotBackupId" class="text-danger"></span>
+                            </div>
                             <div class="form-group">
                                 <label>Link Video</label>
                                 <input class="form-control" name="Video" asp-for="Video" id="linkVideo" required />
@@ -311,7 +436,7 @@
                                         <th>Live</th>
                                         <th>Tên luồng</th>
                                         <th>Khóa luồng</th>
-                                        <th>RTMP</th>
+                                        <th>Bot Backup</th>
                                         <th>Kiểu live</th>
                                         <th>Thời gian bắt đầu</th>
                                         <th>Thời gian kết thúc</th>
@@ -374,12 +499,21 @@
                                                         case LiveType._4K:
                                                             <span class="badge badge-danger">4K</span>
                                                             break;
+                                                        case LiveType._Backup:
+                                                            <span class="badge badge-warning">Backup</span>
+                                                            break;
                                                     }
 
                                                 </td>
                                                 <td>@item.StreamName</td>
                                                 <th>@item.StreamKey</th>
-                                                <td>@item.RTMP</td>
+                                                <td>
+                                                    @if (!string.IsNullOrWhiteSpace(item.BotBackupName))
+                                                    {
+                                                        <span>@(item.BotBackupName) - @(item.BackupGroup)</span>
+                                                    }
+
+                                                </td>
                                                 <td>
 
                                                     @if (item.EndTimeLive != null)

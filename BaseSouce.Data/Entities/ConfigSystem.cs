@@ -8,5 +8,6 @@
         public string BankAccountName { get; set; }
         public string LinkFBAdmin { get; set; }
         public string LinkYoutube { get; set; }
+        public string Telegrams { get; set; }
     }
 }

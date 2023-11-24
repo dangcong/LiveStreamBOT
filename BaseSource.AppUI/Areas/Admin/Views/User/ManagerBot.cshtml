@@ -5,6 +5,7 @@
     var bots = ViewBag.Bots as List<ManagerBotInfoDto>;
     var bot1080 = bots.Where(x => x.LiveType == LiveType._1080).ToList();
     var bot4k = bots.Where(x => x.LiveType == LiveType._4K).ToList();
+    var botBackup = bots.Where(x => x.LiveType == LiveType._Backup).ToList();
     var index = 1;
 
 }
@@ -49,7 +50,7 @@
                                         <tr>
                                             <td>@(index++)</td>
                                             <td> <a href="/admin/bot/group?id=@(item.BotId)"> <span class="text-danger"><strong>@item.BotName</strong></span></a></td>
-                                           <td>@item.Group</td>
+                                            <td>@item.Group</td>
                                             <td>
                                                 @switch (item.LiveType)
                                                 {
@@ -59,19 +60,22 @@
                                                     case LiveType._4K:
                                                         <span class="badge badge-danger">4k</span>
                                                         break;
+                                                    case LiveType._Backup:
+                                                        <span class="badge badge-warning">Backup</span>
+                                                        break;
                                                 }
                                             </td>
                                             <td> <span class="badge badge-primary">@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads)</span></td>
 
                                             <td>
                                                 <a class="btn btn-info btnUpdate" href="#"
-                                                  @* data-toggle="modal"
-                                                   data-target="#updateModal"*@
+                                                @* data-toggle="modal"
+                                               data-target="#updateModal"*@
                                                    data-id="@item.Id"
                                                    data-number="@item.NumberOfThreads">Cập nhật</a>
                                                 <a class="btn btn-danger btnDelete" href="#"
-                                                  @* data-toggle="modal"
-                                                   data-target="#deleteModal"*@
+                                                @* data-toggle="modal"
+                                               data-target="#deleteModal"*@
                                                    data-id="@item.Id">Xóa</a>
                                             </td>
                                         </tr>
@@ -170,6 +174,7 @@
                                 <option>-- Chọn loại bot --</option>
                                 <option value="1">-- BOT 1080 --</option>
                                 <option value="2">-- BOT 4k --</option>
+                                <option value="3">-- BOT Backup --</option>
                             </select>
                         </div>
                     </div>
@@ -194,6 +199,20 @@
                             <select class="form-control select2" name="Bot1080">
                                 <option value="0">-- Chọn bot --</option>
                                 @foreach (var item in bot1080)
+                                {
+                                    <option value="@item.Id">@item.Name - @(item.Group)(@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads))</option>
+                                }
+
+                            </select>
+
+                        </div>
+                    </div>
+                    <div class="form-group mb-4 botbackup" style="display:none">
+                        <label class="">Chọn BOT Backup</label>
+                        <div class="">
+                            <select class="form-control select2" name="BotBackup">
+                                <option value="0">-- Chọn bot --</option>
+                                @foreach (var item in botBackup)
                                 {
                                     <option value="@item.Id">@item.Name - @(item.Group)(@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads))</option>
                                 }
@@ -228,15 +247,19 @@
                     case "1":
                         $('.bot1080').show();
                         $('.bot4k').hide();
+                        $('.botbackup').hide();
                         break;
                     case "2":
                         $('.bot4k').show();
                         $('.bot1080').hide();
+                        $('.botbackup').hide();
                         break;
-                    default:
+                    case "3":
                         $('.bot4k').hide();
                         $('.bot1080').hide();
+                        $('.botbackup').show();
                         break;
+
                 }
             });
             $('body').on('click', '.btnUpdate', function (e) {
@@ -245,13 +268,13 @@
                 let id = $(this).attr('data-id');
                 let number = $(this).attr('data-number');
                 //let stringVal="Id:${id}- numer:[${number}]";
-              
+
                 $('#updateForm input[name="Id"]').val(id);
                 $('#updateForm input[name="NumberOfThreads"]').val(number);
             });
             $('body').on('click', '.btnDelete', function () {
 
-                 $('#deleteModal').modal('show');
+                $('#deleteModal').modal('show');
                 let id = $(this).attr('data-id');
                 $('#deleteForm input[name="Id"]').val(id);
             });

@@ -18,10 +18,16 @@ namespace BaseSource.ViewModels.UserAdmin
         public DateTime CreatedTime { get; set; }
         public string TelegramAPI { get; set; }
 
+        public int TotalBot1080 { get; set; }
+        public int TotalBot4k { get; set; }
+        public int TotalBotBackup { get; set; }
         public int NumberOfThreads1080 { get; set; }
         public int NumberOfThreads4K { get; set; }
+        public int NumberOfThreadsBackup { get; set; }
         public int NumberOfThreads1080InRun { get; set; }
         public int NumberOfThreads4KInRun { get; set; }
+        public int NumberOfThreadsBackupInRun { get; set; }
+        public int NumberOfThreadsBackupPending { get; set; }
         public string Password { get; set; }
         public int TotalBOT { get; set; }
         public DateTime? UpdatedTime { get; set; }
@@ -35,6 +41,7 @@ namespace BaseSource.ViewModels.UserAdmin
         public string UserName { get; set; }
         public bool IsOrder { get; set; }
         public string Manager { get; set; }
+        public string Managers { get; set; }
     }
     public class UserGroupDto
     {
@@ -68,8 +75,10 @@ namespace BaseSource.ViewModels.UserAdmin
         public string UserId { get; set; }
         public int NumberOfThreads1080 { get; set; }
         public int NumberOfThreads4K { get; set; }
+        public int NumberOfThreadsBackup { get; set; }
         public int? Bot1080 { get; set; }
         public int? Bot4K { get; set; }
+        public int? BotBackup { get; set; }
         public string UserName { get; set; }
     }
 
@@ -109,6 +118,7 @@ namespace BaseSource.ViewModels.UserAdmin
         public int? TypeBot { get; set; }
         public int? Bot1080 { get; set; }
         public int? Bot4k { get; set; }
+        public int? BotBackup { get; set; }
     }
     public class UpdateTelegramDto
     {

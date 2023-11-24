@@ -122,9 +122,9 @@ namespace BaseSouce.Services.Services.StreamAdmin
                 if (lstManagers.Any())
                 {
                     data.TotalBOTConnected = await _repositoryBOT.Queryable().AsNoTracking()
-                    .Where(x => x.DeletedTime == null && lstManagers.Any(i => i == x.UserManager) && x.Status==ManagerBOTStatus.Connected).CountAsync();
-                    data.TotalBOTDisconnected = await _repositoryBOT.Queryable().AsNoTracking()
-                    .Where(x => x.DeletedTime == null && lstManagers.Any(i => i == x.UserManager) && x.Status == ManagerBOTStatus.Disconnected).CountAsync();
+                    .Where(x => x.DeletedTime == null && lstManagers.Any(i => i == x.UserManager) && x.Status == ManagerBOTStatus.Connected).CountAsync();
+                    data.TotalBOT = await _repositoryBOT.Queryable().AsNoTracking()
+                    .Where(x => x.DeletedTime == null && lstManagers.Any(i => i == x.UserManager)).CountAsync();
 
                     var streamData = await _repositoryStream.Queryable().AsNoTracking()
                         .Where(x => lstManagers.Any(i => i == x.AppUser.UserManager))
@@ -191,9 +191,9 @@ namespace BaseSouce.Services.Services.StreamAdmin
                 else
                 {
                     data.TotalBOTConnected = await _repositoryBOT.Queryable().AsNoTracking()
-                    .Where(x => x.DeletedTime == null && x.Status==ManagerBOTStatus.Connected).CountAsync();
-                    data.TotalBOTDisconnected = await _repositoryBOT.Queryable().AsNoTracking()
-                    .Where(x => x.DeletedTime == null && x.Status == ManagerBOTStatus.Disconnected).CountAsync();
+                    .Where(x => x.DeletedTime == null && x.Status == ManagerBOTStatus.Connected).CountAsync();
+                    data.TotalBOT = await _repositoryBOT.Queryable().AsNoTracking()
+                    .Where(x => x.DeletedTime == null).CountAsync();
 
                     var streamData = await _repositoryStream.Queryable().AsNoTracking()
                         .Select(x => new
@@ -252,9 +252,9 @@ namespace BaseSouce.Services.Services.StreamAdmin
             else
             {
                 data.TotalBOTConnected = await _repositoryBOT.Queryable().AsNoTracking()
-                    .Where(x => x.DeletedTime == null && x.UserManager == userId && x.Status==ManagerBOTStatus.Connected).CountAsync();
-                data.TotalBOTDisconnected = await _repositoryBOT.Queryable().AsNoTracking()
-                    .Where(x => x.DeletedTime == null && x.UserManager == userId && x.Status == ManagerBOTStatus.Disconnected).CountAsync();
+                    .Where(x => x.DeletedTime == null && x.UserManager == userId && x.Status == ManagerBOTStatus.Connected).CountAsync();
+                data.TotalBOT = await _repositoryBOT.Queryable().AsNoTracking()
+                    .Where(x => x.DeletedTime == null && x.UserManager == userId ).CountAsync();
 
                 var streamData = await _repositoryStream.Queryable().AsNoTracking()
                     .Where(x => x.AppUser.UserManager == userId || x.UserId == userId)

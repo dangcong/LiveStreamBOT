@@ -156,7 +156,7 @@ namespace BaseSource.ViewModels.Stream
         public int NumberOfThreads4K { get; set; }
         public int NumberOfThreads4KInRun { get; set; }
         public int TotalBOTConnected { get; set; }
-        public int TotalBOTDisconnected { get; set; }
+        public int TotalBOT { get; set; }
         public int TotalBOT1080 { get; set; }
         public int TotalBOT4k { get; set; }
         public int TotalBOTBackup { get; set; }

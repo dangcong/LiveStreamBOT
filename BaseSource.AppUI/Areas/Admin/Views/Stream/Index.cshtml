@@ -115,8 +115,9 @@
                                 <thead>
                                     <tr>
                                         <th>STT</th>
-                                        <th>Người dùng</th>
                                         <th>Manager</th>
+                                        <th>Người dùng</th>
+
                                         <th>BOTName</th>
 
                                         <th>Group</th>
@@ -138,10 +139,11 @@
                                     {
                                         <tr>
                                             <td>@(index++)</td>
+                                            <td>@item.UserManager</td>
                                             <td>
                                                 @item.UserName
                                             </td>
-                                            <td>@item.UserManager</td>
+
                                             <td>@item.BotName</td>
                                             <td>@item.BotGroup</td>
                                             <td>@item.StreamName</td>

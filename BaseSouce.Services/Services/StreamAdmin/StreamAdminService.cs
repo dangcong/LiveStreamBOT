@@ -8,11 +8,6 @@ using EFCore.UnitOfWork;
 using EFCore.UnitOfWork.PageList;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BaseSouce.Services.Services.StreamAdmin
 {
@@ -32,12 +27,16 @@ namespace BaseSouce.Services.Services.StreamAdmin
 
         }
 
-        public async Task<List<StreamAdminInfoDto>> GetAllByUserIdAsync(string userId)
+        public async Task<List<StreamAdminInfoDto>> GetAllByUserIdAsync(string userId, bool isAdmin = false)
         {
             var _repository = _unitOfWork.GetRepository<StreamHistory>();
 
             var query = _repository.Queryable().AsNoTracking();
-            query = query.Where(x => x.UserId == userId);
+            if (!isAdmin)
+            {
+                query = query.Where(x => x.UserId == userId || x.ManagerBOT.UserManager == userId);
+            }
+
 
             var data = await _repository.GetStagesPagedListAsync(
                 stages: query,
@@ -144,8 +143,6 @@ namespace BaseSouce.Services.Services.StreamAdmin
                     data.NumberOfThreads1080InRun = streamData
                         .Where(x => x.Type == LiveType._1080 && x.Status == StreamStatus.Streaming
                         ).Count();
-
-
 
                     data.NumberOfThreads4K = await _repositoryUserBot.Queryable()
                         .Include(x => x.ManagerBOT).Include(x => x.User)
@@ -254,7 +251,7 @@ namespace BaseSouce.Services.Services.StreamAdmin
                 data.TotalBOTConnected = await _repositoryBOT.Queryable().AsNoTracking()
                     .Where(x => x.DeletedTime == null && x.UserManager == userId && x.Status == ManagerBOTStatus.Connected).CountAsync();
                 data.TotalBOT = await _repositoryBOT.Queryable().AsNoTracking()
-                    .Where(x => x.DeletedTime == null && x.UserManager == userId ).CountAsync();
+                    .Where(x => x.DeletedTime == null && x.UserManager == userId).CountAsync();
 
                 var streamData = await _repositoryStream.Queryable().AsNoTracking()
                     .Where(x => x.AppUser.UserManager == userId || x.UserId == userId)

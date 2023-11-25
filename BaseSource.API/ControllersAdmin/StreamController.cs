@@ -42,7 +42,7 @@ namespace BaseSource.API.ControllersAdmin
         [Route("user")]
         public async Task<IActionResult> GetAllByUserId(string userId)
         {
-            var result = await _streamAdminService.GetAllByUserIdAsync(userId);
+            var result = await _streamAdminService.GetAllByUserIdAsync(userId, IsAdmin);
             return Ok(new ApiSuccessResult<object>(result));
         }
 
@@ -54,7 +54,5 @@ namespace BaseSource.API.ControllersAdmin
             return Ok(new ApiSuccessResult<object>(result));
 
         }
-
-       
     }
 }

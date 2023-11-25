@@ -40,7 +40,7 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
                 Managers = User.IsInRole("Admin") ? managerSelect : string.Empty
                 //UserName = searchValue
             });
-            var report = await _streamAdminApiClient.GetReportStream();
+            var report = await _streamAdminApiClient.GetReportStream(managerSelect ?? string.Empty);
 
             if (report == null || !report.IsSuccessed)
             {

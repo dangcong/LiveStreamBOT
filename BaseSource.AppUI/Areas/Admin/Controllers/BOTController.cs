@@ -46,7 +46,7 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var report = await _streamAdminApiClient.GetReportStream();
+            var report = await _streamAdminApiClient.GetReportStream(managerSelect ?? string.Empty);
 
             if (report == null || !report.IsSuccessed)
             {

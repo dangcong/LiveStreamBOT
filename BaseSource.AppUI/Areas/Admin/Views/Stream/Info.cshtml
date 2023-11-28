@@ -1,6 +1,6 @@
 ﻿@model StreamClientInfoDto
 @{
-     Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
+    Layout = "~/Areas/Admin/Views/Shared/_Layout.cshtml";
     ViewData["Title"] = "Thông tin luồng live";
 }
 
@@ -33,6 +33,10 @@
                             <div class="custom-control custom-radio custom-control-inline">
                                 <input type="radio" id="live4k" value="2" checked="@(Model.LiveType==LiveType._4K)" name="LiveType" class="custom-control-input">
                                 <label class="custom-control-label" for="live4k">Live 4k</label>
+                            </div>
+                            <div class="custom-control custom-radio custom-control-inline">
+                                <input type="radio" id="liveBackup" value="3" checked="@(Model.LiveType==LiveType._Backup)" name="LiveType" class="custom-control-input">
+                                <label class="custom-control-label" for="live4k">Live Backup</label>
                             </div>
                             <div class="form-group">
                                 <label>Tên luồng live</label>
@@ -74,21 +78,21 @@
                                 <span asp-validation-for="Audio" class="text-danger"></span>
                             </div>
                             @*<div class="form-group">
-                                <label class="d-block">Cài đặt</label>
-                                <div class="form-check">
-                                    <input class="form-check-input" asp-for="IsForever" type="checkbox" id="defaultCheck1">
-                                    <label class="form-check-label" for="defaultCheck1">
-                                        Live 24/7(vĩnh viễn)
-                                    </label>
-                                </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" asp-for="IsLiveNow" type="checkbox" id="defaultCheck3">
-                                    <label class="form-check-label" for="defaultCheck3">
-                                        Live ngay bây giờ
-                                    </label>
-                                </div>
+                            <label class="d-block">Cài đặt</label>
+                            <div class="form-check">
+                            <input class="form-check-input" asp-for="IsForever" type="checkbox" id="defaultCheck1">
+                            <label class="form-check-label" for="defaultCheck1">
+                            Live 24/7(vĩnh viễn)
+                            </label>
+                            </div>
+                            <div class="form-check">
+                            <input class="form-check-input" asp-for="IsLiveNow" type="checkbox" id="defaultCheck3">
+                            <label class="form-check-label" for="defaultCheck3">
+                            Live ngay bây giờ
+                            </label>
+                            </div>
                             </div>*@
-                           <div class="section-title">Hẹn lịch -  <span class="text-danger"> * Lưu ý: Live 24.7 thì không chọn thời gian kết thúc</span></div>
+                            <div class="section-title">Hẹn lịch -  <span class="text-danger"> * Lưu ý: Live 24.7 thì không chọn thời gian kết thúc</span></div>
                             <div class="form-group">
                                 <label>Thời gian bắt đầu</label>
                                 <input type="datetime-local" asp-for="StartTimeLive" class="form-control col-6" placeholder="Thời gian bắt đầu">
@@ -98,7 +102,7 @@
                                 <input type="datetime-local" asp-for="EndTimeLive" class="form-control col-6" placeholder="Thời gian kết thúc">
                             </div>
                         </div>
-                        
+
                     </form>
                 </div>
             </div>

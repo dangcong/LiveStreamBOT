@@ -77,7 +77,7 @@
                             <div class="card-stats-item">
                                 <div class="card-stats-item-count">
                                     <span>
-                                        @(report.NumberOfThreadsBackupInRun)/@(report.NumberOfThreadsBackupPending)/@(report.NumberOfThreadsBackup)/@(report.TotalBOT4k)
+                                        @(report.NumberOfThreadsBackupInRun)/@(report.NumberOfThreadsBackupPending)/@(report.NumberOfThreadsBackup)/@(report.TotalBOTBackup)
                                     </span>
                                 </div>
                                 <div class="card-stats-item-label">
@@ -206,7 +206,14 @@
 
                                             </td>
                                             <td>@item.CreatedTime.ToString("dd/MM/yyyy HH:mm:ss")</td>
-                                            <td><span>@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads)</span> </td>
+                                            @if (item.LiveType!=LiveType._Backup)
+                                            {
+                                                <td><span>@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads)</span> </td>
+                                            }else
+                                            {
+                                                 <td><span>@(item.NumberOfThreadsInRun)/@(item.NumberOfThreadsBackupPending)/@(item.NumberOfThreads)</span> </td>
+                                            }
+                                            
                                             <td>@item.TotalUser</td>
                                             <td>@((item.CPU * 100).ToString("n2"))%</td>
                                             <td>@((item.RAM * 100).ToString("n2"))%</td>

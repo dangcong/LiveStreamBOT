@@ -54,6 +54,7 @@ builder.Services.DIConfiguration();
 builder.Services.AddControllers();
 
 builder.Services.AddHostedService<CheckConnectBotService>();
+builder.Services.AddHostedService<CheckLiveBackupService>();
 //add autoMapper
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

@@ -18,7 +18,6 @@
         .card .card-stats .card-stats-item {
             width: 100%;
         }
-      
     }
 
 </style>
@@ -274,7 +273,7 @@
                                     {
                                         if (item.Type != LiveType._Backup)
                                         {
-                                            <option value="@item.BotId" data-type="@((int)item.Type)">@item.BotName - @(item.Group)(@(item.NumberOfThreadsInRun) / @(item.NumberOfThreadsBackup)  / @(item.NumberOfThreads))</option>
+                                            <option value="@item.BotId" data-type="@((int)item.Type)">@item.BotName - @(item.Group)(@(item.NumberOfThreadsInRun)  / @(item.NumberOfThreads))</option>
                                         }
 
                                     }
@@ -287,11 +286,7 @@
                             <input type="radio" id="facebook" name="PlatformType" class="custom-control-input">
                             <label class="custom-control-label" for="facebook">Facebook</label>
                             </div>*@
-                            <div class="form-group">
-                                <label>Khóa luồng</label>
-                                <input class="form-control" required asp-for="StreamKey" rows="1" />
-                                <span asp-validation-for="StreamKey" class="text-danger"></span>
-                            </div>
+
 
                             <div class="form-group" style=" display:none">
                                 <label>RTMP</label>
@@ -300,13 +295,13 @@
                             </div>
                             <div class="form-group">
                                 <label>Thời gian chờ Backup <span class="text-danger">(Phút)</span></label>
-                                <input class="form-control" value="0"  min="0" required asp-for="TimeBackup" type="number" />
+                                <input class="form-control" value="3" min="0" required asp-for="TimeBackup" type="number" />
                                 <span asp-validation-for="TimeBackup" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label>Chọn BOT Backup<span class="text-danger">(Nếu không Backup thì để trống)</span></label>
-                                <select class="form-control select2" asp-for="ManagerBotBackupId" >
-                                    <option value="0" data-type="3">--Chọn BOT--</option>
+                                <select class="form-control select2" asp-for="ManagerBotBackupId">
+                                    <option value="0">--Chọn BOT--</option>
                                     @foreach (var item in bots)
                                     {
                                         if (item.Type == LiveType._Backup)
@@ -318,6 +313,11 @@
                                 </select>
 
                                 <span asp-validation-for="ManagerBotBackupId" class="text-danger"></span>
+                            </div>
+                            <div class="form-group">
+                                <label>Khóa luồng</label>
+                                <input class="form-control" required asp-for="StreamKey" rows="1" />
+                                <span asp-validation-for="StreamKey" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label>Link Video</label>
@@ -455,34 +455,59 @@
                                             <tr>
                                                 <td>@(index++)</td>
                                                 <td>
-                                                    @switch (item.Status)
+                                                    @if (item.LiveType != LiveType._Backup)
                                                     {
-                                                        case StreamStatus.Streaming:
-                                                            <button class="btn btn-sm btn-danger "
-                                                                    data-id="@item.Id"
-                                                                    onclick="stop('@item.Id');"
-                                                            @*data-toggle="modal" data-target="#stopStreamModal"*@>
-                                                                Dừng
-                                                            </button>
-                                                            break;
-                                                        case StreamStatus.Stop:
-                                                        case StreamStatus.Disconnet:
-                                                            <button class="btn btn-sm btn-success " onclick="start('@item.Id');" data-id="@item.Id"
-                                                            @* data-toggle="modal"
-                                                    data-target="#startStreamModal"*@>
-                                                                Chạy
-                                                            </button>
-                                                            <a href="/stream/edit?id=@item.Id" class="btn btn-sm btn-primary">Sửa</a>
-                                                            <button class="btn btn-sm btn-danger "
-                                                                    data-id="@item.Id"
-                                                                    onclick="deleteStream('@item.Id');"
-                                                            @*data-toggle="modal"
-                                                    data-target="#deleteStreamModal"*@>
-                                                                Xóa
-                                                            </button>
-                                                            break;
+                                                        @switch (item.Status)
+                                                        {
+                                                            case StreamStatus.Streaming:
+                                                                <button class="btn btn-sm btn-danger "
+                                                                        data-id="@item.Id"
+                                                                        onclick="stop('@item.Id');">
+                                                                    Dừng
+                                                                </button>
+                                                                break;
+                                                            case StreamStatus.Stop:
+                                                            case StreamStatus.Disconnet:
+
+                                                                <button class="btn btn-sm btn-success " onclick="start('@item.Id');" data-id="@item.Id">
+                                                                    Chạy
+                                                                </button>
+                                                                <a href="/stream/edit?id=@item.Id" class="btn btn-sm btn-primary">Sửa</a>
+                                                                <button class="btn btn-sm btn-danger "
+                                                                        data-id="@item.Id"
+                                                                        onclick="deleteStream('@item.Id');">
+                                                                    Xóa
+                                                                </button>
+                                                                break;
+                                                        }
+                                                        <a href="/stream/info?id=@item.Id" class="btn btn-sm btn-primary">Chi tiết</a>
                                                     }
-                                                    <a href="/stream/info?id=@item.Id" class="btn btn-sm btn-primary">Chi tiết</a>
+                                                    else
+                                                    {
+                                                        @switch (item.Status)
+                                                        {
+                                                            case StreamStatus.Streaming:
+                                                                <button class="btn btn-sm btn-danger "
+                                                                        data-id="@item.Id"
+                                                                        onclick="stop('@item.Id');">
+                                                                    Dừng
+                                                                </button>
+                                                                break;
+                                                            case StreamStatus.Stop:
+                                                            case StreamStatus.Disconnet:
+
+                                                              
+                                                              
+                                                                <button class="btn btn-sm btn-danger "
+                                                                        data-id="@item.Id"
+                                                                        onclick="deleteStream('@item.Id');">
+                                                                    Xóa
+                                                                </button>
+                                                                break;
+                                                        }
+                                                    }
+
+
                                                 </td>
                                                 <td>
                                                     <span class="text-danger">@item.BotName</span>
@@ -562,7 +587,7 @@
                                                             <span class="badge badge-info">Tải</span>
                                                             break;
                                                         case BaseSouce.SharedSignalrData.Enums.RenderStatus.LiveStreaming:
-                                                            <span class="badge badge-suceess">Đang stream</span>
+                                                            <span class="badge badge-success">Đang stream</span>
                                                             break;
                                                         case BaseSouce.SharedSignalrData.Enums.RenderStatus.Cancelled:
                                                             <span class="badge badge-danger"> Hủy</span>
@@ -589,9 +614,7 @@
                                                             break;
                                                     }
                                                 </td>
-
                                             </tr>
-
                                         }
                                     }
                                 </tbody>

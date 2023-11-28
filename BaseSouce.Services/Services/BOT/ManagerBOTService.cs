@@ -2,7 +2,6 @@
 using BaseSouce.Data.EF;
 using BaseSouce.Data.Entities;
 using BaseSouce.Services.Services.Stream;
-using BaseSouce.Services.Services.StreamAdmin;
 using BaseSouce.Shared.Enums;
 using BaseSouce.SharedSignalrData.Enums;
 using BaseSouce.SharedSignalrData.Classes;
@@ -17,6 +16,7 @@ using Microsoft.AspNetCore.SignalR;
 using BaseSouce.Services.HubServices;
 using Telegram.Bot;
 using Telegram.Bot.Types;
+using Microsoft.Extensions.Configuration;
 
 namespace BaseSouce.Services.Services.BOT
 {
@@ -28,6 +28,9 @@ namespace BaseSouce.Services.Services.BOT
         private readonly IStreamClientService _streamService;
         private readonly IHubContext<BotHub, IBotClientHub> _botContextHub;
         private readonly ITelegramBotClient _telegramBotClient;
+        private readonly IConfiguration _configuration;
+        private TelegramBotClient _botClient2;
+
 
         public ManagerBOTService(IUnitOfWork<BaseSourceDbContext> unitOfWork,
             ILogger<ManagerBOTService> logger,
@@ -35,6 +38,8 @@ namespace BaseSouce.Services.Services.BOT
             IStreamClientService streamService
             , IHubContext<BotHub, IBotClientHub> botContextHub
             , ITelegramBotClient telegramBotClient
+            , IConfiguration configuration
+            //,IBotTeleClient2 botTeleClient2
             )
         {
             _unitOfWork = unitOfWork;
@@ -42,6 +47,9 @@ namespace BaseSouce.Services.Services.BOT
             _mapper = mapper;
             _streamService = streamService;
             _telegramBotClient = telegramBotClient;
+            _configuration = configuration;
+            _botClient2 = new TelegramBotClient(_configuration["TelegramBotConfigure:BotToken2"]);
+            //_botTeleClient2 = botTeleClient2;
         }
 
         public async Task<KeyValuePair<bool, string>> ChangeUsedAsync(int id)
@@ -98,8 +106,10 @@ namespace BaseSouce.Services.Services.BOT
 
                 var botCurrent = await _repository.GetFirstOrDefaultAsync(
                     predicate: x => x.BotId == model.BotId,
-                    disableTracking: false);
+                    disableTracking: false,
+                    include: x => x.Include(i => i.Manager));
 
+                var statusOld = botCurrent.Status;
                 if (botCurrent == null)
                 {
                     botCurrent = new ManagerBOT
@@ -114,7 +124,7 @@ namespace BaseSouce.Services.Services.BOT
                         RAM = model.RamUsage,
                         DiskTotal = model.DiskInfo.Total,
                         DiskUsed = model.DiskInfo.Used,
-                    
+
                     };
                     _repository.Insert(botCurrent);
                 }
@@ -131,12 +141,31 @@ namespace BaseSouce.Services.Services.BOT
                     botCurrent.DiskTotal = model.DiskInfo?.Total ?? 0;
                     botCurrent.DiskUsed = model.DiskInfo?.Used ?? 0;
                     _repository.Update(botCurrent);
+
+                    if (!string.IsNullOrWhiteSpace(botCurrent.Manager.TelegramBOT))
+                    {
+                        var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                        var idTeles = botCurrent.Manager.TelegramBOT.Split(',');
+                        if (idTeles.Length > 0)
+                        {
+                            foreach (var item in idTeles)
+                            {
+                                _ = _botClient2
+                               .SendTextMessageAsync(new ChatId(item.Trim()),
+                               $"BotName: {botCurrent.Name}{Environment.NewLine}"
+                               + $"Group:{botCurrent.Group}{Environment.NewLine}"
+                               + $"Manager:{botCurrent.Manager?.UserName} {Environment.NewLine}"
+                               + $"Live: {botCurrent.LiveType}{Environment.NewLine}"
+                               + $"Disconnected:{timer}");
+                            }
+                        }
+                    }
                 }
 
                 await _unitOfWork.SaveChangesAsync();
 
                 var setting = await _repositorySetting.GetFirstOrDefaultAsync();
-                if (!string.IsNullOrEmpty(setting.Telegrams))
+                if (!string.IsNullOrEmpty(setting.Telegrams) && statusOld == ManagerBOTStatus.Disconnected)
                 {
 
                     var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
@@ -145,7 +174,7 @@ namespace BaseSouce.Services.Services.BOT
                     {
                         foreach (var item in idTeles)
                         {
-                            _ = _telegramBotClient
+                            _ = _botClient2
                            .SendTextMessageAsync(new ChatId(item.Trim()),
                            $"BotName: {botCurrent.Name}{Environment.NewLine}"
                            + $"Group:{botCurrent.Group}{Environment.NewLine}"
@@ -273,6 +302,7 @@ namespace BaseSouce.Services.Services.BOT
             var _repositoryUserBot = _unitOfWork.GetRepository<UserManagerBOT>();
 
             var _repository = _unitOfWork.GetRepository<Data.Entities.ManagerBOT>();
+            var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
             var query = _repository.Queryable().AsNoTracking();
             query = query.Where(x => x.DeletedTime == null);
             if (!isAdmin)
@@ -314,6 +344,14 @@ namespace BaseSouce.Services.Services.BOT
                         .Where(x => x.ManagerBOTId == item.Id)
                         .SumAsync(x => x.NumberOfThreads);
                     item.NumberOfThreads = totalThread;
+
+                    if (item.LiveType == LiveType._Backup)
+                    {
+                        item.NumberOfThreadsBackupPending = await _repositoryStream.Queryable()
+                            .Where(x => x.ManagerBOTBackupId.GetValueOrDefault() > 0
+                            && x.Status == StreamStatus.Streaming
+                            && x.ManagerBOTBackupId == item.Id).CountAsync();
+                    }
                     //switch (item.LiveType)
                     //{
                     //    case LiveType._1080:

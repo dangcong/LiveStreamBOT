@@ -10,6 +10,7 @@ namespace BaseSouce.Data.Entities
         public string LinkTelegram { get; set; }
         public DateTime CreatedTime { get; set; }
         public string TelegramAPI { get; set; }
+        public string TelegramBOT { get; set; }
 
         //public int NumberOfThreads1080 { get; set; }
         //public int NumberOfThreads4K { get; set; }

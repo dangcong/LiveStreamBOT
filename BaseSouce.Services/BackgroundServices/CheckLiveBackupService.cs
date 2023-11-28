@@ -28,17 +28,17 @@ namespace BaseSouce.Services.BackgroundServices
         }
         public Task StartAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Timed Hosted Order History Service running.");
+            _logger.LogInformation("Timed Hosted Check Live Backup Service running.");
 
             _timer = new Timer(DoWork, null, TimeSpan.Zero,
-                TimeSpan.FromSeconds(60));
+                TimeSpan.FromSeconds(30));
 
             return Task.CompletedTask;
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Timed Hosted Order History Service stopping.");
+            _logger.LogInformation("Timed Hosted Check Live Backup Service stopping.");
 
             _timer?.Change(Timeout.Infinite, 0);
 
@@ -47,9 +47,11 @@ namespace BaseSouce.Services.BackgroundServices
 
         private async void DoWork(object state)
         {
-             var _streamService = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<IStreamClientService>();
+            _logger.LogInformation("Begin Check Live Backup.");
+            var _streamService = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<IStreamClientService>();
 
-           await _streamService.CheckLiveBackupAsync();
+            await _streamService.CheckLiveBackupAsync();
+            _logger.LogInformation("End Check Live Backup.");
 
         }
     }

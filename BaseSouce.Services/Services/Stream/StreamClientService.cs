@@ -62,11 +62,11 @@ namespace BaseSouce.Services.Services.Stream
                     return $"Chưa nhập {nameof(model.StreamKey)}";
                 }
 
-                //if (!Uri.TryCreate(model.RTMP, UriKind.Absolute, out Uri? rtmp))
-                //{
-                //    return $"{nameof(model.RTMP)} sai định dạng";
-                //}
-                model.RTMP = "";
+                if (!Uri.TryCreate(model.RTMP, UriKind.Absolute, out Uri? rtmp))
+                {
+                    return $"{nameof(model.RTMP)} sai định dạng";
+                }
+                //model.RTMP = "";
                 Uri uri = new Uri($"{model.RTMP.ToString().TrimEnd('/')}/{model.StreamKey.Trim()}");
 
                 List<string> renderArguments = new List<string>();
@@ -480,7 +480,7 @@ namespace BaseSouce.Services.Services.Stream
                     CreatedTime = DateTime.Now,
                     IsForever = model.IsForever,
                     IsLiveNow = model.IsLiveNow,
-                    RTMP = model.RTMP,
+                    RTMP = "rtmp://x.rtmp.youtube.com/live2",
                     StartTimeLive = model.StartTimeLive,
                     EndTimeLive = model.EndTimeLive,
                     Status = StreamStatus.Stop,
@@ -579,7 +579,7 @@ namespace BaseSouce.Services.Services.Stream
                 {
                     //stop live backup
                     var streamBackup = await _repositoryStream.GetFirstOrDefaultAsync(
-                        predicate: x => x.Id == streamEntity.StreamBackupId.GetValueOrDefault() && x.Status == StreamStatus.Streaming);
+                        predicate: x => x.Id == streamEntity.StreamBackupId.GetValueOrDefault());
                     if (streamBackup != null)
                     {
                         // call BOT cancel
@@ -652,6 +652,8 @@ namespace BaseSouce.Services.Services.Stream
                 streamEntity.ManagerBOTId = botId;
                 streamEntity.DisconnectedTime = null;
                 streamEntity.IsLiveBackup = false;
+                streamEntity.RenderStatus = RenderStatus.Waitting;
+                streamEntity.StreamBackupId = null;
 
                 _repositoryStream.Update(streamEntity);
                 await _unitOfWork.SaveChangesAsync();
@@ -979,12 +981,6 @@ namespace BaseSouce.Services.Services.Stream
                     return new KeyValuePair<bool, string>(false, "Luồng không tồn tại, vui lòng thử lại!");
                 }
 
-                //
-                streamEntity.Status = StreamStatus.Stop;
-
-                _repositoryStream.Update(streamEntity);
-                await _unitOfWork.SaveChangesAsync();
-
                 // call BOT cancel
 
                 await _botContextHub.Clients.All.RenderAsync(new RenderCommand
@@ -993,7 +989,31 @@ namespace BaseSouce.Services.Services.Stream
                     Command = Command.Cancel
                 });
 
+                if (streamEntity.LiveType == LiveType._Backup)
+                {
+                    _repositoryStream.Delete(streamEntity);
+                }
+                else
+                {
+                    streamEntity.Status = StreamStatus.Stop;
+                    if (streamEntity.StreamBackupId != null)
+                    {
+                        var streamBackup = _repositoryStream.GetFirstOrDefaultAsync(
+                            predicate: x => x.Id == streamEntity.StreamBackupId, disableTracking: false);
+                        if (streamBackup != null)
+                        {
+                            _repositoryStream.Delete(streamBackup);
+                        }
+                    }
+                    streamEntity.StreamBackupId = null;
+                    streamEntity.DisconnectedTime = null;
+                    streamEntity.IsLiveBackup = false;
 
+                    _repositoryStream.Update(streamEntity);
+                }
+                //
+
+                await _unitOfWork.SaveChangesAsync();
 
                 return new KeyValuePair<bool, string>(true, string.Empty);
             }
@@ -1007,11 +1027,10 @@ namespace BaseSouce.Services.Services.Stream
         public async Task<StreamClientInfoDto> GetStreamByIdAsync(string userId, int id)
         {
             var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
-
             return await _repositoryStream.GetFirstOrDefaultAsync(
                 predicate: x => x.Id == id && x.UserId == userId,
                 selector: x => _mapper.Map<StreamClientInfoDto>(x),
-                include: x => x.Include(i => i.AppUser),
+                include: x => x.Include(i => i.AppUser).Include(i => i.ManagerBOT),
                 disableTracking: false);
         }
 
@@ -1057,10 +1076,10 @@ namespace BaseSouce.Services.Services.Stream
             {
                 var streamData = await _repositoryStream.Queryable().AsNoTracking()
                     .Where(x => x.UserId == userId && x.LiveType != LiveType._Backup
-                    && x.ManagerBOTBackupId != null && x.ManagerBOTBackupId > 0).Select(x => x.ManagerBOTBackupId).ToListAsync();
+                    && x.ManagerBOTBackupId.GetValueOrDefault() > 0).Select(x => x.ManagerBOTBackupId).ToListAsync();
                 foreach (var item in data)
                 {
-                    item.NumberOfThreadsBackup = streamData.Where(x => x.GetValueOrDefault() == item.BotId).Sum().GetValueOrDefault();
+                    item.NumberOfThreadsBackup = streamData.Where(x => x.GetValueOrDefault() == item.BotId).Count();
                 }
             }
             return data;
@@ -1077,11 +1096,14 @@ namespace BaseSouce.Services.Services.Stream
                 var liveDisconnects = await _repositoryStream.Queryable()
                     .Include(i => i.ManagerBOTBackup).Include(i => i.AppUser)
                     .Where(x => x.DisconnectedTime != null
-                    && x.ManagerBOTBackupId.GetValueOrDefault() > 0 && x.TimeBackup > 0).ToListAsync();
+                    && x.Status == StreamStatus.Disconnet
+                    && x.ManagerBOTBackupId.GetValueOrDefault() > 0 && x.TimeBackup > 0 && x.IsLiveBackup == false).ToListAsync();
                 if (liveDisconnects.Any())
                 {
+                    _logger.LogDebug($"Total Backup Pending:[{liveDisconnects.Count}]");
                     foreach (var item in liveDisconnects)
                     {
+                        _logger.LogDebug($"Backup:[{item.Id}]");
                         var botId = 0;
                         var botIdString = string.Empty;
                         var timeCheckDisconnect = DateTime.Now.AddMinutes(-item.TimeBackup);
@@ -1100,7 +1122,7 @@ namespace BaseSouce.Services.Services.Stream
                             && botBackup != null && botBackup.Status == ManagerBOTStatus.Connected)
                         {
                             ///send data to BOT
-
+                            _logger.LogDebug($"Start Backup:[{item.Id}]");
                             var streamClone = new StreamHistory
                             {
                                 IsLiveBackup = true,
@@ -1122,7 +1144,7 @@ namespace BaseSouce.Services.Services.Stream
                                 UserId = item.UserId,
                                 StreamName = $"{item.StreamName}_backup",
                                 CreatedTime = DateTime.Now,
-                                Video = item.Video,
+                                Video = item.Video
 
                             };
 
@@ -1185,9 +1207,10 @@ namespace BaseSouce.Services.Services.Stream
                             item.DisconnectedTime = null;
                             item.IsLiveBackup = true;
                             item.StreamBackupId = streamClone.Id;
+                            _repositoryStream.Update(liveDisconnects);
+                            await _unitOfWork.SaveChangesAsync();
                         }
-                        _repositoryStream.Update(liveDisconnects);
-                        await _unitOfWork.SaveChangesAsync();
+
                     }
                 }
             }

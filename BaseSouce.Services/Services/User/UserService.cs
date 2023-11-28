@@ -329,7 +329,8 @@ namespace BaseSouce.Services.Services.User
                 packageInfo.PackageLiveBackup.NumberOfThreadsCreatedInRun = streamHistorys
                     .Where(x => x.Type == LiveType._Backup).Select(x => x.NumberOfThreadsInCreated).FirstOrDefault();
                 packageInfo.PackageLiveBackup.TotalPending = await _repositoryStream.Queryable().AsNoTracking()
-                    .Where(x => x.UserId == userId && x.LiveType != LiveType._Backup && x.ManagerBOTBackupId != null).CountAsync();
+                    .Where(x => x.UserId == userId && x.LiveType != LiveType._Backup && x.ManagerBOTBackupId != null
+                    && x.Status==StreamStatus.Streaming).CountAsync();
             }
 
             return packageInfo;
@@ -464,6 +465,7 @@ namespace BaseSouce.Services.Services.User
                 //userCurrent.LinkFB = model.LinkFB;
                 //userCurrent.LinkTelegram = model.LinkTelegram;
                 userCurrent.TelegramAPI = model.TelegramAPI;
+                userCurrent.TelegramBOT = model.TelegramBOT;
                 _repository.Update(userCurrent);
                 await _unitOfWork.SaveChangesAsync();
                 return new KeyValuePair<bool, string>(true, string.Empty);

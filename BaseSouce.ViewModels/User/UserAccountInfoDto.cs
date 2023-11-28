@@ -45,5 +45,6 @@ namespace BaseSouce.ViewModels.User
         public string LinkFB { get; set; }
         public string LinkTelegram { get; set; }
         public string TelegramAPI { get; set; }
+        public string TelegramBOT { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BaseSouce.Data.EF;
+using BaseSouce.Data.Entities;
 using BaseSource.Data.Entities;
 using BaseSource.ViewModels.Setting;
 using EFCore.UnitOfWork;
@@ -37,6 +38,7 @@ namespace BaseSouce.Services.Services.Setting
             try
             {
                 var _repository = _unitOfWork.GetRepository<ConfigSystem>();
+                var _repositoryUser = _unitOfWork.GetRepository<AppUser>();
                 var settingEntity = await _repository.GetFirstOrDefaultAsync(disableTracking: false);
                 if (settingEntity != null)
                 {
@@ -51,6 +53,7 @@ namespace BaseSouce.Services.Services.Setting
                     await _unitOfWork.SaveChangesAsync();
                 }
                 return new KeyValuePair<bool, string>(true, string.Empty);
+
 
             }
             catch (Exception ex)

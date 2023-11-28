@@ -3,7 +3,6 @@ using BaseSouce.Data.Entities;
 using BaseSouce.Services.Services.BOT;
 using BaseSouce.Services.Services.Stream;
 using BaseSouce.Shared.Enums;
-using BaseSouce.SharedSignalrData.Enums;
 using BaseSouce.SharedSignalrData.Classes;
 using BaseSouce.SharedSignalrData.Interfaces;
 using BaseSource.Data.Entities;
@@ -13,8 +12,8 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
 using Telegram.Bot;
+using Microsoft.Extensions.Configuration;
 using Telegram.Bot.Types;
-using Telegram.Bot.Types.Enums;
 
 namespace BaseSouce.Services.HubServices
 {
@@ -23,17 +22,23 @@ namespace BaseSouce.Services.HubServices
         private readonly IManagerBOTService _managerBOTService;
         private readonly IStreamClientService _streamClientService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IConfiguration _configuration;
+        private TelegramBotClient _botClient2;
         private readonly ITelegramBotClient _telegramBotClient;
 
         public BotHub(IManagerBOTService managerBOTService,
             IStreamClientService streamClientService,
-            IUnitOfWork<BaseSourceDbContext> unitOfWork,
-            ITelegramBotClient telegramBotClient)
+            IUnitOfWork<BaseSourceDbContext> unitOfWork
+            , IConfiguration configuration
+            , ITelegramBotClient telegramBotClient
+            )
         {
             _managerBOTService = managerBOTService;
             _streamClientService = streamClientService;
             _unitOfWork = unitOfWork;
+            _configuration = configuration;
             _telegramBotClient = telegramBotClient;
+            _botClient2 = new TelegramBotClient(_configuration["TelegramBotConfigure:BotToken2"]);
 
         }
 
@@ -60,8 +65,6 @@ namespace BaseSouce.Services.HubServices
         }
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
-            //  Trace.WriteLine(Context.ConnectionId + ' - disconnected');
-
             try
             {
                 var _repositoryBot = _unitOfWork.GetRepository<ManagerBOT>();
@@ -69,7 +72,9 @@ namespace BaseSouce.Services.HubServices
                 var _repositorySetting = _unitOfWork.GetRepository<ConfigSystem>();
 
                 var botCurrent = await _repositoryBot.GetFirstOrDefaultAsync(
-                    predicate: x => x.ConnectionId == Context.ConnectionId, disableTracking: false);
+                    predicate: x => x.ConnectionId == Context.ConnectionId
+                    , include: x => x.Include(i => i.Manager),
+                    disableTracking: false);
                 if (botCurrent != null)
                 {
                     botCurrent.Status = ManagerBOTStatus.Disconnected;
@@ -100,14 +105,32 @@ namespace BaseSouce.Services.HubServices
                                 + $"Kiểu live: {liveType}{Environment.NewLine}"
                                 + $"Disconnect:{timer}");
                             }
-
-
-
                         }
                         _repositoryStream.Update(streamsCurrents);
                     }
+
                     _repositoryBot.Update(botCurrent);
                     await _unitOfWork.SaveChangesAsync();
+
+                    if (!string.IsNullOrWhiteSpace(botCurrent.Manager.TelegramBOT))
+                    {
+                        var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                        var idTeles = botCurrent.Manager.TelegramBOT.Split(',');
+                        if (idTeles.Length > 0)
+                        {
+                            foreach (var item in idTeles)
+                            {
+                                _ = _botClient2
+                               .SendTextMessageAsync(new ChatId(item.Trim()),
+                               $"BotName: {botCurrent.Name}{Environment.NewLine}"
+                               + $"Group:{botCurrent.Group}{Environment.NewLine}"
+                               + $"Manager:{botCurrent.Manager?.UserName} {Environment.NewLine}"
+                               + $"Live: {botCurrent.LiveType}{Environment.NewLine}"
+                               + $"Disconnected:{timer}");
+                            }
+                        }
+                    }
+
 
                     var setting = await _repositorySetting.GetFirstOrDefaultAsync();
                     if (!string.IsNullOrEmpty(setting.Telegrams))
@@ -119,7 +142,7 @@ namespace BaseSouce.Services.HubServices
                         {
                             foreach (var item in idTeles)
                             {
-                                _ = _telegramBotClient
+                                _ = _botClient2
                                .SendTextMessageAsync(new ChatId(item.Trim()),
                                $"BotName: {botCurrent.Name}{Environment.NewLine}"
                                + $"Group:{botCurrent.Group}{Environment.NewLine}"
@@ -130,7 +153,6 @@ namespace BaseSouce.Services.HubServices
                         }
                     }
                 }
-
             }
             catch (Exception ex)
             {

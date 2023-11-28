@@ -306,7 +306,7 @@ namespace BaseSouce.Services.Services.UserAdmin
             }
             else
             {
-                query = query.Where(x => x.UserManager == userId);
+                query = query.Where(x => x.UserManager == userId || x.Id == userId);
             }
             query = query.Where(x => x.DeletedTime == null);
             if (!string.IsNullOrEmpty(model.UserName))

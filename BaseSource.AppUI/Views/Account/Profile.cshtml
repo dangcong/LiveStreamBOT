@@ -165,13 +165,13 @@
 
         <div class="alert alert-primary">
             <p>* Nhận thông báo telegram</p>
-            <p>+ Vào link https://t.me/userinfobot nhấn start để nhận ID</p>   
+            <p>+ Vào link https://t.me/userinfobot nhấn start để nhận ID</p>
             <p>+ Cập nhập telegram: điền ID</p>
             <p>* Nhận thông báo live:</p>
             <p>+ Vào http://t.me/ShineLivestreamBot ấn (nhấn start) thì mới nhận được thông báo.</p>
 
         </div>
-        
+
     </div>
 </section>
 <div class="modal fade" tabindex="-1" role="dialog" id="updateModal">
@@ -188,6 +188,14 @@
                     <p>Cập nhật thông tin Telegram API</p>
                     <input name="TelegramAPI" value="@Model.TelegramAPI" class="form-control" />
                 </div>
+                @if (User.IsInRole("Manager"))
+                {
+                    <div class="modal-body">
+                        <p>Cập nhật thông tin Telegram BOT</p>
+                        <input name="TelegramBOT" value="@Model.TelegramBOT" class="form-control" />
+                    </div>
+                }
+
                 <div class="modal-footer bg-whitesmoke br">
 
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

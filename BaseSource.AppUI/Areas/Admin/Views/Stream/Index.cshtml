@@ -76,7 +76,7 @@
                             <div class="card-stats-item">
                                 <div class="card-stats-item-count">
                                     <span>
-                                        @(report.NumberOfThreadsBackupInRun)/@(report.NumberOfThreadsBackupPending)/@(report.NumberOfThreadsBackup)/@(report.TotalBOT4k)
+                                        @(report.NumberOfThreadsBackupInRun)/@(report.NumberOfThreadsBackupPending)/@(report.NumberOfThreadsBackup)/@(report.TotalBOTBackup)
                                     </span>
                                 </div>
                                 <div class="card-stats-item-label">
@@ -154,9 +154,13 @@
                                                 {
                                                     <span class="badge badge-success">1080</span>
                                                 }
-                                                else
+                                                else if (item.LiveType == LiveType._4K)
                                                 {
                                                     <span class="badge badge-danger">4k</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-warning">Backup</span>
                                                 }
                                             </td>
                                             <td>
@@ -207,7 +211,7 @@
                                                         <span class="badge badge-info">Tải</span>
                                                         break;
                                                     case BaseSouce.SharedSignalrData.Enums.RenderStatus.LiveStreaming:
-                                                        <span class="badge badge-suceess">Đang stream</span>
+                                                        <span class="badge badge-success">Đang stream</span>
                                                         break;
                                                     case BaseSouce.SharedSignalrData.Enums.RenderStatus.Cancelled:
                                                         <span class="badge badge-danger"> Hủy</span>

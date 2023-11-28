@@ -1,4 +1,5 @@
 ﻿using BaseSouce.Data.Entities;
+
 using BaseSouce.Services.HubServices;
 using BaseSouce.Services.ServicePackage;
 using BaseSouce.Services.Services.BOT;
@@ -42,6 +43,7 @@ namespace BaseSource.API.Cofigurations
             services.AddTransient<IStreamAdminService, StreamAdminService>();
             services.AddTransient<IUserAdminService, UserAdminService>();
 
+            //services.AddTransient<IBotTeleClient2, BotTeleClient2>();
 
 
             return services;

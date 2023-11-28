@@ -37,7 +37,7 @@ namespace BaseSouce.Services.MappingProfile
 
             CreateMap<ManagerBOT, ManagerBotInfoDto>()
                 .ForMember(dest => dest.TotalUser,
-                options => options.MapFrom(source => source.UserManagerBOTs.DistinctBy(x=>x.UserId).Count()))
+                options => options.MapFrom(source => source.UserManagerBOTs.DistinctBy(x => x.UserId).Count()))
                 .ForMember(dest => dest.Manager,
                 options => options.MapFrom(source => source.Manager.UserName))
                  .ForMember(dest => dest.UserManager,
@@ -50,6 +50,7 @@ namespace BaseSouce.Services.MappingProfile
             #region Stream History
 
             CreateMap<StreamHistory, StreamClientInfoDto>()
+                .ForMember(dest => dest.ManagerBOTId, options => options.MapFrom(source => source.ManagerBOTId))
                 .ForMember(dest => dest.BotBackupName, options => options.MapFrom(source => source.ManagerBOTBackup.Name))
                 .ForMember(dest => dest.BackupGroup, options => options.MapFrom(source => source.ManagerBOTBackup.Group))
                 .ForMember(dest => dest.BotName, options => options.MapFrom(source => source.ManagerBOT.Name))
@@ -67,8 +68,8 @@ namespace BaseSouce.Services.MappingProfile
             #endregion
 
             #region User
-            
-                CreateMap<AppUser, UserInfoResponse>();
+
+            CreateMap<AppUser, UserInfoResponse>();
             #endregion
         }
 

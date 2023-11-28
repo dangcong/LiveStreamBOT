@@ -30,7 +30,7 @@ namespace BaseSouce.Services.BackgroundServices
             _logger.LogInformation("Timed Hosted Order History Service running.");
 
             _timer = new Timer(DoWork, null, TimeSpan.Zero,
-                TimeSpan.FromSeconds(15));
+                TimeSpan.FromSeconds(30));
 
             return Task.CompletedTask;
         }
@@ -49,7 +49,7 @@ namespace BaseSouce.Services.BackgroundServices
             using var _db = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<BaseSourceDbContext>();
 
             var bots = await _db.ManagerBOTs.ToListAsync();
-            var timeCurrent = DateTime.Now.AddSeconds(-300);
+            var timeCurrent = DateTime.Now.AddSeconds(-60);
             foreach (var bot in bots)
             {
                 if (bot.UpdatedTime == null || timeCurrent > bot.UpdatedTime)

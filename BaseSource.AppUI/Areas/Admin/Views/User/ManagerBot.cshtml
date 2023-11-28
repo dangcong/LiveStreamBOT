@@ -214,7 +214,7 @@
                                 <option value="0">-- Chọn bot --</option>
                                 @foreach (var item in botBackup)
                                 {
-                                    <option value="@item.Id">@item.Name - @(item.Group)(@(item.NumberOfThreadsInRun)/@(item.NumberOfThreads))</option>
+                                    <option value="@item.Id">@item.Name - @(item.Group)(@(item.NumberOfThreadsInRun)/@(item.NumberOfThreadsBackupPending)/@(item.NumberOfThreads))</option>
                                 }
 
                             </select>

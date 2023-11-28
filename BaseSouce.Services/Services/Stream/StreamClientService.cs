@@ -575,23 +575,23 @@ namespace BaseSouce.Services.Services.Stream
                     return new KeyValuePair<bool, string>(false, "Luồng không tồn tại, vui lòng thử lại!");
                 }
 
-                if (streamEntity.StreamBackupId.GetValueOrDefault() > 0)
-                {
-                    //stop live backup
-                    var streamBackup = await _repositoryStream.GetFirstOrDefaultAsync(
-                        predicate: x => x.Id == streamEntity.StreamBackupId.GetValueOrDefault());
-                    if (streamBackup != null)
-                    {
-                        // call BOT cancel
-                        await _botContextHub.Clients.All.RenderAsync(new RenderCommand
-                        {
-                            ItemId = streamBackup.Id,
-                            Command = Command.Cancel
-                        });
-                        _repositoryStream.Delete(streamBackup);
-                        await _unitOfWork.SaveChangesAsync();
-                    }
-                }
+                //if (streamEntity.StreamBackupId.GetValueOrDefault() > 0)
+                //{
+                //    //stop live backup
+                //    var streamBackup = await _repositoryStream.GetFirstOrDefaultAsync(
+                //        predicate: x => x.Id == streamEntity.StreamBackupId.GetValueOrDefault());
+                //    if (streamBackup != null)
+                //    {
+                //        // call BOT cancel
+                //        await _botContextHub.Clients.All.RenderAsync(new RenderCommand
+                //        {
+                //            ItemId = streamBackup.Id,
+                //            Command = Command.Cancel
+                //        });
+                //        _repositoryStream.Delete(streamBackup);
+                //        await _unitOfWork.SaveChangesAsync();
+                //    }
+                //}
 
                 var userBots = await _repositoryUserBOT.Queryable()
                     .Include(x => x.ManagerBOT).ThenInclude(i => i.StreamHistorys)
@@ -847,12 +847,10 @@ namespace BaseSouce.Services.Services.Stream
                     }
                     streamEntity.Status = StreamStatus.Streaming;
                 }
-                _repositoryStream.Update(streamEntity);
-                await _unitOfWork.SaveChangesAsync();
+
 
                 if (statusOld != RenderStatus.LiveStreaming && streamEntity.RenderStatus == RenderStatus.LiveStreaming)
                 {
-
                     //send message telegram
                     var liveType = streamEntity.EndTimeLive != null ? "11h" : "24/7";
                     var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
@@ -883,6 +881,60 @@ namespace BaseSouce.Services.Services.Stream
                                + $"Kiểu live: {liveType}{Environment.NewLine}"
                                + $"Bắt đầu:{timer}");
                             }
+                        }
+                    }
+
+                    //remove live backup
+
+                    if (streamEntity.StreamBackupId.GetValueOrDefault() > 0)
+                    {
+                        streamEntity.StreamBackupId = null;
+                        streamEntity.IsLiveBackup = false;
+                        liveType = "Backup";
+                        //stop live backup
+                        var streamBackup = await _repositoryStream.GetFirstOrDefaultAsync(
+                            predicate: x => x.Id == streamEntity.StreamBackupId.GetValueOrDefault());
+                        if (streamBackup != null)
+                        {
+
+                            // call BOT cancel
+                            await _botContextHub.Clients.All.RenderAsync(new RenderCommand
+                            {
+                                ItemId = streamBackup.Id,
+                                Command = Command.Cancel
+                            });
+
+                            if (!string.IsNullOrEmpty(streamEntity.AppUser.TelegramAPI))
+                            {
+                                _ = _telegramBotClient
+                            .SendTextMessageAsync(new ChatId(streamEntity.AppUser.TelegramAPI),
+                            $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                            + $"Tên luồng:{streamBackup.StreamName}{Environment.NewLine}"
+                            + $"Live:{streamBackup.LiveType} {Environment.NewLine}"
+                            + $"Kiểu live: {liveType}{Environment.NewLine}"
+                            + $"Dừng:{timer}");
+                            }
+
+                            if (!string.IsNullOrEmpty(streamEntity.AppUser.LinkTelegram))
+                            {
+                                var idTeles = streamEntity.AppUser.LinkTelegram.Split(',');
+                                if (idTeles.Length > 0)
+                                {
+                                    foreach (var item in idTeles)
+                                    {
+                                        _ = _telegramBotClient
+                                       .SendTextMessageAsync(new ChatId(item.Trim()),
+                                       $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                                       + $"Tên luồng:{streamBackup.StreamName}{Environment.NewLine}"
+                                       + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
+                                       + $"Kiểu live: {liveType}{Environment.NewLine}"
+                                       + $"Dừng:{timer}");
+                                    }
+                                }
+                            }
+
+                            _repositoryStream.Delete(streamBackup);
+                            await _unitOfWork.SaveChangesAsync();
                         }
                     }
                 }
@@ -955,6 +1007,8 @@ namespace BaseSouce.Services.Services.Stream
                         }
                     }
                 }
+                _repositoryStream.Update(streamEntity);
+                await _unitOfWork.SaveChangesAsync();
 
 
                 return new KeyValuePair<bool, string>(true, string.Empty);
@@ -1150,14 +1204,18 @@ namespace BaseSouce.Services.Services.Stream
 
                             _repositoryStream.Insert(streamClone);
                             await _unitOfWork.SaveChangesAsync();
+                            //get streamClone
+                            var streamCloneEntity = await _repositoryStream.GetFirstOrDefaultAsync(
+                                predicate: x => x.Id == streamClone.Id,
+                                include: x => x.Include(i => i.ManagerBOT));
 
-                            var result = await SendDataToBOTAsync(streamClone);
+                            var result = await SendDataToBOTAsync(streamCloneEntity);
                             if (!result)
                             {
                                 _logger.LogError($"Send data to BOT failed by error:[{result.Value}]");
 
-                                streamClone.Status = StreamStatus.Stop;
-                                _repositoryStream.Update(streamClone);
+                                streamCloneEntity.Status = StreamStatus.Stop;
+                                _repositoryStream.Update(streamCloneEntity);
                                 await _unitOfWork.SaveChangesAsync();
 
                             }
@@ -1167,25 +1225,25 @@ namespace BaseSouce.Services.Services.Stream
                                 //send message telegram
                                 if (!string.IsNullOrEmpty(telegramAPI))
                                 {
-                                    var liveType = streamClone.EndTimeLive != null ? "11h" : "24/7";
-                                    var timer = streamClone.StartTimeLive != null ?
-                                        streamClone.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
+                                    var liveType = streamCloneEntity.EndTimeLive != null ? "11h" : "24/7";
+                                    var timer = streamCloneEntity.StartTimeLive != null ?
+                                        streamCloneEntity.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
                                         : "Ngay bây giờ";
                                     var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
                                     _ = _telegramBotClient
                                     .SendTextMessageAsync(new ChatId(telegramAPI),
                                     $"User: {item.AppUser.UserName}{Environment.NewLine}"
-                                    + $"Tên luồng:{streamClone.StreamName}{Environment.NewLine}"
-                                    + $"Live:{streamClone.LiveType} {Environment.NewLine}"
+                                    + $"Tên luồng:{streamCloneEntity.StreamName}{Environment.NewLine}"
+                                    + $"Live:{streamCloneEntity.LiveType} {Environment.NewLine}"
                                     + $"Kiểu live: {liveType}{Environment.NewLine}"
                                     + $"{textTimer}:{timer}");
                                 }
 
                                 if (!string.IsNullOrEmpty(item.AppUser.LinkTelegram))
                                 {
-                                    var liveType = streamClone.EndTimeLive != null ? "11h" : "24/7";
-                                    var timer = streamClone.StartTimeLive != null ?
-                                        streamClone.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
+                                    var liveType = streamCloneEntity.EndTimeLive != null ? "11h" : "24/7";
+                                    var timer = streamCloneEntity.StartTimeLive != null ?
+                                        streamCloneEntity.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
                                         : "Ngay bây giờ";
                                     var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
                                     var idTeles = item.AppUser.LinkTelegram.Split(',');
@@ -1196,8 +1254,8 @@ namespace BaseSouce.Services.Services.Stream
                                             _ = _telegramBotClient
                                            .SendTextMessageAsync(new ChatId(idTele.Trim()),
                                            $"User: {item.AppUser.UserName}{Environment.NewLine}"
-                                           + $"Tên luồng:{streamClone.StreamName}{Environment.NewLine}"
-                                           + $"Live:{streamClone.LiveType} {Environment.NewLine}"
+                                           + $"Tên luồng:{streamCloneEntity.StreamName}{Environment.NewLine}"
+                                           + $"Live:{streamCloneEntity.LiveType} {Environment.NewLine}"
                                            + $"Kiểu live: {liveType}{Environment.NewLine}"
                                            + $"{textTimer}:{timer}");
                                         }
@@ -1207,17 +1265,15 @@ namespace BaseSouce.Services.Services.Stream
                             item.DisconnectedTime = null;
                             item.IsLiveBackup = true;
                             item.StreamBackupId = streamClone.Id;
-                            _repositoryStream.Update(liveDisconnects);
+                            _repositoryStream.Update(item);
                             await _unitOfWork.SaveChangesAsync();
                         }
-
                     }
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Check live backup failed by error:[{ex}]");
-
             }
         }
 

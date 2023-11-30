@@ -142,46 +142,47 @@ namespace BaseSouce.Services.Services.BOT
                     botCurrent.DiskUsed = model.DiskInfo?.Used ?? 0;
                     _repository.Update(botCurrent);
 
-                    if (!string.IsNullOrWhiteSpace(botCurrent.Manager.TelegramBOT))
-                    {
-                        var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
-                        var idTeles = botCurrent.Manager.TelegramBOT.Split(',');
-                        if (idTeles.Length > 0)
-                        {
-                            foreach (var item in idTeles)
-                            {
-                                _ = _botClient2
-                               .SendTextMessageAsync(new ChatId(item.Trim()),
-                               $"BotName: {botCurrent.Name}{Environment.NewLine}"
-                               + $"Group:{botCurrent.Group}{Environment.NewLine}"
-                               + $"Manager:{botCurrent.Manager?.UserName} {Environment.NewLine}"
-                               + $"Live: {botCurrent.LiveType}{Environment.NewLine}"
-                               + $"Disconnected:{timer}");
-                            }
-                        }
-                    }
+
                 }
 
                 await _unitOfWork.SaveChangesAsync();
 
                 var setting = await _repositorySetting.GetFirstOrDefaultAsync();
-                if (!string.IsNullOrEmpty(setting.Telegrams) && statusOld == ManagerBOTStatus.Disconnected)
+
+                var idTelesAll = new List<string>();
+                if (!string.IsNullOrWhiteSpace(botCurrent.Manager.TelegramBOT))
                 {
 
-                    var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                    var idTeles = botCurrent.Manager.TelegramBOT.Split(',');
+                    if (idTeles.Length > 0)
+                    {
+                        idTelesAll.AddRange(idTeles);
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(setting.Telegrams))
+                {
                     var idTeles = setting.Telegrams.Split(',');
                     if (idTeles.Length > 0)
                     {
-                        foreach (var item in idTeles)
-                        {
-                            _ = _botClient2
-                           .SendTextMessageAsync(new ChatId(item.Trim()),
-                           $"BotName: {botCurrent.Name}{Environment.NewLine}"
-                           + $"Group:{botCurrent.Group}{Environment.NewLine}"
-                           + $"Manager:{botCurrent.Manager?.UserName} {Environment.NewLine}"
-                           + $"Live: {botCurrent.LiveType}{Environment.NewLine}"
-                           + $"Connected:{timer}");
-                        }
+                        idTelesAll.AddRange(idTeles);
+
+                    }
+                }
+                if (statusOld == ManagerBOTStatus.Disconnected && idTelesAll.Any())
+                {
+                    idTelesAll = idTelesAll.Distinct().ToList();
+
+                    var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                    foreach (var item in idTelesAll)
+                    {
+                        _ = _botClient2
+                       .SendTextMessageAsync(new ChatId(item.Trim()),
+                       $"BotName: {botCurrent.Name}{Environment.NewLine}"
+                       + $"Group:{botCurrent.Group}{Environment.NewLine}"
+                       + $"Manager:{botCurrent.Manager?.UserName} {Environment.NewLine}"
+                       + $"Live: {botCurrent.LiveType}{Environment.NewLine}"
+                       + $"Connected:{timer}");
                     }
                 }
 

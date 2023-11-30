@@ -330,7 +330,7 @@ namespace BaseSouce.Services.Services.User
                     .Where(x => x.Type == LiveType._Backup).Select(x => x.NumberOfThreadsInCreated).FirstOrDefault();
                 packageInfo.PackageLiveBackup.TotalPending = await _repositoryStream.Queryable().AsNoTracking()
                     .Where(x => x.UserId == userId && x.LiveType != LiveType._Backup && x.ManagerBOTBackupId != null
-                    && x.Status==StreamStatus.Streaming).CountAsync();
+                    && x.Status == StreamStatus.Streaming).CountAsync();
             }
 
             return packageInfo;
@@ -350,6 +350,7 @@ namespace BaseSouce.Services.Services.User
                     LinkFB = x.LinkFB,
                     Phone = x.PhoneNumber,
                     TelegramAPI = x.TelegramAPI,
+                    TelegramBOT = x.TelegramBOT,
                     PackageLive1080 = new PackageLiveInfoDto
                     {
                         NumberOfThreads = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._1080).Sum(i => i.NumberOfThreads),

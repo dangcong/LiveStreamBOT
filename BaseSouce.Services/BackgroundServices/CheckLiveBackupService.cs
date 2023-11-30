@@ -47,11 +47,11 @@ namespace BaseSouce.Services.BackgroundServices
 
         private async void DoWork(object state)
         {
-            _logger.LogInformation("Begin Check Live Backup.");
+           // _logger.LogInformation("Begin Check Live Backup.");
             var _streamService = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<IStreamClientService>();
 
             await _streamService.CheckLiveBackupAsync();
-            _logger.LogInformation("End Check Live Backup.");
+            //_logger.LogInformation("End Check Live Backup.");
 
         }
     }

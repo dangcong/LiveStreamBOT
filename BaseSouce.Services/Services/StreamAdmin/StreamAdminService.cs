@@ -219,9 +219,6 @@ namespace BaseSouce.Services.Services.StreamAdmin
 
                     data.TotalUser = await _repositoryUser.Queryable().AsNoTracking()
                         .Where(x => !x.UserRoles.Any() && x.DeletedTime == null).CountAsync();
-                    //data.TotalManager = await _repositoryUser.Queryable().AsNoTracking()
-                    //    .Where(x => x.DeletedTime == null && x.UserRoles.Any(x => x.RoleId == "baea9405-c706-46ea-9f52-6cfa8c83d65f"))
-                    //    .CountAsync();
 
                     data.NumberOfThreadsBackup = await _repositoryUserBot.Queryable()
                     .Include(x => x.ManagerBOT).Include(x => x.User)
@@ -235,8 +232,6 @@ namespace BaseSouce.Services.Services.StreamAdmin
                     data.NumberOfThreadsBackupPending = await _repositoryStream.Queryable().AsNoTracking()
                         .Where(x => x.ManagerBOTBackupId.GetValueOrDefault() > 0
                         && x.Status == StreamStatus.Streaming).CountAsync();
-
-
 
                     data.TotalBOT1080 = await _repositoryBOT.Queryable().AsNoTracking()
                     .Where(x => x.DeletedTime == null && x.LiveType == LiveType._1080).CountAsync();
@@ -311,14 +306,7 @@ namespace BaseSouce.Services.Services.StreamAdmin
 
                 data.TotalBOTBackup = await _repositoryBOT.Queryable().AsNoTracking()
                     .Where(x => x.DeletedTime == null && x.UserManager == userId && x.LiveType == LiveType._Backup).CountAsync();
-
-
-                //data.TotalManager = await _repositoryUser.Queryable().AsNoTracking()
-                //    .Where(x => x.UserManager == userId && x.DeletedTime == null && x.UserRoles.Any(x => x.RoleId == "baea9405-c706-46ea-9f52-6cfa8c83d65f"))
-                //    .CountAsync();
             }
-
-            // _logger.LogInformation($"NumberOfThreads4K:[{data.NumberOfThreads4K}]");
             return data;
         }
 

@@ -109,7 +109,7 @@ namespace BaseSouce.Services.Services.BOT
                     disableTracking: false,
                     include: x => x.Include(i => i.Manager));
 
-                var statusOld = botCurrent.Status;
+                var statusOld = ManagerBOTStatus.Connected;
                 if (botCurrent == null)
                 {
                     botCurrent = new ManagerBOT
@@ -127,9 +127,11 @@ namespace BaseSouce.Services.Services.BOT
 
                     };
                     _repository.Insert(botCurrent);
+                    statusOld = ManagerBOTStatus.Disconnected;
                 }
                 else
                 {
+                    statusOld = botCurrent.Status;
                     botCurrent.ConnectionId = model.ConnectionId;
                     botCurrent.Bandwidth = model.Bandwidth;
                     botCurrent.RAM = model.RamUsage;
@@ -150,7 +152,7 @@ namespace BaseSouce.Services.Services.BOT
                 var setting = await _repositorySetting.GetFirstOrDefaultAsync();
 
                 var idTelesAll = new List<string>();
-                if (!string.IsNullOrWhiteSpace(botCurrent.Manager.TelegramBOT))
+                if (!string.IsNullOrWhiteSpace(botCurrent.Manager?.TelegramBOT))
                 {
 
                     var idTeles = botCurrent.Manager.TelegramBOT.Split(',');

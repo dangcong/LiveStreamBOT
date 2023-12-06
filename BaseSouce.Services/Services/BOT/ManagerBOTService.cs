@@ -207,7 +207,7 @@ namespace BaseSouce.Services.Services.BOT
 
                 var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
                 var existStream = await _repositoryStream.ExistsAsync(
-                    x => x.Id == id && x.Status == StreamStatus.Streaming);
+                    x => x.ManagerBOTId.GetValueOrDefault() == id && x.Status == StreamStatus.Streaming);
                 if (existStream)
                 {
                     return new KeyValuePair<bool, string>(false, "Đang có luồng Stream, không thể xóa!");

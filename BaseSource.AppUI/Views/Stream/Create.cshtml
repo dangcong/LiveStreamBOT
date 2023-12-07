@@ -496,8 +496,8 @@
                                                             case StreamStatus.Stop:
                                                             case StreamStatus.Disconnet:
 
-                                                              
-                                                              
+
+
                                                                 <button class="btn btn-sm btn-danger "
                                                                         data-id="@item.Id"
                                                                         onclick="deleteStream('@item.Id');">
@@ -585,6 +585,9 @@
                                                             break;
                                                         case BaseSouce.SharedSignalrData.Enums.RenderStatus.Downloading:
                                                             <span class="badge badge-info">Tải</span>
+                                                            break;
+                                                        case BaseSouce.SharedSignalrData.Enums.RenderStatus.Rendering:
+                                                            <span class="badge badge-info">Rendering</span>
                                                             break;
                                                         case BaseSouce.SharedSignalrData.Enums.RenderStatus.LiveStreaming:
                                                             <span class="badge badge-success">Đang stream</span>

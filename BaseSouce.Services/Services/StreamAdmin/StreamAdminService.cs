@@ -126,7 +126,7 @@ namespace BaseSouce.Services.Services.StreamAdmin
                     .Where(x => x.DeletedTime == null && lstManagers.Any(i => i == x.UserManager)).CountAsync();
 
                     var streamData = await _repositoryStream.Queryable().AsNoTracking()
-                        .Where(x => lstManagers.Any(i => i == x.AppUser.UserManager))
+                        .Where(x => lstManagers.Any(i => i == x.AppUser.UserManager) || lstManagers.Any(i => i == x.UserId))
                         .Select(x => new
                         {
                             Type = x.LiveType,
@@ -137,7 +137,7 @@ namespace BaseSouce.Services.Services.StreamAdmin
                         .Include(x => x.ManagerBOT)
                         .Where(x => x.User.DeletedTime == null
                         && x.ManagerBOT.LiveType == LiveType._1080
-                        && lstManagers.Any(i => i == x.User.UserManager)
+                        && (lstManagers.Any(i => i == x.User.UserManager) || lstManagers.Any(i => i == x.UserId))
                         ).SumAsync(x => x.NumberOfThreads);
 
                     data.NumberOfThreads1080InRun = streamData
@@ -148,7 +148,7 @@ namespace BaseSouce.Services.Services.StreamAdmin
                         .Include(x => x.ManagerBOT).Include(x => x.User)
                         .Where(x => x.User.DeletedTime == null
                         && x.ManagerBOT.LiveType == LiveType._4K
-                        && lstManagers.Any(i => i == x.User.UserManager)
+                        && (lstManagers.Any(i => i == x.User.UserManager) || lstManagers.Any(i => i == x.UserId))
                         ).SumAsync(x => x.NumberOfThreads);
 
                     data.NumberOfThreads4KInRun = streamData
@@ -158,7 +158,7 @@ namespace BaseSouce.Services.Services.StreamAdmin
                         .Include(x => x.ManagerBOT).Include(x => x.User)
                         .Where(x => x.User.DeletedTime == null
                         && x.ManagerBOT.LiveType == LiveType._Backup
-                        && lstManagers.Any(i => i == x.User.UserManager)
+                        && (lstManagers.Any(i => i == x.User.UserManager) || lstManagers.Any(i => i == x.UserId))
                         ).SumAsync(x => x.NumberOfThreads);
 
 
@@ -166,8 +166,8 @@ namespace BaseSouce.Services.Services.StreamAdmin
                         .Where(x => x.Type == LiveType._Backup && x.Status == StreamStatus.Streaming).Count();
 
                     data.NumberOfThreadsBackupPending = await _repositoryStream.Queryable().AsNoTracking()
-                        .Where(x => lstManagers.Any(i => i == x.AppUser.UserManager)
-                        && x.ManagerBOTBackupId.GetValueOrDefault() > 0
+                        .Where(x => x.ManagerBOTBackupId.GetValueOrDefault() > 0
+                        && (lstManagers.Any(i => i == x.AppUser.UserManager) || lstManagers.Any(i => i == x.UserId))
                         && x.Status == StreamStatus.Streaming).CountAsync();
 
 
@@ -294,7 +294,8 @@ namespace BaseSouce.Services.Services.StreamAdmin
 
                 data.NumberOfThreadsBackupPending = await _repositoryStream.Queryable().AsNoTracking()
                     .Where(x => x.ManagerBOTBackupId.GetValueOrDefault() > 0
-                    && x.Status == StreamStatus.Streaming).CountAsync();
+                    && x.Status == StreamStatus.Streaming
+                    && (x.AppUser.UserManager == userId || x.UserId == userId)).CountAsync();
 
 
 

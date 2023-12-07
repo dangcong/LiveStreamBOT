@@ -79,7 +79,7 @@ namespace BaseSouce.Services.Services.StreamAdmin
                 }
                 if (lstManagers.Any())
                 {
-                    query = query.Where(x => lstManagers.Any(i => i == x.AppUser.UserManager));
+                    query = query.Where(x => lstManagers.Any(i => i == x.AppUser.UserManager) || lstManagers.Any(i => i == x.UserId));
                 }
             }
             else

@@ -235,7 +235,7 @@ namespace BaseSouce.Services.Services.UserAdmin
             }
             if (lstManagers.Any())
             {
-                query = query.Where(x => lstManagers.Any(i => i == x.UserManager));
+                query = query.Where(x => lstManagers.Any(i => i == x.UserManager) || lstManagers.Any(i => i == x.Id));
             }
             return await query.Where(x => x.DeletedTime == null)
                 .Select(x => new UserAdminInfoDto

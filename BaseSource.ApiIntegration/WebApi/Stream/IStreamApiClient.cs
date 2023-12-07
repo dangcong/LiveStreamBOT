@@ -17,6 +17,7 @@ namespace BaseSource.ApiIntegration.WebApi.Stream
         Task<ApiResult<List<UserBotDto>>> GetBotOfUserAsync();
 
         Task<ApiResult<string>> UpdateBotBackupAsync(StreamBackupUpdateDto model);
+        Task<ApiResult<List<UserBotDto>>> GetBotOfUserIdAsync(string userId);
 
     }
 }

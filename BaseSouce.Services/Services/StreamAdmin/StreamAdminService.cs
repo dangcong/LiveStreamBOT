@@ -297,8 +297,6 @@ namespace BaseSouce.Services.Services.StreamAdmin
                     && x.Status == StreamStatus.Streaming
                     && (x.AppUser.UserManager == userId || x.UserId == userId)).CountAsync();
 
-
-
                 data.TotalBOT1080 = await _repositoryBOT.Queryable().AsNoTracking()
                     .Where(x => x.DeletedTime == null && x.UserManager == userId && x.LiveType == LiveType._1080).CountAsync();
 
@@ -318,7 +316,7 @@ namespace BaseSouce.Services.Services.StreamAdmin
             return await _repositoryStream.GetFirstOrDefaultAsync(
                 predicate: x => x.Id == id,
                 selector: x => _mapper.Map<StreamClientInfoDto>(x),
-                include: x => x.Include(i => i.AppUser),
+                include: x => x.Include(i => i.AppUser).Include(i=>i.ManagerBOT).Include(i=>i.ManagerBOTBackup),
                 disableTracking: false);
         }
     }

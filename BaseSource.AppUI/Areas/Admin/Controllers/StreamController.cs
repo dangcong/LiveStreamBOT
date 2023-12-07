@@ -1,4 +1,5 @@
-﻿using BaseSource.ApiIntegration.WebApi.StreamAdmin;
+﻿using BaseSource.ApiIntegration.WebApi.Stream;
+using BaseSource.ApiIntegration.WebApi.StreamAdmin;
 using BaseSource.ApiIntegration.WebApi.UserAdmin;
 using BaseSource.ViewModels.Stream;
 using Microsoft.AspNetCore.Mvc;
@@ -9,13 +10,16 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
     {
         private readonly IStreamAdminApiClient _streamAdminApiClient;
         private readonly IUserAdminApiClient _userAdminApiClient;
+        private readonly IStreamApiClient _streamApiClient;
         public StreamController(
             IStreamAdminApiClient streamAdminApiClient
             , IUserAdminApiClient userAdminApiClient
+            ,IStreamApiClient streamApiClient
             )
         {
             _streamAdminApiClient = streamAdminApiClient;
             _userAdminApiClient = userAdminApiClient;
+            _streamApiClient = streamApiClient;
         }
 
         [HttpGet]
@@ -67,6 +71,12 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
         public async Task<IActionResult> Info(int id)
         {
             var result = await _streamAdminApiClient.GetById(id);
+
+            if (result==null)
+            {
+                return NotFound();
+            }
+          
             return View(result.ResultObj);
         }
         [HttpGet]

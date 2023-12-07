@@ -32,6 +32,12 @@ namespace BaseSource.ApiIntegration.WebApi.Stream
             return await client.GetAsync<ApiResult<List<UserBotDto>>>("/api/stream/bots");
         }
 
+        public async Task<ApiResult<List<UserBotDto>>> GetBotOfUserIdAsync(string userId)
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            return await client.GetAsync<ApiResult<List<UserBotDto>>>($"/api/stream/botsOfUser?userId={userId}");
+        }
+
         public async Task<ApiResult<PagedResult<StreamClientInfoDto>>> GetByFilterAsync(StreamClientRequestDto model)
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);

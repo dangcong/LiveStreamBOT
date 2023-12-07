@@ -131,6 +131,13 @@ namespace BaseSource.API.Controllers
             var result = await _streamClientService.GetBotOfUserAsync(UserId);
             return Ok(new ApiSuccessResult<object>(result));
         }
+        [HttpGet]
+        [Route("/api/stream/botsOfUser")]
+        public async Task<IActionResult> GetBotsOfUser(string userId)
+        {
+            var result = await _streamClientService.GetBotOfUserAsync(userId);
+            return Ok(new ApiSuccessResult<object>(result));
+        }
 
         [HttpPost]
         [Route("/api/stream/update/botbackup")]

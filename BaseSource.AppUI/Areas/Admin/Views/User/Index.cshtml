@@ -137,17 +137,17 @@
                                         <tr>
                                             <td>@(index++)</td>
                                             <td>
-                                                <button class="btn btn-primary btnTelegram" data-tele="@item.LinkTelegram"
+                                                <button class="btn btn-sm btn-primary btnTelegram" data-tele="@item.LinkTelegram"
                                                         data-id="@item.Id"
                                                         data-manager="@item.UserManager">
                                                     Edit
                                                 </button>
-                                                <a class="btn btn-success" href="/admin/stream/user?userId=@(item.Id)&username=@(item.UserName)">DS Stream</a>
-                                                <a class="btn btn-success" href="/admin/user/managerBot?userId=@(item.Id)&username=@(item.UserName)">DS BOT</a>
-                                                <button class="btn btn-danger btnDelete" data-id="@item.Id">
+                                                <a class="btn btn-sm btn-success" href="/admin/stream/user?userId=@(item.Id)&username=@(item.UserName)">DS Stream</a>
+                                                <a class="btn btn-sm btn-success" href="/admin/user/managerBot?userId=@(item.Id)&username=@(item.UserName)">DS BOT</a>
+                                                <button class="btn btn-sm btn-danger btnDelete" data-id="@item.Id">
                                                     Xóa
                                                 </button>
-                                                <button class="btn btn-warning btnResetPassword"
+                                                <button class="btn btn-sm btn-warning btnResetPassword"
                                                         data-id="@item.Id"
                                                         data-user="@item.UserName">
                                                     Reset Pass

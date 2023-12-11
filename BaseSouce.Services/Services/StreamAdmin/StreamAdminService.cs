@@ -32,16 +32,17 @@ namespace BaseSouce.Services.Services.StreamAdmin
             var _repository = _unitOfWork.GetRepository<StreamHistory>();
 
             var query = _repository.Queryable().AsNoTracking();
-            if (!isAdmin)
-            {
-                query = query.Where(x => x.UserId == userId || x.ManagerBOT.UserManager == userId);
-            }
+            query = query.Where(x => x.UserId == userId);
+            //if (!isAdmin)
+            //{
+            //    query = query.Where(x => x.UserId == userId);
+            //}
 
 
             var data = await _repository.GetStagesPagedListAsync(
                 stages: query,
                 selector: x => _mapper.Map<StreamAdminInfoDto>(x),
-                include: x => x.Include(i => i.AppUser).Include(i => i.ManagerBOT),
+                include: x => x.Include(i => i.AppUser).ThenInclude(i => i.Manager).Include(i => i.ManagerBOT).Include(i => i.ManagerBOTBackup),
                orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                pageIndex: 1, pageSize: 500);
             return data.Items.ToList();
@@ -316,7 +317,7 @@ namespace BaseSouce.Services.Services.StreamAdmin
             return await _repositoryStream.GetFirstOrDefaultAsync(
                 predicate: x => x.Id == id,
                 selector: x => _mapper.Map<StreamClientInfoDto>(x),
-                include: x => x.Include(i => i.AppUser).Include(i=>i.ManagerBOT).Include(i=>i.ManagerBOTBackup),
+                include: x => x.Include(i => i.AppUser).Include(i => i.ManagerBOT).Include(i => i.ManagerBOTBackup),
                 disableTracking: false);
         }
     }

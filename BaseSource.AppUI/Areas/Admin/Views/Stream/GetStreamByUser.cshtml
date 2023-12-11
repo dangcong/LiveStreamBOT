@@ -28,12 +28,13 @@
                                 <thead>
                                     <tr>
                                         <th>STT</th>
+                                        <th>Manager</th>
                                         <th>Người dùng</th>
                                         <th>BOTName</th>
                                         <th>Group</th>
                                         <th>Tên</th>
                                         <th>Key</th>
-                                        <th>RTMP</th>
+                                        <th>BotBackup</th>
                                         <th>Kiểu live</th>
                                         <th>Live</th>
                                         <th>Thời gian bắt đầu</th>
@@ -49,6 +50,7 @@
                                     {
                                         <tr>
                                             <td>@(index++)</td>
+                                            <td>@item.UserManager</td>
                                             <td>
                                                 @item.UserName
                                             </td>
@@ -56,7 +58,7 @@
                                             <td>@item.BotGroup</td>
                                             <td>@item.StreamName</td>
                                             <th>@item.StreamKey</th>
-                                            <td>@item.RTMP</td>
+                                            <td>@(item.BotBackupName) - @(item.BotBackupGroup)</td>
                                             <td>
                                                 @if (item.LiveType == LiveType._1080)
                                                 {

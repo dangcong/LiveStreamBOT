@@ -19,6 +19,7 @@ using Telegram.Bot;
 using Telegram.Bot.Types;
 using BaseSouce.Services.Services.ValidateLink;
 using BaseSource.ViewModels.ManagerBOT;
+using Microsoft.Extensions.Configuration;
 
 namespace BaseSouce.Services.Services.Stream
 {
@@ -33,6 +34,8 @@ namespace BaseSouce.Services.Services.Stream
         private readonly IUserService _userService;
         private readonly ITelegramBotClient _telegramBotClient;
         private readonly IValidateLinkService _validateLinkService;
+        private TelegramBotClient _botClient2;
+        private readonly IConfiguration _configuration;
         public StreamClientService(
             IUnitOfWork<BaseSourceDbContext> unitOfWork,
             ILogger<StreamClientService> logger,
@@ -40,7 +43,9 @@ namespace BaseSouce.Services.Services.Stream
             IHubContext<BotHub, IBotClientHub> botContextHub,
             IUserService userService,
             ITelegramBotClient telegramBotClient,
-            IValidateLinkService validateLinkService)
+            IValidateLinkService validateLinkService
+            , IConfiguration configuration
+            )
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
@@ -49,6 +54,8 @@ namespace BaseSouce.Services.Services.Stream
             _userService = userService;
             _telegramBotClient = telegramBotClient;
             _validateLinkService = validateLinkService;
+            _configuration = configuration;
+            _botClient2 = new TelegramBotClient(_configuration["TelegramBotConfigure:BotToken2"]);
 
         }
 
@@ -659,7 +666,7 @@ namespace BaseSouce.Services.Services.Stream
                 await _unitOfWork.SaveChangesAsync();
 
                 streamEntity = await _repositoryStream.Queryable()
-                    .Include(x => x.ManagerBOT)
+                    .Include(x => x.ManagerBOT).Include(i => i.ManagerBOTBackup)
                     .Where(x => x.UserId == userId && x.Id == id).FirstOrDefaultAsync();
 
                 ///send data to BOT
@@ -713,6 +720,128 @@ namespace BaseSouce.Services.Services.Stream
                         }
                     }
                 }
+
+
+                //check bot backup
+                if (streamEntity.ManagerBOTBackupId.GetValueOrDefault() > 0 && streamEntity.EndTime != null)
+                {
+                    var backupId = streamEntity.StreamBackupId;
+                    if (backupId.GetValueOrDefault() > 0)
+                    {
+                        var streamBackupEntity = await _repositoryStream.GetFirstOrDefaultAsync(
+                            predicate: x => x.Id == backupId && x.Status == StreamStatus.Streaming);
+                        if (streamBackupEntity == null)
+                        {
+                            //create backupStream
+
+                            var botBackup = streamEntity.ManagerBOTBackup;
+                            if (botBackup.Status != ManagerBOTStatus.Connected)
+                            {
+                                botBackup = await _repositoryBOT.GetFirstOrDefaultAsync(
+                                    predicate: x => x.DeletedTime == null
+                                    && x.LiveType == LiveType._Backup
+                                    && x.Status == ManagerBOTStatus.Connected,
+                                    orderBy: x => x.OrderByDescending(i => i.NumberOfThreads));
+
+                            }
+                            if (botBackup != null && botBackup.Status == ManagerBOTStatus.Connected)
+                            {
+                                var streamClone = new StreamHistory
+                                {
+                                    IsLiveBackup = true,
+                                    RTMP = "rtmp://y.rtmp.youtube.com/live2?backup=1",
+                                    LiveType = LiveType._Backup,
+                                    Audio = streamEntity.Audio,
+                                    ManagerBOTId = botBackup.Id,
+                                    PlatformType = streamEntity.PlatformType,
+                                    RenderStatus = RenderStatus.Created,
+                                    StartTimeLive = DateTime.Now,
+                                    Status = StreamStatus.Streaming,
+                                    LiveOrder = streamEntity.LiveOrder,
+                                    IsLiveNow = true,
+                                    BotId = botBackup.BotId,
+                                    IsForever = streamEntity.IsForever,
+                                    TimeBackup = streamEntity.TimeBackup,
+                                    StreamKey = streamEntity.StreamKey,
+                                    EndTimeLive = streamEntity.EndTimeLive,
+                                    UserId = streamEntity.UserId,
+                                    StreamName = $"{streamEntity.StreamName}_backup",
+                                    CreatedTime = DateTime.Now,
+                                    Video = streamEntity.Video
+
+                                };
+
+                                _repositoryStream.Insert(streamClone);
+                                await _unitOfWork.SaveChangesAsync();
+                                //get streamClone
+                                var streamCloneEntity = await _repositoryStream.GetFirstOrDefaultAsync(
+                                    predicate: x => x.Id == streamClone.Id,
+                                    include: x => x.Include(i => i.ManagerBOT));
+
+                                var resultSendBotBackup = await SendDataToBOTAsync(streamCloneEntity);
+                                if (!resultSendBotBackup)
+                                {
+                                    _logger.LogError($"Send data to BOT failed by error:[{resultSendBotBackup.Value}]");
+
+                                    streamCloneEntity.Status = StreamStatus.Stop;
+                                    _repositoryStream.Update(streamCloneEntity);
+                                    await _unitOfWork.SaveChangesAsync();
+
+                                }
+                                else
+                                {
+                                    var telegramAPI = streamEntity.AppUser.TelegramAPI;
+                                    //send message telegram
+                                    if (!string.IsNullOrEmpty(telegramAPI))
+                                    {
+                                        var liveType = streamCloneEntity.EndTimeLive != null ? "11h" : "24/7";
+                                        var timer = streamCloneEntity.StartTimeLive != null ?
+                                            streamCloneEntity.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
+                                            : "Ngay bây giờ";
+                                        var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
+                                        _ = _telegramBotClient
+                                        .SendTextMessageAsync(new ChatId(telegramAPI),
+                                        $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                                        + $"Tên luồng:{streamCloneEntity.StreamName}{Environment.NewLine}"
+                                        + $"Live:{streamCloneEntity.LiveType} {Environment.NewLine}"
+                                        + $"Kiểu live: {liveType}{Environment.NewLine}"
+                                        + $"{textTimer}:{timer}");
+                                    }
+
+                                    if (!string.IsNullOrEmpty(streamEntity.AppUser.LinkTelegram))
+                                    {
+                                        var liveType = streamCloneEntity.EndTimeLive != null ? "11h" : "24/7";
+                                        var timer = streamCloneEntity.StartTimeLive != null ?
+                                            streamCloneEntity.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
+                                            : "Ngay bây giờ";
+                                        var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
+                                        var idTeles = streamEntity.AppUser.LinkTelegram.Split(',');
+                                        if (idTeles.Length > 0)
+                                        {
+                                            foreach (var idTele in idTeles)
+                                            {
+                                                _ = _telegramBotClient
+                                               .SendTextMessageAsync(new ChatId(idTele.Trim()),
+                                               $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                                               + $"Tên luồng:{streamCloneEntity.StreamName}{Environment.NewLine}"
+                                               + $"Live:{streamCloneEntity.LiveType} {Environment.NewLine}"
+                                               + $"Kiểu live: {liveType}{Environment.NewLine}"
+                                               + $"{textTimer}:{timer}");
+                                            }
+                                        }
+                                    }
+                                }
+                                streamEntity.DisconnectedTime = null;
+                                streamEntity.IsLiveBackup = true;
+                                streamEntity.StreamBackupId = streamCloneEntity.Id;
+                                _repositoryStream.Update(streamEntity);
+                                await _unitOfWork.SaveChangesAsync();
+
+                            }
+                        }
+                    }
+                }
+
                 return new KeyValuePair<bool, string>(true, string.Empty);
 
             }
@@ -847,7 +976,7 @@ namespace BaseSouce.Services.Services.Stream
                     }
                     streamEntity.Status = StreamStatus.Streaming;
                 }
-               // _logger.LogInformation($"Stream:[{streamEntity.Id}] - [Backup:{streamEntity.StreamBackupId}]");
+                // _logger.LogInformation($"Stream:[{streamEntity.Id}] - [Backup:{streamEntity.StreamBackupId}]");
                 //remove live backup
 
                 if (streamEntity.StreamBackupId.GetValueOrDefault() > 0 && model.RenderStatus == RenderStatus.LiveStreaming
@@ -1162,7 +1291,8 @@ namespace BaseSouce.Services.Services.Stream
                     .Include(i => i.ManagerBOTBackup).Include(i => i.AppUser)
                     .Where(x => x.DisconnectedTime != null
                     && x.Status == StreamStatus.Disconnet
-                    && x.ManagerBOTBackupId.GetValueOrDefault() > 0 && x.TimeBackup > 0 && x.IsLiveBackup == false).ToListAsync();
+                    && x.ManagerBOTBackupId.GetValueOrDefault() > 0 && x.TimeBackup > 0 && x.IsLiveBackup == false
+                    && x.EndTimeLive == null).ToListAsync();
                 if (liveDisconnects.Any())
                 {
                     _logger.LogDebug($"Total Backup Pending:[{liveDisconnects.Count}]");
@@ -1313,6 +1443,82 @@ namespace BaseSouce.Services.Services.Stream
             {
                 _logger.LogError($"Update botBackup failed by error:[{ex}]");
                 return new KeyValuePair<bool, string>(false, $"Cập nhật không thành công:[{ex.Message}]");
+            }
+        }
+
+        public async Task CheckConnectionBotAsync()
+        {
+            var _repositoryBot = _unitOfWork.GetRepository<ManagerBOT>();
+            var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
+            var _repositorySetting = _unitOfWork.GetRepository<ConfigSystem>();
+            var bots = await _repositoryBot.Queryable().Include(x => x.Manager).ToListAsync();
+            var timeCurrent = DateTime.Now.AddSeconds(-60);
+            var timeDisconnectCurrent = DateTime.Now.AddSeconds(-180);
+            var setting = await _repositorySetting.GetFirstOrDefaultAsync();
+            foreach (var bot in bots)
+            {
+                if (bot.UpdatedTime == null || timeCurrent > bot.UpdatedTime)
+                {
+                    bot.Status = ManagerBOTStatus.Disconnected;
+                    var streamsCurrents = _repositoryStream.Queryable()
+                        .Where(x => x.ManagerBOTId == bot.Id && x.Status == StreamStatus.Streaming).ToList();
+                    if (streamsCurrents != null && streamsCurrents.Any())
+                    {
+                        foreach (var item in streamsCurrents)
+                        {
+                            item.DisconnectedTime = DateTime.Now;
+                        }
+                        _repositoryStream.Update(streamsCurrents);
+                    }
+                    var idTelesAll = new List<string>();
+                    if (timeDisconnectCurrent > bot.DisconnectedTime && !bot.IsSendNotification)
+                    {
+                        bot.IsSendNotification = true;
+                        bot.DisconnectedTime = DateTime.Now;
+                        _repositoryBot.Update(bot);
+
+                        if (!string.IsNullOrWhiteSpace(bot.Manager?.TelegramBOT))
+                        {
+
+                            var idTeles = bot.Manager.TelegramBOT.Split(',');
+                            if (idTeles.Length > 0)
+                            {
+                                idTelesAll.AddRange(idTeles);
+                            }
+                        }
+
+                        if (!string.IsNullOrEmpty(setting.Telegrams))
+                        {
+                            var idTeles = setting.Telegrams.Split(',');
+                            if (idTeles.Length > 0)
+                            {
+                                idTelesAll.AddRange(idTeles);
+
+                            }
+                        }
+                    }
+
+                    await _unitOfWork.SaveChangesAsync();
+
+                    //send notification
+                    if (idTelesAll.Any())
+                    {
+                        idTelesAll = idTelesAll.Distinct().ToList();
+                        var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                        foreach (var item in idTelesAll)
+                        {
+                            _ = _botClient2
+                               .SendTextMessageAsync(new ChatId(item.Trim()),
+                               $"BotName: {bot.Name}{Environment.NewLine}"
+                              + $"Group:{bot.Group}{Environment.NewLine}"
+                              + $"Manager:{bot.Manager?.UserName} {Environment.NewLine}"
+                              + $"Live: {bot.LiveType}{Environment.NewLine}"
+                               + $"Disconnected:{timer}");
+                        }
+                    }
+
+
+                }
             }
         }
     }

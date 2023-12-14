@@ -22,6 +22,8 @@ namespace BaseSouce.Data.Entities
         public long DiskUsed { get; set; }
         public long DiskTotal { get; set; }
         public DateTime? UpdatedTime { get; set; }
+        public DateTime? DisconnectedTime { get; set; }
+        public bool IsSendNotification { get; set; }
         public LiveType? LiveType { get; set; }
 
         public bool IsUsed { get; set; }

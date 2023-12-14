@@ -21,6 +21,7 @@ namespace BaseSouce.Services.Services.Stream
         Task<List<UserBotDto>> GetBotOfUserAsync(string userId);
         Task<KeyValuePair<bool,string>> UpdateBotBackupAsync(string userId, StreamBackupUpdateDto model);
         Task CheckLiveBackupAsync();
+        Task CheckConnectionBotAsync();
 
     }
 }

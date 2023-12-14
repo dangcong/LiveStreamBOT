@@ -1,4 +1,5 @@
 ﻿using BaseSouce.Data.EF;
+using BaseSouce.Services.Services.Stream;
 using BaseSouce.Shared.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -46,28 +47,8 @@ namespace BaseSouce.Services.BackgroundServices
 
         private async void DoWork(object state)
         {
-            using var _db = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<BaseSourceDbContext>();
-
-            var bots = await _db.ManagerBOTs.ToListAsync();
-            var timeCurrent = DateTime.Now.AddSeconds(-60);
-            foreach (var bot in bots)
-            {
-                if (bot.UpdatedTime == null || timeCurrent > bot.UpdatedTime)
-                {
-                     bot.Status = ManagerBOTStatus.Disconnected;
-
-                    var streamsCurrents = _db.StreamHistorys.Where(x => x.ManagerBOTId == bot.Id && x.Status == StreamStatus.Streaming).ToList();
-                    if (streamsCurrents != null && streamsCurrents.Any())
-                    {
-                        foreach (var item in streamsCurrents)
-                        {
-                            item.DisconnectedTime = DateTime.Now;
-                        }
-                    }
-                    await _db.SaveChangesAsync();
-                }
-            }
-
+            var _streamService = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<IStreamClientService>();
+            await _streamService.CheckConnectionBotAsync();
         }
 
     }

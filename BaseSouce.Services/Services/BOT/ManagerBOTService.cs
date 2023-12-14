@@ -142,6 +142,8 @@ namespace BaseSouce.Services.Services.BOT
                     botCurrent.Bandwidth = model.Bandwidth;
                     botCurrent.DiskTotal = model.DiskInfo?.Total ?? 0;
                     botCurrent.DiskUsed = model.DiskInfo?.Used ?? 0;
+                    botCurrent.DisconnectedTime = null;
+                    botCurrent.IsSendNotification = false;
                     _repository.Update(botCurrent);
 
 

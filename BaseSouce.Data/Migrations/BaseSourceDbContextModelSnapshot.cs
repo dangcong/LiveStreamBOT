@@ -58,7 +58,7 @@ namespace BaseSource.Data.Migrations
                         new
                         {
                             Id = "c1105ce5-9dbc-49a9-a7d5-c963b6daa62a",
-                            ConcurrencyStamp = "3dbb0569-be00-443a-8e86-8643279a3c57",
+                            ConcurrencyStamp = "9b10f313-f7bb-4b90-85af-f7781dda2495",
                             Description = "Administrator role",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -202,7 +202,7 @@ namespace BaseSource.Data.Migrations
                         {
                             Id = "ffded6b0-3769-4976-841b-69459049a62d",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "cd92b0d3-5221-4b00-9c64-9d31b14eb26e",
+                            ConcurrencyStamp = "88850b79-d1df-4f17-81a2-6d4a2e46ac60",
                             CreatedTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
@@ -211,7 +211,7 @@ namespace BaseSource.Data.Migrations
                             NormalizedUserName = "superadmin",
                             NumberOfThreads1080Create = 0,
                             NumberOfThreads4KCreate = 0,
-                            PasswordHash = "AQAAAAEAACcQAAAAELziyzuGqwGvzP18QRjQ74kjhTQpF6QdUwvV6sSBcF2s3HG5O0WoklScHxkELLagsQ==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEPAB5SGAJ8S50vL/j9DZW8d/TCzrwYBENYQVVXth65ljSawSsKP5XljbgbQ16hWOUw==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -333,6 +333,9 @@ namespace BaseSource.Data.Migrations
                     b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<DateTime?>("DisconnectedTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<long>("DiskTotal")
                         .HasColumnType("bigint");
 
@@ -343,6 +346,9 @@ namespace BaseSource.Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsBackup")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsSendNotification")
                         .HasColumnType("bit");
 
                     b.Property<bool>("IsUsed")

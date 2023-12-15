@@ -109,9 +109,9 @@
                                     <span class="badge badge-warning">Backup(Chạy/Chờ/Tổng/BOT)</span>
                                 </div>
                             </div>
-                          @*   <div class="card-stats-item">
-                                <div class="card-stats-item-count">@(packageInfo.PackageLive1080.NumberOfThreadsCreated)/@(packageInfo.PackageLive4k.NumberOfThreadsCreated)</div>
-                                <div class="card-stats-item-label"> <span class="badge badge-primary">Tổng Luồng(1080/4k)</span></div>
+                            @*   <div class="card-stats-item">
+                            <div class="card-stats-item-count">@(packageInfo.PackageLive1080.NumberOfThreadsCreated)/@(packageInfo.PackageLive4k.NumberOfThreadsCreated)</div>
+                            <div class="card-stats-item-label"> <span class="badge badge-primary">Tổng Luồng(1080/4k)</span></div>
                             </div> *@
                             @*  <div class="card-stats-item">
                             <div class="card-stats-item-count">@report.TotalBOT</div>
@@ -496,7 +496,9 @@
                                                             case StreamStatus.Stop:
                                                             case StreamStatus.Disconnet:
 
-
+                                                                <button class="btn btn-sm btn-success " onclick="start('@item.Id');" data-id="@item.Id">
+                                                                    Chạy
+                                                                </button>
 
                                                                 <button class="btn btn-sm btn-danger "
                                                                         data-id="@item.Id"

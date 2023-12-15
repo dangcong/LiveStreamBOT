@@ -346,27 +346,6 @@ namespace BaseSouce.Services.Services.Stream
                 var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
                 var _repositoryUserBot = _unitOfWork.GetRepository<UserManagerBOT>();
 
-                //var userCurrent = await _repositoryUser.GetFirstOrDefaultAsync(
-                //    predicate: x => x.Id == userId,
-                //    selector: x => new
-                //    {
-                //        NumberOfThreads1080 = x.UserManagerBOTs.Where(x => x.ManagerBOT.LiveType == LiveType._1080).Sum(x => x.NumberOfThreads),
-                //        NumberOfThreads1080InRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._1080).Count(),
-                //        NumberOfThreads4k = x.UserManagerBOTs.Where(x => x.ManagerBOT.LiveType == LiveType._4K).Sum(x => x.NumberOfThreads),
-                //        NumberOfThreads4kInRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._4K).Count(),
-                //        Bot1080Id = x.UserManagerBOTs.Where(i => i.LiveType == LiveType._1080).Select(i => new
-                //        {
-                //            Id = i.ManagerBOTId,
-                //            BotId = i.ManagerBOT.BotId
-                //        }).FirstOrDefault(),
-                //        Bot4k0Id = x.UserManagerBOTs.Where(i => i.LiveType == LiveType._4K).Select(i => new
-                //        {
-                //            Id = i.ManagerBOTId,
-                //            BotId = i.ManagerBOT.BotId
-                //        }).FirstOrDefault()
-                //    },
-                //    include: x => x.Include(i => i.UserManagerBOTs).ThenInclude(o => o.ManagerBOT));
-
                 var userBots = await _repositoryUserBot.Queryable()
                     .Include(x => x.ManagerBOT).ThenInclude(i => i.StreamHistorys)
                     .Where(x => x.UserId == userId && x.LiveType == model.LiveType && x.ManagerBOT.Status == ManagerBOTStatus.Connected)
@@ -375,7 +354,7 @@ namespace BaseSouce.Services.Services.Stream
                         BotId = x.ManagerBOTId,
                         BotIdString = x.ManagerBOT.BotId,
                         NumberOfThreads = x.NumberOfThreads,
-                        NumberOfThreadsInRun = x.ManagerBOT.StreamHistorys.Where(i => i.UserId == userId && i.Status == StreamStatus.Streaming).Count(),
+                        NumberOfThreadsInRun = x.ManagerBOT.StreamHistorys.Where(i => i.UserId == userId && i.Status == StreamStatus.Streaming).Count()
                     })
                     .OrderBy(x => x.NumberOfThreadsInRun)
                     .ToListAsync();
@@ -568,7 +547,6 @@ namespace BaseSouce.Services.Services.Stream
 
                 var _repositoryUserBOT = _unitOfWork.GetRepository<UserManagerBOT>();
 
-
                 var userCurrent = await _repositoryUser.GetFirstOrDefaultAsync(
                     predicate: x => x.Id == userId, disableTracking: true);
 
@@ -682,47 +660,54 @@ namespace BaseSouce.Services.Services.Stream
 
                 }
                 //send message telegram
+                var idTeles = new List<string>();
                 if (!string.IsNullOrEmpty(userCurrent.TelegramAPI))
                 {
-                    var liveType = streamEntity.EndTimeLive != null ? "11h" : "24/7";
-                    var timer = streamEntity.StartTimeLive != null ?
-                        streamEntity.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
-                        : "Ngay bây giờ";
-                    var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
-                    _ = _telegramBotClient
-                    .SendTextMessageAsync(new ChatId(userCurrent.TelegramAPI),
-                    $"User: {userCurrent.UserName}{Environment.NewLine}"
-                    + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
-                    + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
-                    + $"Kiểu live: {liveType}{Environment.NewLine}"
-                    + $"{textTimer}:{timer}");
+                    idTeles.Add(userCurrent.TelegramAPI);
+                    //var liveType = streamEntity.EndTimeLive != null ? "11h" : "24/7";
+                    //var timer = streamEntity.StartTimeLive != null ?
+                    //    streamEntity.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
+                    //    : "Ngay bây giờ";
+                    //var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
+                    //_ = _telegramBotClient
+                    //.SendTextMessageAsync(new ChatId(userCurrent.TelegramAPI),
+                    //$"User: {userCurrent.UserName}{Environment.NewLine}"
+                    //+ $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
+                    //+ $"Live:{streamEntity.LiveType} {Environment.NewLine}"
+                    //+ $"Kiểu live: {liveType}{Environment.NewLine}"
+                    //+ $"{textTimer}:{timer}");
                 }
                 if (!string.IsNullOrEmpty(userCurrent.LinkTelegram))
                 {
+                    idTeles.AddRange(userCurrent.LinkTelegram.Split(','));
+
+                }
+                if (idTeles.Any())
+                {
+                    idTeles = idTeles.Distinct().ToList();
                     var liveType = streamEntity.EndTimeLive != null ? "11h" : "24/7";
                     var timer = streamEntity.StartTimeLive != null ?
                         streamEntity.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
                         : "Ngay bây giờ";
                     var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
-                    var idTeles = userCurrent.LinkTelegram.Split(',');
-                    if (idTeles.Length > 0)
+
+                    foreach (var idTele in idTeles)
                     {
-                        foreach (var idTele in idTeles)
-                        {
-                            _ = _telegramBotClient
-                           .SendTextMessageAsync(new ChatId(idTele.Trim()),
-                           $"User: {userCurrent.UserName}{Environment.NewLine}"
-                           + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
-                           + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
-                           + $"Kiểu live: {liveType}{Environment.NewLine}"
-                           + $"{textTimer}:{timer}");
-                        }
+                        _ = _telegramBotClient
+                       .SendTextMessageAsync(new ChatId(idTele.Trim()),
+                       $"User: {userCurrent.UserName}{Environment.NewLine}"
+                       + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
+                       + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
+                       + $"Kiểu live: {liveType}{Environment.NewLine}"
+                       + $"{textTimer}:{timer}");
                     }
                 }
 
 
                 //check bot backup
-                if (streamEntity.ManagerBOTBackupId.GetValueOrDefault() > 0 && streamEntity.EndTimeLive != null)
+                if (streamEntity.ManagerBOTBackupId.GetValueOrDefault() > 0
+                    && streamEntity.EndTimeLive != null
+                    && streamEntity.LiveType != LiveType._Backup)
                 {
                     var backupId = streamEntity.StreamBackupId;
                     var streamBackupEntity = await _repositoryStream.GetFirstOrDefaultAsync(
@@ -807,28 +792,28 @@ namespace BaseSouce.Services.Services.Stream
                                     + $"{textTimer}:{timer}");
                                 }
 
-                                if (!string.IsNullOrEmpty(userCurrent.LinkTelegram))
-                                {
-                                    var liveType = streamCloneEntity.EndTimeLive != null ? "11h" : "24/7";
-                                    var timer = streamCloneEntity.StartTimeLive != null ?
-                                        streamCloneEntity.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
-                                        : "Ngay bây giờ";
-                                    var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
-                                    var idTeles = userCurrent.LinkTelegram.Split(',');
-                                    if (idTeles.Length > 0)
-                                    {
-                                        foreach (var idTele in idTeles)
-                                        {
-                                            _ = _telegramBotClient
-                                           .SendTextMessageAsync(new ChatId(idTele.Trim()),
-                                           $"User: {userCurrent.UserName}{Environment.NewLine}"
-                                           + $"Tên luồng:{streamCloneEntity.StreamName}{Environment.NewLine}"
-                                           + $"Live:{streamCloneEntity.LiveType} {Environment.NewLine}"
-                                           + $"Kiểu live: {liveType}{Environment.NewLine}"
-                                           + $"{textTimer}:{timer}");
-                                        }
-                                    }
-                                }
+                                //if (!string.IsNullOrEmpty(userCurrent.LinkTelegram))
+                                //{
+                                //    var liveType = streamCloneEntity.EndTimeLive != null ? "11h" : "24/7";
+                                //    var timer = streamCloneEntity.StartTimeLive != null ?
+                                //        streamCloneEntity.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
+                                //        : "Ngay bây giờ";
+                                //    var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
+                                //    var idTeles = userCurrent.LinkTelegram.Split(',');
+                                //    if (idTeles.Length > 0)
+                                //    {
+                                //        foreach (var idTele in idTeles)
+                                //        {
+                                //            _ = _telegramBotClient
+                                //           .SendTextMessageAsync(new ChatId(idTele.Trim()),
+                                //           $"User: {userCurrent.UserName}{Environment.NewLine}"
+                                //           + $"Tên luồng:{streamCloneEntity.StreamName}{Environment.NewLine}"
+                                //           + $"Live:{streamCloneEntity.LiveType} {Environment.NewLine}"
+                                //           + $"Kiểu live: {liveType}{Environment.NewLine}"
+                                //           + $"{textTimer}:{timer}");
+                                //        }
+                                //    }
+                                //}
                             }
 
                             streamEntity.DisconnectedTime = null;
@@ -909,7 +894,6 @@ namespace BaseSouce.Services.Services.Stream
             try
             {
                 var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
-
                 var streamEntity = await _repositoryStream.GetFirstOrDefaultAsync(
                     predicate: x => x.Id == model.ItemId,
                     disableTracking: false,
@@ -945,33 +929,34 @@ namespace BaseSouce.Services.Services.Stream
                         //send message telegram
                         var liveType = streamEntity.EndTimeLive != null ? "11h" : "24/7";
                         var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
-
+                        var idTeles = new List<string>();
                         if (!string.IsNullOrEmpty(streamEntity.AppUser.TelegramAPI))
                         {
-                            _ = _telegramBotClient
-                        .SendTextMessageAsync(new ChatId(streamEntity.AppUser.TelegramAPI),
-                        $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
-                        + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
-                        + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
-                        + $"Kiểu live: {liveType}{Environment.NewLine}"
-                        + $"Tiếp tục live:{timer}");
+                            idTeles.Add(streamEntity.AppUser.TelegramAPI);
+                            //    _ = _telegramBotClient
+                            //.SendTextMessageAsync(new ChatId(streamEntity.AppUser.TelegramAPI),
+                            //$"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                            //+ $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
+                            //+ $"Live:{streamEntity.LiveType} {Environment.NewLine}"
+                            //+ $"Kiểu live: {liveType}{Environment.NewLine}"
+                            //+ $"Tiếp tục live:{timer}");
                         }
-
                         if (!string.IsNullOrEmpty(streamEntity.AppUser.LinkTelegram))
                         {
-                            var idTeles = streamEntity.AppUser.LinkTelegram.Split(',');
-                            if (idTeles.Length > 0)
+                            idTeles.AddRange(streamEntity.AppUser.LinkTelegram.Split(','));
+                        }
+                        if (idTeles.Count > 0)
+                        {
+                            idTeles = idTeles.Distinct().ToList();
+                            foreach (var item in idTeles)
                             {
-                                foreach (var item in idTeles)
-                                {
-                                    _ = _telegramBotClient
-                                   .SendTextMessageAsync(new ChatId(item.Trim()),
-                                   $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
-                                   + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
-                                   + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
-                                   + $"Kiểu live: {liveType}{Environment.NewLine}"
-                                   + $"Tiếp tục live:{timer}");
-                                }
+                                _ = _telegramBotClient
+                               .SendTextMessageAsync(new ChatId(item.Trim()),
+                               $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                               + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
+                               + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
+                               + $"Kiểu live: {liveType}{Environment.NewLine}"
+                               + $"Tiếp tục live:{timer}");
                             }
                         }
                     }
@@ -981,7 +966,8 @@ namespace BaseSouce.Services.Services.Stream
                 //remove live backup
 
                 if (streamEntity.StreamBackupId.GetValueOrDefault() > 0 && model.RenderStatus == RenderStatus.LiveStreaming
-                    && streamEntity.Status == StreamStatus.Streaming)
+                    && streamEntity.Status == StreamStatus.Streaming
+                    && streamEntity.EndTimeLive == null)
                 {
                     //_logger.LogInformation($"Close Backup:[{streamEntity.StreamBackupId}]");
                     var liveType = "Backup";
@@ -998,33 +984,36 @@ namespace BaseSouce.Services.Services.Stream
                             ItemId = streamBackup.Id,
                             Command = Command.Cancel
                         });
-
+                        var idTeles = new List<string>();
                         if (!string.IsNullOrEmpty(streamEntity.AppUser.TelegramAPI))
                         {
-                            _ = _telegramBotClient
-                        .SendTextMessageAsync(new ChatId(streamEntity.AppUser.TelegramAPI),
-                        $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
-                        + $"Tên luồng:{streamBackup.StreamName}{Environment.NewLine}"
-                        + $"Live:{streamBackup.LiveType} {Environment.NewLine}"
-                        + $"Kiểu live: {liveType}{Environment.NewLine}"
-                        + $"Dừng:{timer}");
+                            idTeles.Add(streamEntity.AppUser.TelegramAPI);
+                            //    _ = _telegramBotClient
+                            //.SendTextMessageAsync(new ChatId(streamEntity.AppUser.TelegramAPI),
+                            //$"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                            //+ $"Tên luồng:{streamBackup.StreamName}{Environment.NewLine}"
+                            //+ $"Live:{streamBackup.LiveType} {Environment.NewLine}"
+                            //+ $"Kiểu live: {liveType}{Environment.NewLine}"
+                            //+ $"Dừng:{timer}");
                         }
 
                         if (!string.IsNullOrEmpty(streamEntity.AppUser.LinkTelegram))
                         {
-                            var idTeles = streamEntity.AppUser.LinkTelegram.Split(',');
-                            if (idTeles.Length > 0)
+                            idTeles.AddRange(streamEntity.AppUser.LinkTelegram.Split(','));
+                            //var idTeles = streamEntity.AppUser.LinkTelegram.Split(',');
+                        }
+                        if (idTeles.Count > 0)
+                        {
+                            idTeles = idTeles.Distinct().ToList();
+                            foreach (var item in idTeles)
                             {
-                                foreach (var item in idTeles)
-                                {
-                                    _ = _telegramBotClient
-                                   .SendTextMessageAsync(new ChatId(item.Trim()),
-                                   $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
-                                   + $"Tên luồng:{streamBackup.StreamName}{Environment.NewLine}"
-                                   + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
-                                   + $"Kiểu live: {liveType}{Environment.NewLine}"
-                                   + $"Dừng:{timer}");
-                                }
+                                _ = _telegramBotClient
+                               .SendTextMessageAsync(new ChatId(item.Trim()),
+                               $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                               + $"Tên luồng:{streamBackup.StreamName}{Environment.NewLine}"
+                               + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
+                               + $"Kiểu live: {liveType}{Environment.NewLine}"
+                               + $"Dừng:{timer}");
                             }
                         }
 
@@ -1041,33 +1030,36 @@ namespace BaseSouce.Services.Services.Stream
                     //send message telegram
                     var liveType = streamEntity.EndTimeLive != null ? "11h" : "24/7";
                     var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
-
+                    var idTeles = new List<string>();
                     if (!string.IsNullOrEmpty(streamEntity.AppUser.TelegramAPI))
                     {
-                        _ = _telegramBotClient
-                    .SendTextMessageAsync(new ChatId(streamEntity.AppUser.TelegramAPI),
-                    $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
-                    + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
-                    + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
-                    + $"Kiểu live: {liveType}{Environment.NewLine}"
-                    + $"Bắt đầu:{timer}");
+                        idTeles.Add(streamEntity.AppUser.TelegramAPI);
+                        //    _ = _telegramBotClient
+                        //.SendTextMessageAsync(new ChatId(streamEntity.AppUser.TelegramAPI),
+                        //$"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                        //+ $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
+                        //+ $"Live:{streamEntity.LiveType} {Environment.NewLine}"
+                        //+ $"Kiểu live: {liveType}{Environment.NewLine}"
+                        //+ $"Bắt đầu:{timer}");
                     }
 
                     if (!string.IsNullOrEmpty(streamEntity.AppUser.LinkTelegram))
                     {
-                        var idTeles = streamEntity.AppUser.LinkTelegram.Split(',');
-                        if (idTeles.Length > 0)
+                        idTeles.AddRange(streamEntity.AppUser.LinkTelegram.Split(','));
+
+                    }
+                    if (idTeles.Count > 0)
+                    {
+                        idTeles = idTeles.Distinct().ToList();
+                        foreach (var item in idTeles)
                         {
-                            foreach (var item in idTeles)
-                            {
-                                _ = _telegramBotClient
-                               .SendTextMessageAsync(new ChatId(item.Trim()),
-                               $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
-                               + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
-                               + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
-                               + $"Kiểu live: {liveType}{Environment.NewLine}"
-                               + $"Bắt đầu:{timer}");
-                            }
+                            _ = _telegramBotClient
+                           .SendTextMessageAsync(new ChatId(item.Trim()),
+                           $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                           + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
+                           + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
+                           + $"Kiểu live: {liveType}{Environment.NewLine}"
+                           + $"Bắt đầu:{timer}");
                         }
                     }
 
@@ -1078,37 +1070,43 @@ namespace BaseSouce.Services.Services.Stream
                     var liveType = streamEntity.EndTimeLive != null ? "11h" : "24/7";
                     var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
 
+                    var idTeles = new List<string>();
                     if (!string.IsNullOrEmpty(streamEntity.AppUser.TelegramAPI))
                     {
-                        _ = _telegramBotClient
-                    .SendTextMessageAsync(new ChatId(streamEntity.AppUser.TelegramAPI),
-                    $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
-                    + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
-                    + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
-                    + $"Kiểu live: {liveType}{Environment.NewLine}"
-                    + $"Lỗi:{streamEntity.ErrorMessage}");
+                        idTeles.Add(streamEntity.AppUser.TelegramAPI);
+                        //    _ = _telegramBotClient
+                        //.SendTextMessageAsync(new ChatId(streamEntity.AppUser.TelegramAPI),
+                        //$"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                        //+ $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
+                        //+ $"Live:{streamEntity.LiveType} {Environment.NewLine}"
+                        //+ $"Kiểu live: {liveType}{Environment.NewLine}"
+                        //+ $"Lỗi:{streamEntity.ErrorMessage}");
                     }
                     if (!string.IsNullOrEmpty(streamEntity.AppUser.LinkTelegram))
                     {
-                        var idTeles = streamEntity.AppUser.LinkTelegram.Split(',');
-                        if (idTeles.Length > 0)
+                        idTeles.AddRange(streamEntity.AppUser.LinkTelegram.Split(','));
+
+                    }
+                    if (idTeles.Count > 0)
+                    {
+                        idTeles = idTeles.Distinct().ToList();
+
+                        foreach (var item in idTeles)
                         {
-                            foreach (var item in idTeles)
-                            {
-                                _ = _telegramBotClient
-                               .SendTextMessageAsync(new ChatId(item.Trim()),
-                               $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
-                               + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
-                               + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
-                               + $"Kiểu live: {liveType}{Environment.NewLine}"
-                               + $"Lỗi:{timer}");
-                            }
+                            _ = _telegramBotClient
+                           .SendTextMessageAsync(new ChatId(item.Trim()),
+                           $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                           + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
+                           + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
+                           + $"Kiểu live: {liveType}{Environment.NewLine}"
+                           + $"Lỗi:{timer}");
                         }
                     }
 
                 }
                 else if (streamEntity.RenderStatus == RenderStatus.Ended)
                 {
+                    var idTeles = new List<string>();
                     streamEntity.Status = StreamStatus.Stop;
 
                     var liveType = streamEntity.EndTimeLive != null ? "11h" : "24/7";
@@ -1116,30 +1114,39 @@ namespace BaseSouce.Services.Services.Stream
 
                     if (!string.IsNullOrEmpty(streamEntity.AppUser.TelegramAPI))
                     {
-                        _ = _telegramBotClient
-                       .SendTextMessageAsync(new ChatId(streamEntity.AppUser.TelegramAPI),
-                       $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
-                       + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
-                       + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
-                       + $"Kiểu live: {liveType}{Environment.NewLine}"
-                       + $"Dừng:{timer}");
+                        idTeles.Add(streamEntity.AppUser.TelegramAPI);
+                        // _ = _telegramBotClient
+                        //.SendTextMessageAsync(new ChatId(streamEntity.AppUser.TelegramAPI),
+                        //$"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                        //+ $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
+                        //+ $"Live:{streamEntity.LiveType} {Environment.NewLine}"
+                        //+ $"Kiểu live: {liveType}{Environment.NewLine}"
+                        //+ $"Dừng:{timer}");
                     }
                     if (!string.IsNullOrEmpty(streamEntity.AppUser.LinkTelegram))
                     {
-                        var idTeles = streamEntity.AppUser.LinkTelegram.Split(',');
-                        if (idTeles.Length > 0)
+                        idTeles.AddRange(streamEntity.AppUser.LinkTelegram.Split(','));
+
+                    }
+                    if (idTeles.Count > 0)
+                    {
+                        idTeles = idTeles.Distinct().ToList();
+                        foreach (var item in idTeles)
                         {
-                            foreach (var item in idTeles)
-                            {
-                                _ = _telegramBotClient
-                               .SendTextMessageAsync(new ChatId(item.Trim()),
-                               $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
-                               + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
-                               + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
-                               + $"Kiểu live: {liveType}{Environment.NewLine}"
-                               + $"Dừng:{timer}");
-                            }
+                            _ = _telegramBotClient
+                           .SendTextMessageAsync(new ChatId(item.Trim()),
+                           $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                           + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
+                           + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
+                           + $"Kiểu live: {liveType}{Environment.NewLine}"
+                           + $"Dừng:{timer}");
                         }
+                    }
+                    if (streamEntity.EndTimeLive != null && streamEntity.LiveType == LiveType._Backup)
+                    {
+                        _repositoryStream.Delete(streamEntity);
+                        await _unitOfWork.SaveChangesAsync();
+                        return new KeyValuePair<bool, string>(true, string.Empty);
                     }
                 }
                 _repositoryStream.Update(streamEntity);
@@ -1201,7 +1208,7 @@ namespace BaseSouce.Services.Services.Stream
                         }
 
                     }
-                   // streamEntity.StreamBackupId = null;
+                    // streamEntity.StreamBackupId = null;
                     streamEntity.DisconnectedTime = null;
                     streamEntity.IsLiveBackup = false;
 
@@ -1364,44 +1371,49 @@ namespace BaseSouce.Services.Services.Stream
                             }
                             else
                             {
+                                var idTeles = new List<string>();
                                 var telegramAPI = item.AppUser.TelegramAPI;
                                 //send message telegram
                                 if (!string.IsNullOrEmpty(telegramAPI))
                                 {
-                                    var liveType = streamCloneEntity.EndTimeLive != null ? "11h" : "24/7";
-                                    var timer = streamCloneEntity.StartTimeLive != null ?
-                                        streamCloneEntity.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
-                                        : "Ngay bây giờ";
-                                    var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
-                                    _ = _telegramBotClient
-                                    .SendTextMessageAsync(new ChatId(telegramAPI),
-                                    $"User: {item.AppUser.UserName}{Environment.NewLine}"
-                                    + $"Tên luồng:{streamCloneEntity.StreamName}{Environment.NewLine}"
-                                    + $"Live:{streamCloneEntity.LiveType} {Environment.NewLine}"
-                                    + $"Kiểu live: {liveType}{Environment.NewLine}"
-                                    + $"{textTimer}:{timer}");
+                                    idTeles.Add(telegramAPI);
+                                    //var liveType = streamCloneEntity.EndTimeLive != null ? "11h" : "24/7";
+                                    //var timer = streamCloneEntity.StartTimeLive != null ?
+                                    //    streamCloneEntity.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
+                                    //    : "Ngay bây giờ";
+                                    //var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
+                                    //_ = _telegramBotClient
+                                    //.SendTextMessageAsync(new ChatId(telegramAPI),
+                                    //$"User: {item.AppUser.UserName}{Environment.NewLine}"
+                                    //+ $"Tên luồng:{streamCloneEntity.StreamName}{Environment.NewLine}"
+                                    //+ $"Live:{streamCloneEntity.LiveType} {Environment.NewLine}"
+                                    //+ $"Kiểu live: {liveType}{Environment.NewLine}"
+                                    //+ $"{textTimer}:{timer}");
                                 }
 
                                 if (!string.IsNullOrEmpty(item.AppUser.LinkTelegram))
                                 {
+                                    idTeles.AddRange(item.AppUser.LinkTelegram.Split(','));
+
+                                }
+                                if (idTeles.Any())
+                                {
+                                    idTeles = idTeles.Distinct().ToList();
                                     var liveType = streamCloneEntity.EndTimeLive != null ? "11h" : "24/7";
                                     var timer = streamCloneEntity.StartTimeLive != null ?
                                         streamCloneEntity.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
                                         : "Ngay bây giờ";
                                     var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
-                                    var idTeles = item.AppUser.LinkTelegram.Split(',');
-                                    if (idTeles.Length > 0)
+
+                                    foreach (var idTele in idTeles)
                                     {
-                                        foreach (var idTele in idTeles)
-                                        {
-                                            _ = _telegramBotClient
-                                           .SendTextMessageAsync(new ChatId(idTele.Trim()),
-                                           $"User: {item.AppUser.UserName}{Environment.NewLine}"
-                                           + $"Tên luồng:{streamCloneEntity.StreamName}{Environment.NewLine}"
-                                           + $"Live:{streamCloneEntity.LiveType} {Environment.NewLine}"
-                                           + $"Kiểu live: {liveType}{Environment.NewLine}"
-                                           + $"{textTimer}:{timer}");
-                                        }
+                                        _ = _telegramBotClient
+                                       .SendTextMessageAsync(new ChatId(idTele.Trim()),
+                                       $"User: {item.AppUser.UserName}{Environment.NewLine}"
+                                       + $"Tên luồng:{streamCloneEntity.StreamName}{Environment.NewLine}"
+                                       + $"Live:{streamCloneEntity.LiveType} {Environment.NewLine}"
+                                       + $"Kiểu live: {liveType}{Environment.NewLine}"
+                                       + $"{textTimer}:{timer}");
                                     }
                                 }
                             }

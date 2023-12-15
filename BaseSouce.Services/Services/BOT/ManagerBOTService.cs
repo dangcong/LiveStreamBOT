@@ -146,6 +146,10 @@ namespace BaseSouce.Services.Services.BOT
                     botCurrent.IsSendNotification = false;
                     _repository.Update(botCurrent);
 
+                    //reset live backup
+
+
+
 
                 }
 

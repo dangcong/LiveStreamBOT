@@ -1468,7 +1468,13 @@ namespace BaseSouce.Services.Services.Stream
             var _repositorySetting = _unitOfWork.GetRepository<ConfigSystem>();
             var bots = await _repositoryBot.Queryable().Include(x => x.Manager).ToListAsync();
             var timeCurrent = DateTime.Now.AddSeconds(-60);
-            var timeDisconnectCurrent = DateTime.Now.AddSeconds(-180);
+            var timeDelay = 0;
+            int.TryParse(_configuration["TimeDelayBot"], out timeDelay);
+            if (timeDelay == 0)
+            {
+                timeDelay = 0;
+            }
+            var timeDisconnectCurrent = DateTime.Now.AddSeconds(-timeDelay);
             var setting = await _repositorySetting.GetFirstOrDefaultAsync();
             foreach (var bot in bots)
             {

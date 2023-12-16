@@ -748,7 +748,7 @@ namespace BaseSouce.Services.Services.Stream
                                 StreamKey = streamEntity.StreamKey,
                                 EndTimeLive = streamEntity.EndTimeLive,
                                 UserId = streamEntity.UserId,
-                                StreamName = $"{streamEntity.StreamName}_backup",
+                                StreamName = $"{streamEntity.StreamName}_backup11h",
                                 CreatedTime = DateTime.Now,
                                 Video = streamEntity.Video
 
@@ -921,11 +921,12 @@ namespace BaseSouce.Services.Services.Stream
                 }
                 else if (model.RenderStatus < RenderStatus.Ended)
                 {
-                    if (streamEntity.Status == StreamStatus.Disconnet || streamEntity.Status == StreamStatus.Stop)
+                    if (streamEntity.Status == StreamStatus.Disconnet || streamEntity.Status == StreamStatus.Stop
+                        && streamEntity.DisconnectedTime < DateTime.Now.AddSeconds(-180))
                     {
-                        _logger.LogInformation($"continue [{streamEntity.Id}]" +
-                            $" [Render:status[{streamEntity.RenderStatus}]] " +
-                            $"[Status :{streamEntity.Status}]");
+                        //_logger.LogInformation($"continue [{streamEntity.Id}]" +
+                        //    $" [Render:status[{streamEntity.RenderStatus}]] " +
+                        //    $"[Status :{streamEntity.Status}]");
                         //send message telegram
                         var liveType = streamEntity.EndTimeLive != null ? "11h" : "24/7";
                         var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
@@ -1019,7 +1020,7 @@ namespace BaseSouce.Services.Services.Stream
 
                         _repositoryStream.Delete(streamBackup);
                         await _unitOfWork.SaveChangesAsync();
-                        _logger.LogInformation($"End close Backup:[{streamEntity.StreamBackupId}]");
+                        //_logger.LogInformation($"End close Backup:[{streamEntity.StreamBackupId}]");
                         //streamEntity.StreamBackupId = null;
                         streamEntity.IsLiveBackup = false;
                     }
@@ -1346,7 +1347,7 @@ namespace BaseSouce.Services.Services.Stream
                                 StreamKey = item.StreamKey,
                                 EndTimeLive = item.EndTimeLive,
                                 UserId = item.UserId,
-                                StreamName = $"{item.StreamName}_backup",
+                                StreamName = $"{item.StreamName}_backup247",
                                 CreatedTime = DateTime.Now,
                                 Video = item.Video
 

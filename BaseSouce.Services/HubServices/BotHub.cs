@@ -89,23 +89,26 @@ namespace BaseSouce.Services.HubServices
 
                         foreach (var item in streamsCurrents)
                         {
-
                             item.Status = StreamStatus.Disconnet;
-                            item.DisconnectedTime = DateTime.Now;
                             item.IsLiveBackup = false;
-
-                            if (!string.IsNullOrEmpty(item.AppUser.TelegramAPI))
+                            if (item.DisconnectedTime != null && item.DisconnectedTime < DateTime.Now.AddSeconds(-180))
                             {
-                                var liveType = item.EndTimeLive != null ? "11h" : "24/7";
-                                var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
-                                _ = _telegramBotClient
-                                .SendTextMessageAsync(new ChatId(item.AppUser.TelegramAPI),
-                                $"User: {item.AppUser.UserName}{Environment.NewLine}"
-                                + $"Tên luồng:{item.StreamName}{Environment.NewLine}"
-                                + $"Live:{item.LiveType} {Environment.NewLine}"
-                                + $"Kiểu live: {liveType}{Environment.NewLine}"
-                                + $"Disconnect:{timer}");
+                                if (!string.IsNullOrEmpty(item.AppUser.TelegramAPI))
+                                {
+                                    var liveType = item.EndTimeLive != null ? "11h" : "24/7";
+                                    var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                                    _ = _telegramBotClient
+                                    .SendTextMessageAsync(new ChatId(item.AppUser.TelegramAPI),
+                                    $"User: {item.AppUser.UserName}{Environment.NewLine}"
+                                    + $"Tên luồng:{item.StreamName}{Environment.NewLine}"
+                                    + $"Live:{item.LiveType} {Environment.NewLine}"
+                                    + $"Kiểu live: {liveType}{Environment.NewLine}"
+                                    + $"Disconnected:{timer}");
+                                }
                             }
+                            item.DisconnectedTime = DateTime.Now;
+
+
                         }
                         _repositoryStream.Update(streamsCurrents);
                     }

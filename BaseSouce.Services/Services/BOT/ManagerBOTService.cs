@@ -110,6 +110,7 @@ namespace BaseSouce.Services.Services.BOT
                     include: x => x.Include(i => i.Manager));
 
                 var statusOld = ManagerBOTStatus.Connected;
+                DateTime? timeDisconnected = DateTime.Now;
                 if (botCurrent == null)
                 {
                     botCurrent = new ManagerBOT
@@ -128,10 +129,12 @@ namespace BaseSouce.Services.Services.BOT
                     };
                     _repository.Insert(botCurrent);
                     statusOld = ManagerBOTStatus.Disconnected;
+                    timeDisconnected = DateTime.Now.AddSeconds(-240);
                 }
                 else
                 {
                     statusOld = botCurrent.Status;
+                    timeDisconnected = botCurrent.DisconnectedTime;
                     botCurrent.ConnectionId = model.ConnectionId;
                     botCurrent.Bandwidth = model.Bandwidth;
                     botCurrent.RAM = model.RamUsage;
@@ -146,11 +149,8 @@ namespace BaseSouce.Services.Services.BOT
                     botCurrent.IsSendNotification = false;
                     _repository.Update(botCurrent);
 
+
                     //reset live backup
-
-
-
-
                 }
 
                 await _unitOfWork.SaveChangesAsync();
@@ -177,7 +177,9 @@ namespace BaseSouce.Services.Services.BOT
 
                     }
                 }
-                if (statusOld == ManagerBOTStatus.Disconnected && idTelesAll.Any())
+                if (statusOld == ManagerBOTStatus.Disconnected &&
+                    timeDisconnected < DateTime.Now.AddSeconds(-180)
+                    && idTelesAll.Any())
                 {
                     idTelesAll = idTelesAll.Distinct().ToList();
 

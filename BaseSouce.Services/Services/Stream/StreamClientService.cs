@@ -921,7 +921,7 @@ namespace BaseSouce.Services.Services.Stream
                 }
                 else if (model.RenderStatus < RenderStatus.Ended)
                 {
-                    if (streamEntity.Status == StreamStatus.Disconnet || streamEntity.Status == StreamStatus.Stop
+                    if ((streamEntity.Status == StreamStatus.Disconnet || streamEntity.Status == StreamStatus.Stop)
                         && streamEntity.DisconnectedTime < DateTime.Now.AddSeconds(-180))
                     {
                         //_logger.LogInformation($"continue [{streamEntity.Id}]" +
@@ -1533,6 +1533,41 @@ namespace BaseSouce.Services.Services.Stream
                     }
 
 
+                }
+            }
+
+            var streamDisconnect = await _repositoryStream.Queryable().AsNoTracking().Include(x => x.AppUser)
+                .Where(x => x.Status == StreamStatus.Disconnet && x.DisconnectedTime < timeDisconnectCurrent).ToListAsync();
+            if (streamDisconnect.Any())
+            {
+                foreach (var item in streamDisconnect)
+                {
+                    var idTelesAll = new List<string>();
+                    if (!string.IsNullOrEmpty(item.AppUser.TelegramAPI))
+                    {
+                        idTelesAll.Add(item.AppUser.TelegramAPI);
+
+                    }
+                    if (!string.IsNullOrEmpty(item.AppUser.LinkTelegram))
+                    {
+                        idTelesAll.AddRange(item.AppUser.LinkTelegram.Split(','));
+                    }
+                    if (idTelesAll.Count > 0)
+                    {
+                        idTelesAll = idTelesAll.Distinct().ToList();
+                        foreach (var tele in idTelesAll)
+                        {
+                            var liveType = item.EndTimeLive != null ? "11h" : "24/7";
+                            var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                            _ = _telegramBotClient
+                           .SendTextMessageAsync(new ChatId(tele.Trim()),
+                           $"User: {item.AppUser.UserName}{Environment.NewLine}"
+                           + $"Tên luồng:{item.StreamName}{Environment.NewLine}"
+                           + $"Live:{item.LiveType} {Environment.NewLine}"
+                           + $"Kiểu live: {liveType}{Environment.NewLine}"
+                           + $"Disconnected:{timer}");
+                        }
+                    }
                 }
             }
         }

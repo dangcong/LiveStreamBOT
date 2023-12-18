@@ -47,8 +47,10 @@ namespace BaseSouce.Services.BackgroundServices
 
         private async void DoWork(object state)
         {
+            _logger.LogInformation($"Begin check connection");
             var _streamService = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<IStreamClientService>();
             await _streamService.CheckConnectionBotAsync();
+            _logger.LogInformation($"End check connection");
         }
 
     }

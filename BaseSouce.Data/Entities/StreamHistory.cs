@@ -30,6 +30,7 @@ namespace BaseSource.Data.Entities
         public bool IsLiveBackup { get; set; }
         public int? StreamBackupId { get; set; }
         public StreamStatus Status { get; set; }
+        public bool IsSendNotification { get; set; }
         public int TimeBackup { get; set; }
         public PlatformType PlatformType { get; set; }
         public RenderStatus RenderStatus { get; set; }

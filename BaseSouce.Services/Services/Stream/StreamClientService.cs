@@ -908,6 +908,7 @@ namespace BaseSouce.Services.Services.Stream
 
                 //
                 streamEntity.RenderStatus = model.RenderStatus;
+                streamEntity.IsSendNotification = false;
                 if (model.RenderStatus == RenderStatus.Error)
                 {
                     _logger.LogError($"Error when render :[{model.ExceptionInfo}]");
@@ -1378,18 +1379,7 @@ namespace BaseSouce.Services.Services.Stream
                                 if (!string.IsNullOrEmpty(telegramAPI))
                                 {
                                     idTeles.Add(telegramAPI);
-                                    //var liveType = streamCloneEntity.EndTimeLive != null ? "11h" : "24/7";
-                                    //var timer = streamCloneEntity.StartTimeLive != null ?
-                                    //    streamCloneEntity.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
-                                    //    : "Ngay bây giờ";
-                                    //var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
-                                    //_ = _telegramBotClient
-                                    //.SendTextMessageAsync(new ChatId(telegramAPI),
-                                    //$"User: {item.AppUser.UserName}{Environment.NewLine}"
-                                    //+ $"Tên luồng:{streamCloneEntity.StreamName}{Environment.NewLine}"
-                                    //+ $"Live:{streamCloneEntity.LiveType} {Environment.NewLine}"
-                                    //+ $"Kiểu live: {liveType}{Environment.NewLine}"
-                                    //+ $"{textTimer}:{timer}");
+
                                 }
 
                                 if (!string.IsNullOrEmpty(item.AppUser.LinkTelegram))
@@ -1418,7 +1408,7 @@ namespace BaseSouce.Services.Services.Stream
                                     }
                                 }
                             }
-                            item.DisconnectedTime = null;
+                            //item.DisconnectedTime = null;
                             item.IsLiveBackup = true;
                             item.StreamBackupId = streamCloneEntity.Id;
                             _repositoryStream.Update(item);
@@ -1463,119 +1453,131 @@ namespace BaseSouce.Services.Services.Stream
 
         public async Task CheckConnectionBotAsync()
         {
-            var _repositoryBot = _unitOfWork.GetRepository<ManagerBOT>();
-            var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
-            var _repositorySetting = _unitOfWork.GetRepository<ConfigSystem>();
-            var bots = await _repositoryBot.Queryable().Include(x => x.Manager).ToListAsync();
-            var timeCurrent = DateTime.Now.AddSeconds(-60);
-            var timeDelay = 0;
-            int.TryParse(_configuration["TimeDelayBot"], out timeDelay);
-            if (timeDelay == 0)
+            try
             {
-                timeDelay = 0;
-            }
-            var timeDisconnectCurrent = DateTime.Now.AddSeconds(-timeDelay);
-            var setting = await _repositorySetting.GetFirstOrDefaultAsync();
-            foreach (var bot in bots)
-            {
-                if (bot.UpdatedTime == null || timeCurrent > bot.UpdatedTime)
+                 _logger.LogInformation($"Begin check connection");
+                var _repositoryBot = _unitOfWork.GetRepository<ManagerBOT>();
+                var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
+                var _repositorySetting = _unitOfWork.GetRepository<ConfigSystem>();
+                var bots = await _repositoryBot.Queryable().Include(x => x.Manager).ToListAsync();
+                var timeCurrent = DateTime.Now.AddSeconds(-60);
+                var timeDelay = 0;
+                int.TryParse(_configuration["TimeDelayBot"], out timeDelay);
+                if (timeDelay == 0)
                 {
-                    bot.Status = ManagerBOTStatus.Disconnected;
-                    var streamsCurrents = _repositoryStream.Queryable()
-                        .Where(x => x.ManagerBOTId == bot.Id && x.Status == StreamStatus.Streaming).ToList();
-                    if (streamsCurrents != null && streamsCurrents.Any())
-                    {
-                        foreach (var item in streamsCurrents)
-                        {
-                            item.DisconnectedTime = DateTime.Now;
-                        }
-                        _repositoryStream.Update(streamsCurrents);
-                    }
-                    var idTelesAll = new List<string>();
-                    if (timeDisconnectCurrent > bot.DisconnectedTime && !bot.IsSendNotification)
-                    {
-                        bot.IsSendNotification = true;
-                        bot.DisconnectedTime = DateTime.Now;
-                        _repositoryBot.Update(bot);
-
-                        if (!string.IsNullOrWhiteSpace(bot.Manager?.TelegramBOT))
-                        {
-
-                            var idTeles = bot.Manager.TelegramBOT.Split(',');
-                            if (idTeles.Length > 0)
-                            {
-                                idTelesAll.AddRange(idTeles);
-                            }
-                        }
-
-                        if (!string.IsNullOrEmpty(setting.Telegrams))
-                        {
-                            var idTeles = setting.Telegrams.Split(',');
-                            if (idTeles.Length > 0)
-                            {
-                                idTelesAll.AddRange(idTeles);
-
-                            }
-                        }
-                    }
-
-                    await _unitOfWork.SaveChangesAsync();
-
-                    //send notification
-                    if (idTelesAll.Any())
-                    {
-                        idTelesAll = idTelesAll.Distinct().ToList();
-                        var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
-                        foreach (var item in idTelesAll)
-                        {
-                            _ = _botClient2
-                               .SendTextMessageAsync(new ChatId(item.Trim()),
-                               $"BotName: {bot.Name}{Environment.NewLine}"
-                              + $"Group:{bot.Group}{Environment.NewLine}"
-                              + $"Manager:{bot.Manager?.UserName} {Environment.NewLine}"
-                              + $"Live: {bot.LiveType}{Environment.NewLine}"
-                               + $"Disconnected:{timer}");
-                        }
-                    }
-
-
+                    timeDelay = 180;
                 }
-            }
-
-            var streamDisconnect = await _repositoryStream.Queryable().AsNoTracking().Include(x => x.AppUser)
-                .Where(x => x.Status == StreamStatus.Disconnet && x.DisconnectedTime < timeDisconnectCurrent).ToListAsync();
-            if (streamDisconnect.Any())
-            {
-                foreach (var item in streamDisconnect)
+                var timeDisconnectCurrent = DateTime.Now.AddSeconds(-timeDelay);
+                var setting = await _repositorySetting.GetFirstOrDefaultAsync();
+                foreach (var bot in bots)
                 {
-                    var idTelesAll = new List<string>();
-                    if (!string.IsNullOrEmpty(item.AppUser.TelegramAPI))
+                    if (bot.UpdatedTime == null || timeCurrent > bot.UpdatedTime)
                     {
-                        idTelesAll.Add(item.AppUser.TelegramAPI);
-
-                    }
-                    if (!string.IsNullOrEmpty(item.AppUser.LinkTelegram))
-                    {
-                        idTelesAll.AddRange(item.AppUser.LinkTelegram.Split(','));
-                    }
-                    if (idTelesAll.Count > 0)
-                    {
-                        idTelesAll = idTelesAll.Distinct().ToList();
-                        foreach (var tele in idTelesAll)
+                        bot.Status = ManagerBOTStatus.Disconnected;
+                        var streamsCurrents = _repositoryStream.Queryable()
+                            .Where(x => x.ManagerBOTId == bot.Id && x.Status == StreamStatus.Streaming).ToList();
+                        if (streamsCurrents != null && streamsCurrents.Any())
                         {
-                            var liveType = item.EndTimeLive != null ? "11h" : "24/7";
+                            foreach (var item in streamsCurrents)
+                            {
+                                item.DisconnectedTime = DateTime.Now;
+                            }
+                            _repositoryStream.Update(streamsCurrents);
+                        }
+                        var idTelesAll = new List<string>();
+                        if (timeDisconnectCurrent > bot.DisconnectedTime && !bot.IsSendNotification)
+                        {
+                            bot.IsSendNotification = true;
+                            //bot.DisconnectedTime = DateTime.Now;
+                            _repositoryBot.Update(bot);
+
+                            if (!string.IsNullOrWhiteSpace(bot.Manager?.TelegramBOT))
+                            {
+
+                                var idTeles = bot.Manager.TelegramBOT.Split(',');
+                                if (idTeles.Length > 0)
+                                {
+                                    idTelesAll.AddRange(idTeles);
+                                }
+                            }
+
+                            if (!string.IsNullOrEmpty(setting.Telegrams))
+                            {
+                                var idTeles = setting.Telegrams.Split(',');
+                                if (idTeles.Length > 0)
+                                {
+                                    idTelesAll.AddRange(idTeles);
+
+                                }
+                            }
+                        }
+
+                        await _unitOfWork.SaveChangesAsync();
+
+                        //send notification
+                        if (idTelesAll.Any())
+                        {
+                            idTelesAll = idTelesAll.Distinct().ToList();
                             var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
-                            _ = _telegramBotClient
-                           .SendTextMessageAsync(new ChatId(tele.Trim()),
-                           $"User: {item.AppUser.UserName}{Environment.NewLine}"
-                           + $"Tên luồng:{item.StreamName}{Environment.NewLine}"
-                           + $"Live:{item.LiveType} {Environment.NewLine}"
-                           + $"Kiểu live: {liveType}{Environment.NewLine}"
-                           + $"Disconnected:{timer}");
+                            foreach (var item in idTelesAll)
+                            {
+                                _ = _botClient2
+                                   .SendTextMessageAsync(new ChatId(item.Trim()),
+                                   $"BotName: {bot.Name}{Environment.NewLine}"
+                                  + $"Group:{bot.Group}{Environment.NewLine}"
+                                  + $"Manager:{bot.Manager?.UserName} {Environment.NewLine}"
+                                  + $"Live: {bot.LiveType}{Environment.NewLine}"
+                                   + $"Disconnected:{timer}");
+                            }
                         }
                     }
                 }
+
+                var streamDisconnect = await _repositoryStream.Queryable().Include(x => x.AppUser)
+                    .Where(x => x.Status == StreamStatus.Disconnet && x.DisconnectedTime < timeDisconnectCurrent
+                    && !x.IsSendNotification).ToListAsync();
+                _logger.LogInformation($"Total stream disconneted:[{streamDisconnect.Count}]");
+                if (streamDisconnect.Any())
+                {
+                    foreach (var item in streamDisconnect)
+                    {
+                        item.IsSendNotification = true;
+                        var idTelesAll = new List<string>();
+                        if (!string.IsNullOrEmpty(item.AppUser.TelegramAPI))
+                        {
+                            idTelesAll.Add(item.AppUser.TelegramAPI);
+
+                        }
+                        if (!string.IsNullOrEmpty(item.AppUser.LinkTelegram))
+                        {
+                            idTelesAll.AddRange(item.AppUser.LinkTelegram.Split(','));
+                        }
+                        if (idTelesAll.Count > 0)
+                        {
+                            idTelesAll = idTelesAll.Distinct().ToList();
+                            foreach (var tele in idTelesAll)
+                            {
+                                var liveType = item.EndTimeLive != null ? "11h" : "24/7";
+                                var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                                _ = _telegramBotClient
+                               .SendTextMessageAsync(new ChatId(tele.Trim()),
+                               $"User: {item.AppUser.UserName}{Environment.NewLine}"
+                               + $"Tên luồng:{item.StreamName}{Environment.NewLine}"
+                               + $"Live:{item.LiveType} {Environment.NewLine}"
+                               + $"Kiểu live: {liveType}{Environment.NewLine}"
+                               + $"Disconnected:{timer}");
+                            }
+                        }
+                    }
+                    _repositoryStream.Update(streamDisconnect);
+                   await _unitOfWork.SaveChangesAsync();
+                }
             }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Check connected bot failed: {ex.Message}");
+            }
+
         }
     }
 }

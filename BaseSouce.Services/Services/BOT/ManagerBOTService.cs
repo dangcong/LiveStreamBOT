@@ -177,9 +177,12 @@ namespace BaseSouce.Services.Services.BOT
 
                     }
                 }
-                if (statusOld == ManagerBOTStatus.Disconnected &&
-                    timeDisconnected < DateTime.Now.AddSeconds(-180)
-                    && idTelesAll.Any())
+                _logger.LogInformation($"{timeDisconnected}");
+
+                if (statusOld == ManagerBOTStatus.Disconnected 
+                    &&(timeDisconnected < DateTime.Now.AddSeconds(-180) || timeDisconnected == null)
+                    && idTelesAll.Any()
+                    )
                 {
                     idTelesAll = idTelesAll.Distinct().ToList();
 

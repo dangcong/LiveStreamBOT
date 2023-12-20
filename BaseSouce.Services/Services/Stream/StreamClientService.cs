@@ -909,6 +909,7 @@ namespace BaseSouce.Services.Services.Stream
                 //
                 streamEntity.RenderStatus = model.RenderStatus;
                 streamEntity.IsSendNotification = false;
+                streamEntity.DisconnectedTime = null;
                 if (model.RenderStatus == RenderStatus.Error)
                 {
                     _logger.LogError($"Error when render :[{model.ExceptionInfo}]");
@@ -1455,7 +1456,7 @@ namespace BaseSouce.Services.Services.Stream
         {
             try
             {
-                 _logger.LogInformation($"Begin check connection");
+                _logger.LogInformation($"Begin check connection");
                 var _repositoryBot = _unitOfWork.GetRepository<ManagerBOT>();
                 var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
                 var _repositorySetting = _unitOfWork.GetRepository<ConfigSystem>();
@@ -1471,7 +1472,7 @@ namespace BaseSouce.Services.Services.Stream
                 var setting = await _repositorySetting.GetFirstOrDefaultAsync();
                 foreach (var bot in bots)
                 {
-                    if (bot.UpdatedTime == null || timeCurrent > bot.UpdatedTime)
+                    if ((bot.UpdatedTime == null || timeCurrent > bot.UpdatedTime))
                     {
                         bot.Status = ManagerBOTStatus.Disconnected;
                         var streamsCurrents = _repositoryStream.Queryable()
@@ -1534,7 +1535,9 @@ namespace BaseSouce.Services.Services.Stream
                 }
 
                 var streamDisconnect = await _repositoryStream.Queryable().Include(x => x.AppUser)
-                    .Where(x => x.Status == StreamStatus.Disconnet && x.DisconnectedTime < timeDisconnectCurrent
+                    .Where(x => x.Status == StreamStatus.Disconnet
+                    && x.DisconnectedTime < timeDisconnectCurrent
+                    && x.DisconnectedTime != null
                     && !x.IsSendNotification).ToListAsync();
                 _logger.LogInformation($"Total stream disconneted:[{streamDisconnect.Count}]");
                 if (streamDisconnect.Any())
@@ -1570,7 +1573,7 @@ namespace BaseSouce.Services.Services.Stream
                         }
                     }
                     _repositoryStream.Update(streamDisconnect);
-                   await _unitOfWork.SaveChangesAsync();
+                    await _unitOfWork.SaveChangesAsync();
                 }
             }
             catch (Exception ex)

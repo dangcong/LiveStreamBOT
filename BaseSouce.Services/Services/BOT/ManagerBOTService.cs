@@ -110,6 +110,7 @@ namespace BaseSouce.Services.Services.BOT
                     include: x => x.Include(i => i.Manager));
 
                 var statusOld = ManagerBOTStatus.Connected;
+                var timeUpdateOld = botCurrent?.UpdatedTime ?? DateTime.Now;
                 DateTime? timeDisconnected = DateTime.Now;
                 if (botCurrent == null)
                 {
@@ -178,25 +179,34 @@ namespace BaseSouce.Services.Services.BOT
                     }
                 }
                 _logger.LogInformation($"{timeDisconnected}");
+                var timeDelay = 0;
+                int.TryParse(_configuration["TimeDelayBot"], out timeDelay);
+                if (timeDelay == 0)
+                {
+                    timeDelay = 180;
+                }
 
-                if (statusOld == ManagerBOTStatus.Disconnected 
-                    &&(timeDisconnected < DateTime.Now.AddSeconds(-180) || timeDisconnected == null)
-                    && idTelesAll.Any()
+                if (timeUpdateOld < DateTime.Now.AddSeconds(-timeDelay)
+                    || (statusOld == ManagerBOTStatus.Disconnected && (timeDisconnected < DateTime.Now.AddSeconds(-timeDelay) || timeDisconnected == null))
                     )
                 {
-                    idTelesAll = idTelesAll.Distinct().ToList();
-
-                    var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
-                    foreach (var item in idTelesAll)
+                    if (idTelesAll.Any())
                     {
-                        _ = _botClient2
-                       .SendTextMessageAsync(new ChatId(item.Trim()),
-                       $"BotName: {botCurrent.Name}{Environment.NewLine}"
-                       + $"Group:{botCurrent.Group}{Environment.NewLine}"
-                       + $"Manager:{botCurrent.Manager?.UserName} {Environment.NewLine}"
-                       + $"Live: {botCurrent.LiveType}{Environment.NewLine}"
-                       + $"Connected:{timer}");
+                        idTelesAll = idTelesAll.Distinct().ToList();
+
+                        var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+                        foreach (var item in idTelesAll)
+                        {
+                            _ = _botClient2
+                             .SendTextMessageAsync(new ChatId(item.Trim()),
+                             $"BotName: {botCurrent.Name}{Environment.NewLine}"
+                             + $"Group:{botCurrent.Group}{Environment.NewLine}"
+                             + $"Manager:{botCurrent.Manager?.UserName} {Environment.NewLine}"
+                             + $"Live: {botCurrent.LiveType}{Environment.NewLine}"
+                             + $"Connected:{timer}");
+                        }
                     }
+
                 }
 
                 return new KeyValuePair<bool, string>(true, string.Empty);

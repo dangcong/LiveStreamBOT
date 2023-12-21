@@ -638,6 +638,7 @@ namespace BaseSouce.Services.Services.Stream
                 streamEntity.DisconnectedTime = null;
                 streamEntity.IsLiveBackup = false;
                 streamEntity.RenderStatus = RenderStatus.Waitting;
+                streamEntity.Updatedtime = DateTime.Now;
                 //streamEntity.StreamBackupId = null;
 
                 _repositoryStream.Update(streamEntity);
@@ -906,10 +907,11 @@ namespace BaseSouce.Services.Services.Stream
 
                 var statusOld = streamEntity.RenderStatus;
 
+
                 //
                 streamEntity.RenderStatus = model.RenderStatus;
                 streamEntity.IsSendNotification = false;
-                streamEntity.DisconnectedTime = null;
+
                 if (model.RenderStatus == RenderStatus.Error)
                 {
                     _logger.LogError($"Error when render :[{model.ExceptionInfo}]");
@@ -923,8 +925,16 @@ namespace BaseSouce.Services.Services.Stream
                 }
                 else if (model.RenderStatus < RenderStatus.Ended)
                 {
-                    if ((streamEntity.Status == StreamStatus.Disconnet || streamEntity.Status == StreamStatus.Stop)
-                        && streamEntity.DisconnectedTime < DateTime.Now.AddSeconds(-180))
+                    var timeDelay = 0;
+                    int.TryParse(_configuration["TimeDelayBot"], out timeDelay);
+                    if (timeDelay == 0)
+                    {
+                        timeDelay = 180;
+                    }
+                    if ((streamEntity.Updatedtime < DateTime.Now.AddSeconds(-timeDelay) && statusOld == RenderStatus.LiveStreaming)
+                        || ((streamEntity.Status == StreamStatus.Disconnet || streamEntity.Status == StreamStatus.Stop)
+                        && streamEntity.DisconnectedTime < DateTime.Now.AddSeconds(-timeDelay))
+                        )
                     {
                         //_logger.LogInformation($"continue [{streamEntity.Id}]" +
                         //    $" [Render:status[{streamEntity.RenderStatus}]] " +
@@ -964,6 +974,7 @@ namespace BaseSouce.Services.Services.Stream
                         }
                     }
                     streamEntity.Status = StreamStatus.Streaming;
+                    streamEntity.DisconnectedTime = null;
                 }
                 // _logger.LogInformation($"Stream:[{streamEntity.Id}] - [Backup:{streamEntity.StreamBackupId}]");
                 //remove live backup
@@ -1152,6 +1163,8 @@ namespace BaseSouce.Services.Services.Stream
                         return new KeyValuePair<bool, string>(true, string.Empty);
                     }
                 }
+
+                streamEntity.Updatedtime = DateTime.Now;
                 _repositoryStream.Update(streamEntity);
                 await _unitOfWork.SaveChangesAsync();
 
@@ -1461,13 +1474,14 @@ namespace BaseSouce.Services.Services.Stream
                 var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
                 var _repositorySetting = _unitOfWork.GetRepository<ConfigSystem>();
                 var bots = await _repositoryBot.Queryable().Include(x => x.Manager).ToListAsync();
-                var timeCurrent = DateTime.Now.AddSeconds(-60);
+
                 var timeDelay = 0;
                 int.TryParse(_configuration["TimeDelayBot"], out timeDelay);
                 if (timeDelay == 0)
                 {
                     timeDelay = 180;
                 }
+                var timeCurrent = DateTime.Now.AddSeconds(-timeDelay);
                 var timeDisconnectCurrent = DateTime.Now.AddSeconds(-timeDelay);
                 var setting = await _repositorySetting.GetFirstOrDefaultAsync();
                 foreach (var bot in bots)

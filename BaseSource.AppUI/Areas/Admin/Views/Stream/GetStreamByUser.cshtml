@@ -85,7 +85,7 @@
                                                 }
                                             </td>
                                             <td>
-                                                @(item.Updatedtime?.ToString("dd/MM/yyyy HH:mm:ss") ?? item.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")
+                                                @( item.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss") ?? "N/A")
                                             </td>
                                             <td>
                                                 @if (item.EndTimeLive != null)

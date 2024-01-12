@@ -14,7 +14,7 @@
     <PackageReference Include="UnitOfWork.EntityFrameworkCore" Version="6.0.3" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
 	  <PackageReference Include="TqkLibrary.Net.CloudStorage.Dropbox" Version="1.0.2-build20231014164108" />
-	  <PackageReference Include="TqkLibrary.Net.CloudStorage.GoogleDrive" Version="1.0.2-build20231014162252" />
+	  <PackageReference Include="TqkLibrary.Net.CloudStorage.GoogleDrive" Version="1.0.2-build20240112105336" />
 	  <PackageReference Include="TqkLibrary.Net.CloudStorage.OneDrive" Version="1.0.2-build20231014164201" />
   </ItemGroup>
 

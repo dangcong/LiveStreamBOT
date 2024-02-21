@@ -15,7 +15,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3-beta1" />
-	<PackageReference Include="TqkLibrary.Net.CloudStorage.GoogleDrive" Version="1.0.1-build2023030103" />
   </ItemGroup>
 
 </Project>

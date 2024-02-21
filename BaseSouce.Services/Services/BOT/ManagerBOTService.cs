@@ -126,6 +126,7 @@ namespace BaseSouce.Services.Services.BOT
                         RAM = model.RamUsage,
                         DiskTotal = model.DiskInfo.Total,
                         DiskUsed = model.DiskInfo.Used,
+                        IsUsed = true
 
                     };
                     _repository.Insert(botCurrent);
@@ -148,6 +149,7 @@ namespace BaseSouce.Services.Services.BOT
                     botCurrent.DiskUsed = model.DiskInfo?.Used ?? 0;
                     botCurrent.DisconnectedTime = null;
                     botCurrent.IsSendNotification = false;
+                    botCurrent.IsUsed = true;
                     _repository.Update(botCurrent);
 
 

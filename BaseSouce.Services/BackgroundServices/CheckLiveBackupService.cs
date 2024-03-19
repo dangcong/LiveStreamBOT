@@ -31,7 +31,7 @@ namespace BaseSouce.Services.BackgroundServices
             _logger.LogInformation("Timed Hosted Check Live Backup Service running.");
 
             _timer = new Timer(DoWork, null, TimeSpan.Zero,
-                TimeSpan.FromSeconds(30));
+                TimeSpan.FromSeconds(180));
 
             return Task.CompletedTask;
         }
@@ -47,6 +47,7 @@ namespace BaseSouce.Services.BackgroundServices
 
         private async void DoWork(object state)
         {
+            Thread.Sleep(150);
            // _logger.LogInformation("Begin Check Live Backup.");
             var _streamService = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<IStreamClientService>();
 

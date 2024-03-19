@@ -47,7 +47,8 @@ namespace BaseSouce.Services.BackgroundServices
 
         private async void DoWork(object state)
         {
-            Thread.Sleep(150);
+            Thread.Sleep(1000 * 120);
+
            // _logger.LogInformation("Begin Check Live Backup.");
             var _streamService = _scopeFactory.CreateScope().ServiceProvider.GetRequiredService<IStreamClientService>();
 

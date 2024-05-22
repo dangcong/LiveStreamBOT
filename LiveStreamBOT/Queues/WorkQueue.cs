@@ -153,7 +153,7 @@ namespace LiveStreamBOT.Queues
 
                     foreach (var file in RenderCommand.FileDatas)
                     {
-                        await downloadHelper.DownloadAsync(file, _workingDir, async (x) =>
+                        await downloadHelper.DownloadAsync(file, _workingDir, (x) =>
                         {
                             sizeDownloaded += x;
 
@@ -161,7 +161,7 @@ namespace LiveStreamBOT.Queues
                             {
                                 dateTime = DateTime.Now.AddSeconds(1);
 
-                                await RenderUpdateAsync(new RenderMessage()
+                                _ = RenderUpdateAsync(new RenderMessage()
                                 {
                                     ItemId = RenderCommand.ItemId,
                                     WorkId = RenderCommand.WorkId,
@@ -246,11 +246,11 @@ namespace LiveStreamBOT.Queues
             }
         }
 
-        async void PreRender_OnEncodingProgress(RenderProgress obj)
+        void PreRender_OnEncodingProgress(RenderProgress obj)
         {
             if (obj is not null)
             {
-                await RenderUpdateAsync(new RenderMessage()
+                _ = RenderUpdateAsync(new RenderMessage()
                 {
                     ItemId = RenderCommand.ItemId,
                     WorkId = RenderCommand.WorkId,
@@ -284,7 +284,7 @@ namespace LiveStreamBOT.Queues
                         CheckEndTime();
 
                         await Task.Delay(5000, cancellationTokenSource.Token);
-                        await RenderUpdateAsync(new RenderMessage()
+                        _ = RenderUpdateAsync(new RenderMessage()
                         {
                             ItemId = RenderCommand.ItemId,
                             WorkId = RenderCommand.WorkId,
@@ -334,11 +334,11 @@ namespace LiveStreamBOT.Queues
             }
         }
 
-        async void LiveStream_OnEncodingProgress(RenderProgress obj)
+        void LiveStream_OnEncodingProgress(RenderProgress obj)
         {
             if (obj is not null)
             {
-                await RenderUpdateAsync(new RenderMessage()
+                _ = RenderUpdateAsync(new RenderMessage()
                 {
                     ItemId = RenderCommand.ItemId,
                     WorkId = RenderCommand.WorkId,

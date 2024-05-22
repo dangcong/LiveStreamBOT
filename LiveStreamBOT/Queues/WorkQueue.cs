@@ -61,7 +61,7 @@ namespace LiveStreamBOT.Queues
                     RenderCommand.UtcEndTime.Value <= RenderCommand.UtcStartTime.Value
                     )
                 {
-                    await RenderUpdateAsync(new RenderMessage()
+                    _ = RenderUpdateAsync(new RenderMessage()
                     {
                         ItemId = RenderCommand.ItemId,
                         WorkId = RenderCommand.WorkId,
@@ -79,7 +79,7 @@ namespace LiveStreamBOT.Queues
                             await WaitTimeAsync();
                             await LiveStreamAsync();
 
-                            await RenderUpdateAsync(new RenderMessage()
+                            _ = RenderUpdateAsync(new RenderMessage()
                             {
                                 ItemId = RenderCommand.ItemId,
                                 WorkId = RenderCommand.WorkId,
@@ -102,7 +102,7 @@ namespace LiveStreamBOT.Queues
             {
                 if (_cancellationTokenSource_endTime.IsCancellationRequested)
                 {
-                    await RenderUpdateAsync(new RenderMessage()
+                    _ = RenderUpdateAsync(new RenderMessage()
                     {
                         ItemId = RenderCommand.ItemId,
                         WorkId = RenderCommand.WorkId,
@@ -111,7 +111,7 @@ namespace LiveStreamBOT.Queues
                 }
                 else
                 {
-                    await RenderUpdateAsync(new RenderMessage()
+                    _ = RenderUpdateAsync(new RenderMessage()
                     {
                         ItemId = RenderCommand.ItemId,
                         WorkId = RenderCommand.WorkId,
@@ -122,7 +122,7 @@ namespace LiveStreamBOT.Queues
             catch (Exception ex)
             {
                 if (ex is AggregateException ae) ex = ae.InnerException ?? ex;
-                await SendErrorAsync(ex);
+                _ = SendErrorAsync(ex);
             }
             finally
             {
@@ -174,7 +174,7 @@ namespace LiveStreamBOT.Queues
                         _cancellationTokenSource_endTime.Token.ThrowIfCancellationRequested();
                     }
 
-                    await RenderUpdateAsync(new RenderMessage()
+                    _ = RenderUpdateAsync(new RenderMessage()
                     {
                         ItemId = RenderCommand.ItemId,
                         WorkId = RenderCommand.WorkId,
@@ -194,7 +194,7 @@ namespace LiveStreamBOT.Queues
                             if (code >= 500)
                             {
                                 DeleteDownloaded();
-                                await RenderUpdateAsync(new RenderMessage()
+                                _ = RenderUpdateAsync(new RenderMessage()
                                 {
                                     ItemId = RenderCommand.ItemId,
                                     WorkId = RenderCommand.WorkId,

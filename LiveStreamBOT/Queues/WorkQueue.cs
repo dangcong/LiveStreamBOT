@@ -311,7 +311,7 @@ namespace LiveStreamBOT.Queues
                 });
                 liveStream.OnEncodingProgress += LiveStream_OnEncodingProgress;
                 if (stream != null) liveStream.WithStdInStream(stream);
-                await RenderUpdateAsync(new RenderMessage()
+                _ = RenderUpdateAsync(new RenderMessage()
                 {
                     ItemId = RenderCommand.ItemId,
                     WorkId = RenderCommand.WorkId,

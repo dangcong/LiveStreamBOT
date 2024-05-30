@@ -42,12 +42,12 @@ namespace BaseSouce.Services.HubServices
 
         }
 
-        public async Task PingAsync(ClientInfo clientInfo)
+        public Task PingAsync(ClientInfo clientInfo)
         {
             if (this.Context.GetHttpContext()?.Request?.Headers?.TryGetValue("BotId", out StringValues strings) == true)
             {
                 string key = strings.ToString();
-                await _managerBOTService.CreateBOTAsync(new ManagerBotCreateDto
+                _ = _managerBOTService.CreateBOTAsync(new ManagerBotCreateDto
                 {
                     BotId = key,
                     ConnectionId = Context.ConnectionId,
@@ -57,6 +57,7 @@ namespace BaseSouce.Services.HubServices
                     DiskInfo = clientInfo.DiskInfo,
                 });
             }
+            return Task.CompletedTask;
         }
 
         public async Task RenderUpdateAsync(RenderMessage renderMessage)

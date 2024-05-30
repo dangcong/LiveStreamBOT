@@ -122,7 +122,7 @@ namespace BaseSouce.Services.Services.BOT
                         Name = model.Name,
                         Status = ManagerBOTStatus.Connected,
                         UpdatedTime = DateTime.Now,
-                        Bandwidth = model.Bandwidth,
+                        Bandwidth = Math.Round(model.Bandwidth,2),
                         RAM = model.RamUsage,
                         DiskTotal = model.DiskInfo.Total,
                         DiskUsed = model.DiskInfo.Used,
@@ -138,20 +138,19 @@ namespace BaseSouce.Services.Services.BOT
                     statusOld = botCurrent.Status;
                     timeDisconnected = botCurrent.DisconnectedTime;
                     botCurrent.ConnectionId = model.ConnectionId;
-                    botCurrent.Bandwidth = model.Bandwidth;
+                    botCurrent.Bandwidth = Math.Round(model.Bandwidth,2);
                     botCurrent.RAM = model.RamUsage;
                     botCurrent.CPU = model.CpuUsage;
                     botCurrent.Status = ManagerBOTStatus.Connected;
                     botCurrent.UpdatedTime = DateTime.Now;
                     botCurrent.RAM = model.RamUsage;
-                    botCurrent.Bandwidth = model.Bandwidth;
+                    //botCurrent.Bandwidth = model.Bandwidth;
                     botCurrent.DiskTotal = model.DiskInfo?.Total ?? 0;
                     botCurrent.DiskUsed = model.DiskInfo?.Used ?? 0;
                     botCurrent.DisconnectedTime = null;
                     botCurrent.IsSendNotification = false;
                     botCurrent.IsUsed = true;
                     _repository.Update(botCurrent);
-
 
                     //reset live backup
                 }

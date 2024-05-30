@@ -214,7 +214,9 @@ namespace BaseSouce.Services.Services.BOT
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Create BOT failed by error:[{ex}]");
+                _logger.LogError($"Create BOT failed by error:[{ex}] " +
+                    $"-[{model.BotId}- {model.Bandwidth} - {model.RamUsage} -{model.CpuUsage} - {model.ConnectionId}" +
+                    $"{model.DiskInfo?.Total} - {model.DiskInfo?.Used}]");
                 return new KeyValuePair<bool, string>(false, "Create BOT failed");
             }
         }

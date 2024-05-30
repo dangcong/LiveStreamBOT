@@ -64,14 +64,15 @@ namespace BaseSouce.Services.HubServices
         {
             await _streamClientService.UpdateStreamAsync(renderMessage);
         }
-        public override async Task OnConnectedAsync()
+        public override Task OnConnectedAsync()
         {
-            await base.Clients.Caller.SetSettingAsync(new SettingInfo()
+            _ = base.Clients.Caller.SetSettingAsync(new SettingInfo()
             {
                 PingInterval = 5000,
                 ScheduleTimeOnDownloadFailed = TimeSpan.FromMinutes(10),
                 NetworkName = null,
             });
+            return Task.CompletedTask;
         }
         public override async Task OnDisconnectedAsync(Exception? exception)
         {

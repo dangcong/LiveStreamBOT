@@ -10,7 +10,7 @@ namespace LiveStreamBOT.DataClass
     {
         public string BotId { get; set; } = Guid.NewGuid().ToString();
         public string NetworkName { get; set; } = "eth0";
-        public int PingInterval { get; set; } = 1000;
+        public int PingInterval { get; set; } = 5000;
         public TimeSpan ScheduleTimeOnDownloadFailed { get; set; } = TimeSpan.FromMinutes(10);
     }
 }

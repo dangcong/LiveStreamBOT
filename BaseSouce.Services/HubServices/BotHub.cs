@@ -47,7 +47,7 @@ namespace BaseSouce.Services.HubServices
             if (this.Context.GetHttpContext()?.Request?.Headers?.TryGetValue("BotId", out StringValues strings) == true)
             {
                 string key = strings.ToString();
-                await  _managerBOTService.CreateBOTAsync(new ManagerBotCreateDto
+                await _managerBOTService.CreateBOTAsync(new ManagerBotCreateDto
                 {
                     BotId = key,
                     ConnectionId = Context.ConnectionId,
@@ -63,6 +63,15 @@ namespace BaseSouce.Services.HubServices
         public async Task RenderUpdateAsync(RenderMessage renderMessage)
         {
             await _streamClientService.UpdateStreamAsync(renderMessage);
+        }
+        public override async Task OnConnectedAsync()
+        {
+            await base.Clients.Caller.SetSettingAsync(new SettingInfo()
+            {
+                PingInterval = 5000,
+                ScheduleTimeOnDownloadFailed = TimeSpan.FromMinutes(10),
+                NetworkName = null,
+            });
         }
         public override async Task OnDisconnectedAsync(Exception? exception)
         {

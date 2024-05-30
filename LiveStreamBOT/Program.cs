@@ -41,7 +41,7 @@ try
     ServerHub = signalrClient.ServerHub;
     signalrClient.OnConnectionStateChange += SignalrClient_OnConnectionStateChange;
     signalrClient.OnRenderCommand += SignalrClient_OnRenderCommand;
-
+    signalrClient.OnUpdateSettingCommand += SignalrClient_OnUpdateSettingCommand;
     await signalrClient.StartAsync();
 
     Singleton.Setting.Save();
@@ -85,6 +85,14 @@ try
 finally
 {
     taskQueue.ShutDown();
+}
+
+void SignalrClient_OnUpdateSettingCommand(SettingInfo obj)
+{
+    Singleton.Setting.Setting.ScheduleTimeOnDownloadFailed = obj.ScheduleTimeOnDownloadFailed;
+    Singleton.Setting.Setting.PingInterval = obj.PingInterval;
+    if(!string.IsNullOrWhiteSpace(obj.NetworkName)) Singleton.Setting.Setting.NetworkName = obj.NetworkName;
+    Singleton.Setting.Save();
 }
 
 ISystemInfoReader GetSystemInfoReader()

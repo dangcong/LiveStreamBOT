@@ -41,6 +41,12 @@ namespace LiveStreamBOT.Services
                 _signalrClient.OnRenderCommand?.Invoke(renderCommand);
                 return Task.CompletedTask;
             }
+
+            public Task SetSettingAsync(SettingInfo settingInfo)
+            {
+                _signalrClient.OnUpdateSettingCommand?.Invoke(settingInfo);
+                return Task.CompletedTask;
+            }
         }
         class SafeServerHub : IServerHub
         {
@@ -79,7 +85,7 @@ namespace LiveStreamBOT.Services
                     if (ex is AggregateException ae) ex = ae.InnerException;
 
                     LogHelper.WriteLog($"{ex.GetType().FullName}: {ex.Message}, {ex.StackTrace}");
-                    if(renderMessage.RenderStatus >= RenderStatus.Ended)
+                    if (renderMessage.RenderStatus >= RenderStatus.Ended)
                     {
                         ThreadPool.QueueUserWorkItem((o) =>
                         {
@@ -95,6 +101,7 @@ namespace LiveStreamBOT.Services
 
 
         internal event Action<RenderCommand> OnRenderCommand;
+        internal event Action<SettingInfo> OnUpdateSettingCommand;
         internal event Action<SignalRConnectionState> OnConnectionStateChange;
         internal IServerHub ServerHub { get; }
 

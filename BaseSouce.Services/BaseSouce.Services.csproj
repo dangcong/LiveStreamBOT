@@ -3,10 +3,10 @@
 	<Import Project="..\ProjectBuildProperties.targets" />
 
 	<ItemGroup>
-		<PackageReference Include="Discord.Net" Version="3.18.0-beta.2" Condition="$(DefineConstants.Contains('DISCORD'))"/>
-		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+		<PackageReference Include="Discord.Net" Version="3.18.0-beta.2" Condition="$(DefineConstants.Contains('DISCORD'))" />
+		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
 		<PackageReference Include="Mailjet.Api" Version="3.0.0" />
-		<PackageReference Include="Telegram.Bot" Version="19.0.0"  Condition="$(DefineConstants.Contains('TELEGRAM'))"/>
+		<PackageReference Include="Telegram.Bot" Version="19.0.0" Condition="$(DefineConstants.Contains('TELEGRAM'))" />
 		<PackageReference Include="UnitOfWork.EntityFrameworkCore" Version="6.0.3" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
 		<PackageReference Include="TqkLibrary.Net.CloudStorage.Dropbox" Version="1.0.2-build20231014164108" />

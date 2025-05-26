@@ -33,12 +33,15 @@ namespace BaseSouce.Services.Services.User
         private readonly SignInManager<AppUser> _signInManager;
         private readonly IConfiguration _configuration;
 
-        public UserService(IUnitOfWork<BaseSourceDbContext> unitOfWork,
+        public UserService(
+            IUnitOfWork<BaseSourceDbContext> unitOfWork,
             UserManager<AppUser> userManager,
             ILogger<UserService> logger,
-            IMapper mapper, ISendMailService emailService,
+            IMapper mapper,
+            ISendMailService emailService,
             SignInManager<AppUser> signInManager,
-            IConfiguration configuration)
+            IConfiguration configuration
+            )
         {
             _unitOfWork = unitOfWork;
             _userManager = userManager;
@@ -47,8 +50,6 @@ namespace BaseSouce.Services.Services.User
             _emailService = emailService;
             _signInManager = signInManager;
             _configuration = configuration;
-
-
         }
 
 

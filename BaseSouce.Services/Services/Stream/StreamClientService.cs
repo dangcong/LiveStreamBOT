@@ -39,8 +39,8 @@ namespace BaseSouce.Services.Services.Stream
             IHubContext<BotHub, IBotClientHub> botContextHub,
             IUserService userService,
             BotMessage botMessage,
-            IValidateLinkService validateLinkService
-            , IConfiguration configuration
+            IValidateLinkService validateLinkService,
+            IConfiguration configuration
             )
         {
             _unitOfWork = unitOfWork;

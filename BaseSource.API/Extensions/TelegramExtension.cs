@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Options;
+﻿#if TELEGRAM
+using Microsoft.Extensions.Options;
 using Telegram.Bot;
 
 namespace BaseSource.API.Extensions
@@ -24,3 +25,4 @@ namespace BaseSource.API.Extensions
         public string BotToken { get; init; } = default!;
     }
 }
+#endif

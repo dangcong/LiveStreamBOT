@@ -1,43 +1,44 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>Exe</OutputType>
-    <TargetFramework>net6.0</TargetFramework>
-    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-  </PropertyGroup>
+	<Import Project="..\ProjectBuildProperties.targets" />
 
-  <ItemGroup>
-    <Folder Include="Properties\" />
-  </ItemGroup>
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="FFmpegArgs.Executes" Version="1.5.2" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.2" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
-    <PackageReference Include="System.Diagnostics.PerformanceCounter" Version="7.0.0" />
-    <PackageReference Include="System.Management" Version="7.0.1" />
-    <PackageReference Include="TqkLibrary.Net.CloudStorage.Dropbox" Version="1.0.2-build20231014164108" />
-    <PackageReference Include="TqkLibrary.Net.CloudStorage.GoogleDrive" Version="1.0.2-build20240116165420" />
-    <PackageReference Include="TqkLibrary.Net.CloudStorage.OneDrive" Version="1.0.2-build20231014164201" />
-    <PackageReference Include="TqkLibrary.Queues" Version="1.0.0-build2022121301" />
-    <PackageReference Include="TypedSignalR.Client" Version="3.3.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Properties\" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\BaseSouce.SharedSignalrData\BaseSouce.SharedSignalrData.csproj" />
-    <ProjectReference Include="..\BaseSouce.Shared\BaseSource.Shared.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="FFmpegArgs.Executes" Version="1.5.2" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.2" />
+		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
+		<PackageReference Include="System.Diagnostics.PerformanceCounter" Version="7.0.0" />
+		<PackageReference Include="System.Management" Version="7.0.1" />
+		<PackageReference Include="TqkLibrary.Net.CloudStorage.Dropbox" Version="1.0.2-build20231014164108" />
+		<PackageReference Include="TqkLibrary.Net.CloudStorage.GoogleDrive" Version="1.0.2-build20240116165420" />
+		<PackageReference Include="TqkLibrary.Net.CloudStorage.OneDrive" Version="1.0.2-build20231014164201" />
+		<PackageReference Include="TqkLibrary.Queues" Version="1.0.0-build2022121301" />
+		<PackageReference Include="TypedSignalR.Client" Version="3.3.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Update="Run.bat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Update="Run.sh">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\BaseSouce.SharedSignalrData\BaseSouce.SharedSignalrData.csproj" />
+		<ProjectReference Include="..\BaseSouce.Shared\BaseSource.Shared.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Run.bat">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Update="Run.sh">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
 
 </Project>

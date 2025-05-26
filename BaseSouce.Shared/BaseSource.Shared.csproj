@@ -1,20 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<Import Project="..\ProjectBuildProperties.targets" />
 
-  <ItemGroup>
-    <Folder Include="Constants\" />
-    <Folder Include="Enums\" />
-    <Folder Include="Exceptions\" />
-  </ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3-beta1" />
-  </ItemGroup>
+	<ItemGroup>
+		<Folder Include="Constants\" />
+		<Folder Include="Enums\" />
+		<Folder Include="Exceptions\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="5.0.17" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3-beta1" />
+	</ItemGroup>
 
 </Project>

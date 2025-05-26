@@ -11,9 +11,7 @@ using EFCore.UnitOfWork;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
-using Telegram.Bot;
 using Microsoft.Extensions.Configuration;
-using Telegram.Bot.Types;
 
 namespace BaseSouce.Services.HubServices
 {
@@ -23,23 +21,17 @@ namespace BaseSouce.Services.HubServices
         private readonly IStreamClientService _streamClientService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuration;
-        private TelegramBotClient _botClient2;
-        private readonly ITelegramBotClient _telegramBotClient;
 
         public BotHub(IManagerBOTService managerBOTService,
             IStreamClientService streamClientService,
             IUnitOfWork<BaseSourceDbContext> unitOfWork
             , IConfiguration configuration
-            , ITelegramBotClient telegramBotClient
             )
         {
             _managerBOTService = managerBOTService;
             _streamClientService = streamClientService;
             _unitOfWork = unitOfWork;
             _configuration = configuration;
-            _telegramBotClient = telegramBotClient;
-            _botClient2 = new TelegramBotClient(_configuration["TelegramBotConfigure:BotToken2"]);
-
         }
 
         public async Task PingAsync(ClientInfo clientInfo)

@@ -1,18 +1,14 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-   
-  </PropertyGroup>
+	<Import Project="..\ProjectBuildProperties.targets" />
 
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\BaseSouce.SharedSignalrData\BaseSouce.SharedSignalrData.csproj" />
-    <ProjectReference Include="..\BaseSouce.Shared\BaseSource.Shared.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\BaseSouce.SharedSignalrData\BaseSouce.SharedSignalrData.csproj" />
+		<ProjectReference Include="..\BaseSouce.Shared\BaseSource.Shared.csproj" />
+	</ItemGroup>
 
 </Project>

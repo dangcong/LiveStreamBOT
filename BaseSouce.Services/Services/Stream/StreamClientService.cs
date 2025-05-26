@@ -15,16 +15,13 @@ using EFCore.UnitOfWork.PageList;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using Telegram.Bot;
-using Telegram.Bot.Types;
 using BaseSouce.Services.Services.ValidateLink;
 using BaseSource.ViewModels.ManagerBOT;
 using Microsoft.Extensions.Configuration;
+using BaseSouce.Services.BotMessageServices;
 
 namespace BaseSouce.Services.Services.Stream
 {
-
-
     public class StreamClientService : IStreamClientService
     {
         private readonly IUnitOfWork _unitOfWork;
@@ -32,9 +29,8 @@ namespace BaseSouce.Services.Services.Stream
         private readonly IMapper _mapper;
         private readonly IHubContext<BotHub, IBotClientHub> _botContextHub;
         private readonly IUserService _userService;
-        private readonly ITelegramBotClient _telegramBotClient;
+        private readonly BotMessage _botMessage;
         private readonly IValidateLinkService _validateLinkService;
-        private TelegramBotClient _botClient2;
         private readonly IConfiguration _configuration;
         public StreamClientService(
             IUnitOfWork<BaseSourceDbContext> unitOfWork,
@@ -42,7 +38,7 @@ namespace BaseSouce.Services.Services.Stream
             IMapper mapper,
             IHubContext<BotHub, IBotClientHub> botContextHub,
             IUserService userService,
-            ITelegramBotClient telegramBotClient,
+            BotMessage botMessage,
             IValidateLinkService validateLinkService
             , IConfiguration configuration
             )
@@ -52,11 +48,9 @@ namespace BaseSouce.Services.Services.Stream
             _mapper = mapper;
             _botContextHub = botContextHub;
             _userService = userService;
-            _telegramBotClient = telegramBotClient;
+            _botMessage = botMessage;
             _validateLinkService = validateLinkService;
             _configuration = configuration;
-            _botClient2 = new TelegramBotClient(_configuration["TelegramBotConfigure:BotToken2"]);
-
         }
 
 
@@ -692,16 +686,12 @@ namespace BaseSouce.Services.Services.Stream
                         : "Ngay bây giờ";
                     var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
 
-                    foreach (var idTele in idTeles)
-                    {
-                        _ = _telegramBotClient
-                       .SendTextMessageAsync(new ChatId(idTele.Trim()),
-                       $"User: {userCurrent.UserName}{Environment.NewLine}"
+                    string message = $"User: {userCurrent.UserName}{Environment.NewLine}"
                        + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
                        + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
                        + $"Kiểu live: {liveType}{Environment.NewLine}"
-                       + $"{textTimer}:{timer}");
-                    }
+                       + $"{textTimer}:{timer}";
+                    _ = _botMessage.SendMessageAsync(idTeles, message);
                 }
 
 
@@ -784,8 +774,8 @@ namespace BaseSouce.Services.Services.Stream
                                         streamCloneEntity.StartTimeLive?.ToString("dd/MM/yyyy HH:mm:ss")
                                         : "Ngay bây giờ";
                                     var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
-                                    _ = _telegramBotClient
-                                    .SendTextMessageAsync(new ChatId(telegramAPI),
+
+                                    _ = _botMessage.SendMessageAsync(telegramAPI,
                                     $"User: {userCurrent.UserName}{Environment.NewLine}"
                                     + $"Tên luồng:{streamCloneEntity.StreamName}{Environment.NewLine}"
                                     + $"Live:{streamCloneEntity.LiveType} {Environment.NewLine}"
@@ -961,16 +951,14 @@ namespace BaseSouce.Services.Services.Stream
                         if (idTeles.Count > 0)
                         {
                             idTeles = idTeles.Distinct().ToList();
-                            foreach (var item in idTeles)
-                            {
-                                _ = _telegramBotClient
-                               .SendTextMessageAsync(new ChatId(item.Trim()),
-                               $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
-                               + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
-                               + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
-                               + $"Kiểu live: {liveType}{Environment.NewLine}"
-                               + $"Tiếp tục live:{timer}");
-                            }
+                            _ = _botMessage.SendMessageAsync(
+                                  idTeles,
+                                 $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                                 + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
+                                 + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
+                                 + $"Kiểu live: {liveType}{Environment.NewLine}"
+                                 + $"Tiếp tục live:{timer}"
+                             );
                         }
                     }
                     streamEntity.Status = StreamStatus.Streaming;
@@ -1019,16 +1007,14 @@ namespace BaseSouce.Services.Services.Stream
                         if (idTeles.Count > 0)
                         {
                             idTeles = idTeles.Distinct().ToList();
-                            foreach (var item in idTeles)
-                            {
-                                _ = _telegramBotClient
-                               .SendTextMessageAsync(new ChatId(item.Trim()),
-                               $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
-                               + $"Tên luồng:{streamBackup.StreamName}{Environment.NewLine}"
-                               + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
-                               + $"Kiểu live: {liveType}{Environment.NewLine}"
-                               + $"Dừng:{timer}");
-                            }
+                            _ = _botMessage.SendMessageAsync(
+                                idTeles,
+                                $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                                + $"Tên luồng:{streamBackup.StreamName}{Environment.NewLine}"
+                                + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
+                                + $"Kiểu live: {liveType}{Environment.NewLine}"
+                                + $"Dừng:{timer}"
+                            );
                         }
 
                         _repositoryStream.Delete(streamBackup);
@@ -1065,19 +1051,15 @@ namespace BaseSouce.Services.Services.Stream
                     if (idTeles.Count > 0)
                     {
                         idTeles = idTeles.Distinct().ToList();
-                        foreach (var item in idTeles)
-                        {
-                            _ = _telegramBotClient
-                           .SendTextMessageAsync(new ChatId(item.Trim()),
+                        _ = _botMessage.SendMessageAsync(
+                            idTeles,
                            $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
                            + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
                            + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
                            + $"Kiểu live: {liveType}{Environment.NewLine}"
-                           + $"Bắt đầu:{timer}");
-                        }
+                           + $"Bắt đầu:{timer}"
+                        );
                     }
-
-
                 }
                 else if (streamEntity.RenderStatus == RenderStatus.Error)
                 {
@@ -1104,17 +1086,14 @@ namespace BaseSouce.Services.Services.Stream
                     if (idTeles.Count > 0)
                     {
                         idTeles = idTeles.Distinct().ToList();
-
-                        foreach (var item in idTeles)
-                        {
-                            _ = _telegramBotClient
-                           .SendTextMessageAsync(new ChatId(item.Trim()),
+                        _ = _botMessage.SendMessageAsync(
+                            idTeles,
                            $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
                            + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
                            + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
                            + $"Kiểu live: {liveType}{Environment.NewLine}"
-                           + $"Lỗi:{timer}");
-                        }
+                           + $"Lỗi:{timer}"
+                       );
                     }
 
                 }
@@ -1140,21 +1119,18 @@ namespace BaseSouce.Services.Services.Stream
                     if (!string.IsNullOrEmpty(streamEntity.AppUser.LinkTelegram))
                     {
                         idTeles.AddRange(streamEntity.AppUser.LinkTelegram.Split(','));
-
                     }
                     if (idTeles.Count > 0)
                     {
                         idTeles = idTeles.Distinct().ToList();
-                        foreach (var item in idTeles)
-                        {
-                            _ = _telegramBotClient
-                           .SendTextMessageAsync(new ChatId(item.Trim()),
-                           $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
-                           + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
-                           + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
-                           + $"Kiểu live: {liveType}{Environment.NewLine}"
-                           + $"Dừng:{timer}");
-                        }
+                        _ = _botMessage.SendMessageAsync(
+                            idTeles,
+                            $"User: {streamEntity.AppUser.UserName}{Environment.NewLine}"
+                             + $"Tên luồng:{streamEntity.StreamName}{Environment.NewLine}"
+                             + $"Live:{streamEntity.LiveType} {Environment.NewLine}"
+                             + $"Kiểu live: {liveType}{Environment.NewLine}"
+                             + $"Dừng:{timer}"
+                        );
                     }
                     if (streamEntity.EndTimeLive != null && streamEntity.LiveType == LiveType._Backup)
                     {
@@ -1410,16 +1386,14 @@ namespace BaseSouce.Services.Services.Stream
                                         : "Ngay bây giờ";
                                     var textTimer = timer == "Ngay bây giờ" ? "Chạy live" : "Hẹn lịch";
 
-                                    foreach (var idTele in idTeles)
-                                    {
-                                        _ = _telegramBotClient
-                                       .SendTextMessageAsync(new ChatId(idTele.Trim()),
+                                    _ = _botMessage.SendMessageAsync(
+                                        idTeles,
                                        $"User: {item.AppUser.UserName}{Environment.NewLine}"
                                        + $"Tên luồng:{streamCloneEntity.StreamName}{Environment.NewLine}"
                                        + $"Live:{streamCloneEntity.LiveType} {Environment.NewLine}"
                                        + $"Kiểu live: {liveType}{Environment.NewLine}"
-                                       + $"{textTimer}:{timer}");
-                                    }
+                                       + $"{textTimer}:{timer}"
+                                   );
                                 }
                             }
                             //item.DisconnectedTime = null;
@@ -1534,16 +1508,16 @@ namespace BaseSouce.Services.Services.Stream
                         {
                             idTelesAll = idTelesAll.Distinct().ToList();
                             var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
-                            foreach (var item in idTelesAll)
-                            {
-                                _ = _botClient2
-                                   .SendTextMessageAsync(new ChatId(item.Trim()),
-                                   $"BotName: {bot.Name}{Environment.NewLine}"
-                                  + $"Group:{bot.Group}{Environment.NewLine}"
-                                  + $"Manager:{bot.Manager?.UserName} {Environment.NewLine}"
-                                  + $"Live: {bot.LiveType}{Environment.NewLine}"
-                                   + $"Disconnected:{timer}");
-                            }
+
+                            _ = _botMessage.SendMessageAsync(
+                                idTelesAll,
+                                $"BotName: {bot.Name}{Environment.NewLine}"
+                                + $"Group:{bot.Group}{Environment.NewLine}"
+                                + $"Manager:{bot.Manager?.UserName} {Environment.NewLine}"
+                                + $"Live: {bot.LiveType}{Environment.NewLine}"
+                                + $"Disconnected:{timer}",
+                                BotMessage.SendType.Bot
+                            );
                         }
                     }
                 }
@@ -1572,18 +1546,17 @@ namespace BaseSouce.Services.Services.Stream
                         if (idTelesAll.Count > 0)
                         {
                             idTelesAll = idTelesAll.Distinct().ToList();
-                            foreach (var tele in idTelesAll)
-                            {
-                                var liveType = item.EndTimeLive != null ? "11h" : "24/7";
-                                var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
-                                _ = _telegramBotClient
-                               .SendTextMessageAsync(new ChatId(tele.Trim()),
+                            var liveType = item.EndTimeLive != null ? "11h" : "24/7";
+                            var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
+
+                            _ = _botMessage.SendMessageAsync(
+                                idTelesAll,
                                $"User: {item.AppUser.UserName}{Environment.NewLine}"
                                + $"Tên luồng:{item.StreamName}{Environment.NewLine}"
                                + $"Live:{item.LiveType} {Environment.NewLine}"
                                + $"Kiểu live: {liveType}{Environment.NewLine}"
-                               + $"Disconnected:{timer}");
-                            }
+                               + $"Disconnected:{timer}"
+                            );
                         }
                     }
                     _repositoryStream.Update(streamDisconnect);

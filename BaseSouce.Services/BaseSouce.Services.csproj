@@ -1,27 +1,23 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-	  <LangVersion>11.0</LangVersion>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<Import Project="..\ProjectBuildProperties.targets" />
 
-  <ItemGroup>
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
-    <PackageReference Include="Mailjet.Api" Version="3.0.0" />
-    <PackageReference Include="Telegram.Bot" Version="19.0.0" />
-    <PackageReference Include="UnitOfWork.EntityFrameworkCore" Version="6.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
-	  <PackageReference Include="TqkLibrary.Net.CloudStorage.Dropbox" Version="1.0.2-build20231014164108" />
-	  <PackageReference Include="TqkLibrary.Net.CloudStorage.GoogleDrive" Version="1.0.2-build20240116165420" />
-	  <PackageReference Include="TqkLibrary.Net.CloudStorage.OneDrive" Version="1.0.2-build20231014164201" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Discord.Net" Version="3.18.0-beta.2" Condition="$(DefineConstants.Contains('DISCORD'))"/>
+		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+		<PackageReference Include="Mailjet.Api" Version="3.0.0" />
+		<PackageReference Include="Telegram.Bot" Version="19.0.0"  Condition="$(DefineConstants.Contains('TELEGRAM'))"/>
+		<PackageReference Include="UnitOfWork.EntityFrameworkCore" Version="6.0.3" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
+		<PackageReference Include="TqkLibrary.Net.CloudStorage.Dropbox" Version="1.0.2-build20231014164108" />
+		<PackageReference Include="TqkLibrary.Net.CloudStorage.GoogleDrive" Version="1.0.2-build20240116165420" />
+		<PackageReference Include="TqkLibrary.Net.CloudStorage.OneDrive" Version="1.0.2-build20231014164201" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\BaseSouce.Data\BaseSource.Data.csproj" />
-    <ProjectReference Include="..\BaseSouce.SharedSignalrData\BaseSouce.SharedSignalrData.csproj" />
-    <ProjectReference Include="..\BaseSouce.ViewModels\BaseSource.ViewModels.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\BaseSouce.Data\BaseSource.Data.csproj" />
+		<ProjectReference Include="..\BaseSouce.SharedSignalrData\BaseSouce.SharedSignalrData.csproj" />
+		<ProjectReference Include="..\BaseSouce.ViewModels\BaseSource.ViewModels.csproj" />
+	</ItemGroup>
 
 </Project>

@@ -13,6 +13,7 @@ using BaseSource.Shared.Helpers;
 using BaseSouce.Services.HubServices;
 using BaseSouce.Services.BackgroundServices;
 using BaseSouce.SharedSignalrData;
+using BaseSouce.Services.BotMessageServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -65,10 +66,12 @@ builder.Services.SwaggerConfiguration(builder.Configuration);
 
 builder.Services.AddSignalR().AddJsonProtocol(configure => configure.PayloadSerializerOptions.SignalR_JsonSerializerOptions());
 
+#if TELEGRAM
 builder.AddTelegram();
-
-
-
+#elif DISCORD
+await builder.AddDiscordAsync();
+#endif
+builder.Services.AddTransient<BotMessage>();
 
 var app = builder.Build();
 

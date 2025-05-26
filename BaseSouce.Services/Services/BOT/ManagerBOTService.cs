@@ -14,9 +14,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.SignalR;
 using BaseSouce.Services.HubServices;
-using Telegram.Bot;
-using Telegram.Bot.Types;
 using Microsoft.Extensions.Configuration;
+using BaseSouce.Services.BotMessageServices;
 
 namespace BaseSouce.Services.Services.BOT
 {
@@ -27,17 +26,14 @@ namespace BaseSouce.Services.Services.BOT
         private readonly IMapper _mapper;
         private readonly IStreamClientService _streamService;
         private readonly IHubContext<BotHub, IBotClientHub> _botContextHub;
-        private readonly ITelegramBotClient _telegramBotClient;
+        private readonly BotMessage _botMessage;
         private readonly IConfiguration _configuration;
-        private TelegramBotClient _botClient2;
-
-
         public ManagerBOTService(IUnitOfWork<BaseSourceDbContext> unitOfWork,
             ILogger<ManagerBOTService> logger,
             IMapper mapper,
             IStreamClientService streamService
             , IHubContext<BotHub, IBotClientHub> botContextHub
-            , ITelegramBotClient telegramBotClient
+            , BotMessage botMessage
             , IConfiguration configuration
             //,IBotTeleClient2 botTeleClient2
             )
@@ -46,9 +42,8 @@ namespace BaseSouce.Services.Services.BOT
             _logger = logger;
             _mapper = mapper;
             _streamService = streamService;
-            _telegramBotClient = telegramBotClient;
+            _botMessage = botMessage;
             _configuration = configuration;
-            _botClient2 = new TelegramBotClient(_configuration["TelegramBotConfigure:BotToken2"]);
             //_botTeleClient2 = botTeleClient2;
         }
 
@@ -122,7 +117,7 @@ namespace BaseSouce.Services.Services.BOT
                         Name = model.Name,
                         Status = ManagerBOTStatus.Connected,
                         UpdatedTime = DateTime.Now,
-                        Bandwidth = Math.Round(model.Bandwidth,2),
+                        Bandwidth = Math.Round(model.Bandwidth, 2),
                         RAM = model.RamUsage,
                         DiskTotal = model.DiskInfo.Total,
                         DiskUsed = model.DiskInfo.Used,
@@ -138,7 +133,7 @@ namespace BaseSouce.Services.Services.BOT
                     statusOld = botCurrent.Status;
                     timeDisconnected = botCurrent.DisconnectedTime;
                     botCurrent.ConnectionId = model.ConnectionId;
-                    botCurrent.Bandwidth = Math.Round(model.Bandwidth,2);
+                    botCurrent.Bandwidth = Math.Round(model.Bandwidth, 2);
                     botCurrent.RAM = model.RamUsage;
                     botCurrent.CPU = model.CpuUsage;
                     botCurrent.Status = ManagerBOTStatus.Connected;
@@ -196,16 +191,16 @@ namespace BaseSouce.Services.Services.BOT
                         idTelesAll = idTelesAll.Distinct().ToList();
 
                         var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
-                        foreach (var item in idTelesAll)
-                        {
-                            _ = _botClient2
-                             .SendTextMessageAsync(new ChatId(item.Trim()),
-                             $"BotName: {botCurrent.Name}{Environment.NewLine}"
-                             + $"Group:{botCurrent.Group}{Environment.NewLine}"
-                             + $"Manager:{botCurrent.Manager?.UserName} {Environment.NewLine}"
-                             + $"Live: {botCurrent.LiveType}{Environment.NewLine}"
-                             + $"Connected:{timer}");
-                        }
+
+                        _ = _botMessage.SendMessageAsync(
+                            idTelesAll,
+                            $"BotName: {botCurrent.Name}{Environment.NewLine}"
+                            + $"Group:{botCurrent.Group}{Environment.NewLine}"
+                            + $"Manager:{botCurrent.Manager?.UserName} {Environment.NewLine}"
+                            + $"Live: {botCurrent.LiveType}{Environment.NewLine}"
+                            + $"Connected:{timer}", 
+                            BotMessage.SendType.Bot
+                            );
                     }
 
                 }
@@ -445,7 +440,8 @@ namespace BaseSouce.Services.Services.BOT
                         item.NumberOfThreadsInRun = userCurrent.NumberOfThreadsInRun;
                     }
                 }
-            };
+            }
+            ;
             return data;
 
         }

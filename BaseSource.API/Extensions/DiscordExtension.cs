@@ -14,7 +14,13 @@ namespace BaseSource.API.Extensions
 
             BotMessage.DiscordBotConfigure discordBotConfigure = builder.Configuration
                 .GetSection(BotMessage.DiscordBotConfigure.Configuration)
-                .Get<BotMessage.DiscordBotConfigure>();
+                .Get<BotMessage.DiscordBotConfigure>()!;
+
+            builder.Services
+                .AddTransient<BotMessage.DiscordBotConfigure>(x => x
+                    .GetRequiredService<IConfiguration>()
+                    .GetSection(BotMessage.DiscordBotConfigure.Configuration)
+                    .Get<BotMessage.DiscordBotConfigure>()!);
 
             var config = new DiscordSocketConfig
             {

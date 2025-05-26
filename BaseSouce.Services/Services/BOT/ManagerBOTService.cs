@@ -107,6 +107,7 @@ namespace BaseSouce.Services.Services.BOT
                 var statusOld = ManagerBOTStatus.Connected;
                 var timeUpdateOld = botCurrent?.UpdatedTime ?? DateTime.Now;
                 DateTime? timeDisconnected = DateTime.Now;
+                var bandwidth = model.Bandwidth != null && model.Bandwidth >= 0 ? model.Bandwidth : 0;
                 if (botCurrent == null)
                 {
                     botCurrent = new ManagerBOT
@@ -117,7 +118,7 @@ namespace BaseSouce.Services.Services.BOT
                         Name = model.Name,
                         Status = ManagerBOTStatus.Connected,
                         UpdatedTime = DateTime.Now,
-                        Bandwidth = Math.Round(model.Bandwidth, 2),
+                        Bandwidth = Math.Round(bandwidth, 2),
                         RAM = model.RamUsage,
                         DiskTotal = model.DiskInfo.Total,
                         DiskUsed = model.DiskInfo.Used,
@@ -133,7 +134,7 @@ namespace BaseSouce.Services.Services.BOT
                     statusOld = botCurrent.Status;
                     timeDisconnected = botCurrent.DisconnectedTime;
                     botCurrent.ConnectionId = model.ConnectionId;
-                    botCurrent.Bandwidth = Math.Round(model.Bandwidth, 2);
+                    botCurrent.Bandwidth = Math.Round(bandwidth, 2);
                     botCurrent.RAM = model.RamUsage;
                     botCurrent.CPU = model.CpuUsage;
                     botCurrent.Status = ManagerBOTStatus.Connected;
@@ -209,7 +210,9 @@ namespace BaseSouce.Services.Services.BOT
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Create BOT failed by error:[{ex}]");
+                _logger.LogError($"Create BOT failed by error:[{ex}] " +
+                    $"-[{model.BotId}- {model.Bandwidth} - {model.RamUsage} -{model.CpuUsage} - {model.ConnectionId}" +
+                    $"{model.DiskInfo?.Total} - {model.DiskInfo?.Used}]");
                 return new KeyValuePair<bool, string>(false, "Create BOT failed");
             }
         }

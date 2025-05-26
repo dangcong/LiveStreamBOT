@@ -8,7 +8,7 @@ namespace BaseSource.API.Extensions
     {
         public static void AddTelegram(this WebApplicationBuilder builder)
         {
-            builder.Services.Configure<TelegramBotConfiguration>(builder.Configuration.GetSection(TelegramBotConfiguration.Configuration));
+            //builder.Services.Configure<TelegramBotConfiguration>(builder.Configuration.GetSection(TelegramBotConfiguration.Configuration));
             builder.Services.AddHttpClient("telegram_bot_client")
                             .AddTypedClient<ITelegramBotClient>((HttpClient httpClient, IServiceProvider sp) =>
                             {

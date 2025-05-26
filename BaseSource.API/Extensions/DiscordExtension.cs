@@ -9,8 +9,8 @@ namespace BaseSource.API.Extensions
     {
         public static async Task AddDiscordAsync(this WebApplicationBuilder builder)
         {
-            builder.Services
-                .Configure<BotMessage.DiscordBotConfigure>(builder.Configuration.GetSection(BotMessage.DiscordBotConfigure.Configuration));
+            //builder.Services
+            //    .Configure<BotMessage.DiscordBotConfigure>(builder.Configuration.GetSection(BotMessage.DiscordBotConfigure.Configuration));
 
             BotMessage.DiscordBotConfigure discordBotConfigure = builder.Configuration
                 .GetSection(BotMessage.DiscordBotConfigure.Configuration)

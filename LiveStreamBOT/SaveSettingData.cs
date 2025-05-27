@@ -17,7 +17,7 @@ namespace LiveStreamBOT
         /// </summary>
         public T Setting { get; private set; }
         private readonly string SavePath;
-        private readonly Timer timer;
+        private readonly System.Timers.Timer timer;
 
         /// <summary>
         /// 
@@ -31,7 +31,7 @@ namespace LiveStreamBOT
             this.SavePath = SavePath;
             if (File.Exists(SavePath)) Setting = JsonConvert.DeserializeObject<T>(File.ReadAllText(SavePath));
             else Setting = new T();
-            timer = new Timer(delay);
+            timer = new System.Timers.Timer(delay);
             timer.Elapsed += Timer_Elapsed;
             timer.AutoReset = false;
         }

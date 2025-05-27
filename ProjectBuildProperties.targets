@@ -5,8 +5,8 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 
-		<PreserveCompilationContext>false</PreserveCompilationContext>
-		<GenerateDependencyFile>false</GenerateDependencyFile>
+		<!--<PreserveCompilationContext>false</PreserveCompilationContext>-->
+		<!--<GenerateDependencyFile>false</GenerateDependencyFile>-->
 		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>

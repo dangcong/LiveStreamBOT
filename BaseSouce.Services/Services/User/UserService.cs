@@ -65,7 +65,7 @@ namespace BaseSouce.Services.Services.User
                 model.UserName = model.UserName.ToLower();
                 var existingUser = await _unitOfWork.GetRepository<AppUser>()
                     .GetFirstOrDefaultAsync(predicate: x => (x.UserName.ToLower() == model.UserName
-                    || x.Email.ToLower() == model.UserName.ToLower()) && x.DeletedTime == null, disableTracking: true);
+                    || x.Email.ToLower() == model.UserName.ToLower()) && x.DeletedTime == null, disableTracking: false);
                 if (existingUser == null)
                 {
                     return new KeyValuePair<bool, string>(false, "Tài khoản không tồn tại");

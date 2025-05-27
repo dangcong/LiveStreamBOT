@@ -15,6 +15,7 @@ namespace BaseSouce.Data.Extensions
         {
             // Identity data
             var roleAdminId = (new Guid("c1105ce5-9dbc-49a9-a7d5-c963b6daa62a")).ToString();
+            var roleManagerId = (new Guid("D32B2CC9-AABE-43B2-8BC0-66C8DFD77080")).ToString();
 
             modelBuilder.Entity<AppRole>().HasData(
                 new AppRole
@@ -23,6 +24,13 @@ namespace BaseSouce.Data.Extensions
                     Name = "Admin",
                     NormalizedName = "Admin",
                     Description = "Administrator role"
+                },
+                new AppRole
+                {
+                    Id = roleManagerId,
+                    Name = "Manager",
+                    NormalizedName = "Manager",
+                    Description = "Manager role"
                 });
 
             var userAdminId = (new Guid("ffded6b0-3769-4976-841b-69459049a62d")).ToString();

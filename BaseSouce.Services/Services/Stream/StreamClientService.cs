@@ -18,7 +18,7 @@ using Microsoft.Extensions.Logging;
 using BaseSouce.Services.Services.ValidateLink;
 using BaseSource.ViewModels.ManagerBOT;
 using Microsoft.Extensions.Configuration;
-using BaseSouce.Services.BotMessageServices;
+using BaseSouce.Services.BotChatServices;
 
 namespace BaseSouce.Services.Services.Stream
 {
@@ -29,7 +29,7 @@ namespace BaseSouce.Services.Services.Stream
         private readonly IMapper _mapper;
         private readonly IHubContext<BotHub, IBotClientHub> _botContextHub;
         private readonly IUserService _userService;
-        private readonly BotMessage _botMessage;
+        private readonly IBotChatService _botMessage;
         private readonly IValidateLinkService _validateLinkService;
         private readonly IConfiguration _configuration;
         public StreamClientService(
@@ -38,7 +38,7 @@ namespace BaseSouce.Services.Services.Stream
             IMapper mapper,
             IHubContext<BotHub, IBotClientHub> botContextHub,
             IUserService userService,
-            BotMessage botMessage,
+            IBotChatService botMessage,
             IValidateLinkService validateLinkService,
             IConfiguration configuration
             )
@@ -1516,7 +1516,7 @@ namespace BaseSouce.Services.Services.Stream
                                 + $"Manager:{bot.Manager?.UserName} {Environment.NewLine}"
                                 + $"Live: {bot.LiveType}{Environment.NewLine}"
                                 + $"Disconnected:{timer}",
-                                BotMessage.SendType.Bot
+                                BotChatService.SendType.Bot
                             );
                         }
                     }

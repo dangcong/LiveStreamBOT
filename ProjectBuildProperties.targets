@@ -11,9 +11,6 @@
 		<AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
 		<GenerateBindingRedirectsOutputType>true</GenerateBindingRedirectsOutputType>
 		<PathMap>$(MSBuildProjectDirectory)=$(MSBuildProjectName)</PathMap>
-
-		<!--<DefineConstants>$(DefineConstants);TELEGRAM</DefineConstants>-->
-		<DefineConstants>$(DefineConstants);DISCORD</DefineConstants>
 	</PropertyGroup>
 
 

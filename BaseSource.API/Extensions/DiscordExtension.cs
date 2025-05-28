@@ -1,7 +1,8 @@
-﻿#if DISCORD
-using BaseSouce.Services.BotMessageServices;
+﻿using BaseSouce.Services.BotChatServices;
 using Discord;
+using Discord.Rest;
 using Discord.WebSocket;
+using Microsoft.Extensions.Options;
 
 namespace BaseSource.API.Extensions
 {
@@ -9,28 +10,37 @@ namespace BaseSource.API.Extensions
     {
         public static async Task AddDiscordAsync(this WebApplicationBuilder builder)
         {
-            //builder.Services
-            //    .Configure<BotMessage.DiscordBotConfigure>(builder.Configuration.GetSection(BotMessage.DiscordBotConfigure.Configuration));
+            builder.Services
+                .Configure<DiscordBotChatService.DiscordBotConfigure>(builder.Configuration
+                    .GetSection(DiscordBotChatService.DiscordBotConfigure.Configuration));
 
-            BotMessage.DiscordBotConfigure discordBotConfigure = builder.Configuration
-                .GetSection(BotMessage.DiscordBotConfigure.Configuration)
-                .Get<BotMessage.DiscordBotConfigure>()!;
+            DiscordBotChatService.DiscordBotConfigure discordBotConfigure = builder.Configuration
+                .GetSection(DiscordBotChatService.DiscordBotConfigure.Configuration)
+                .Get<DiscordBotChatService.DiscordBotConfigure>()!;
 
             builder.Services
-                .AddTransient<BotMessage.DiscordBotConfigure>(x => x
+                .AddTransient<DiscordBotChatService.DiscordBotConfigure>(x => x
                     .GetRequiredService<IConfiguration>()
-                    .GetSection(BotMessage.DiscordBotConfigure.Configuration)
-                    .Get<BotMessage.DiscordBotConfigure>()!);
+                    .GetSection(DiscordBotChatService.DiscordBotConfigure.Configuration)
+                    .Get<DiscordBotChatService.DiscordBotConfigure>()!);
 
-            var config = new DiscordSocketConfig
+            var config = new DiscordRestConfig
             {
-                GatewayIntents = GatewayIntents.AllUnprivileged | GatewayIntents.MessageContent,
+
             };
-            DiscordSocketClient client = new DiscordSocketClient(config);
-            await client.LoginAsync(TokenType.Bot, discordBotConfigure.BotToken, true);
-            await client.StartAsync();
-            builder.Services.AddSingleton(client);
+
+            DiscordRestClient streamClient = new DiscordRestClient(config);
+            await streamClient.LoginAsync(TokenType.Bot, discordBotConfigure.Token_Stream, true);
+            DiscordRestClient botClient = new DiscordRestClient(config);
+            await botClient.LoginAsync(TokenType.Bot, discordBotConfigure.Token_Bot, true);
+
+            DiscordBotChatService.DiscordContainer discordContainer = new DiscordBotChatService.DiscordContainer()
+            {
+                Stream = streamClient,
+                Bot = botClient
+            };
+            builder.Services.AddSingleton<DiscordBotChatService.IDiscordContainer>(discordContainer);
+            builder.Services.AddTransient<IDiscordBotChatService, DiscordBotChatService>();
         }
     }
 }
-#endif

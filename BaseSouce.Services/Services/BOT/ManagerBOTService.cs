@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.SignalR;
 using BaseSouce.Services.HubServices;
 using Microsoft.Extensions.Configuration;
-using BaseSouce.Services.BotMessageServices;
+using BaseSouce.Services.BotChatServices;
 
 namespace BaseSouce.Services.Services.BOT
 {
@@ -26,14 +26,14 @@ namespace BaseSouce.Services.Services.BOT
         private readonly IMapper _mapper;
         private readonly IStreamClientService _streamService;
         private readonly IHubContext<BotHub, IBotClientHub> _botContextHub;
-        private readonly BotMessage _botMessage;
+        private readonly IBotChatService _botMessage;
         private readonly IConfiguration _configuration;
         public ManagerBOTService(IUnitOfWork<BaseSourceDbContext> unitOfWork,
             ILogger<ManagerBOTService> logger,
             IMapper mapper,
             IStreamClientService streamService
             , IHubContext<BotHub, IBotClientHub> botContextHub
-            , BotMessage botMessage
+            , IBotChatService botMessage
             , IConfiguration configuration
             //,IBotTeleClient2 botTeleClient2
             )
@@ -200,7 +200,7 @@ namespace BaseSouce.Services.Services.BOT
                             + $"Manager:{botCurrent.Manager?.UserName} {Environment.NewLine}"
                             + $"Live: {botCurrent.LiveType}{Environment.NewLine}"
                             + $"Connected:{timer}", 
-                            BotMessage.SendType.Bot
+                            BotChatService.SendType.Bot
                             );
                     }
 

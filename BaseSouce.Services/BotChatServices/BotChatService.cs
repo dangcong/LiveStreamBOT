@@ -3,13 +3,17 @@ using Telegram.Bot;
 using Discord;
 using Telegram.Bot.Types;
 using static BaseSouce.Services.BotChatServices.BotChatService;
+using BaseSource.Shared.Interfaces;
+using BaseSource.Shared.Classes;
 
 namespace BaseSouce.Services.BotChatServices
 {
     public interface IBotChatService
     {
-        Task SendMessageAsync(string channelId, string text, SendType sendType = SendType.Stream, CancellationToken cancellationToken = default);
-        Task SendMessageAsync(List<string> channelIds, string text, SendType sendType = SendType.Stream, CancellationToken cancellationToken = default);
+        Task SendMessageAsync(IEnumerable<IBotChatId> botChatIds, IEnumerable<string> texts, SendType sendType = SendType.Stream, CancellationToken cancellationToken = default);
+        Task SendMessageAsync(IBotChatId botChatId, IEnumerable<string> texts, SendType sendType = SendType.Stream, CancellationToken cancellationToken = default);
+        Task SendMessageAsync(IEnumerable<IBotChatId> botChatIds, string text, SendType sendType = SendType.Stream, CancellationToken cancellationToken = default);
+        Task SendMessageAsync(IBotChatId botChatId, string text, SendType sendType = SendType.Stream, CancellationToken cancellationToken = default);
     }
     public class BotChatService : IBotChatService
     {
@@ -33,30 +37,58 @@ namespace BaseSouce.Services.BotChatServices
             this._logger = logger;
         }
 
-        public async Task SendMessageAsync(string channelId, string text, SendType sendType = SendType.Stream, CancellationToken cancellationToken = default)
+        public Task SendMessageAsync(
+            IEnumerable<IBotChatId> botChatIds,
+            IEnumerable<string> texts,
+            SendType sendType = SendType.Stream,
+            CancellationToken cancellationToken = default
+            )
+            => SendMessageAsync(new BotChatId(botChatIds), string.Join(Environment.NewLine, texts), sendType, cancellationToken);
+        public Task SendMessageAsync(
+            IBotChatId botChatId,
+            IEnumerable<string> texts,
+            SendType sendType = SendType.Stream,
+            CancellationToken cancellationToken = default
+            )
+            => SendMessageAsync(botChatId, string.Join(Environment.NewLine, texts), sendType, cancellationToken);
+        public Task SendMessageAsync(
+            IEnumerable<IBotChatId> botChatIds,
+            string text,
+            SendType sendType = SendType.Stream,
+            CancellationToken cancellationToken = default
+            )
+            => SendMessageAsync(new BotChatId(botChatIds), text, sendType, cancellationToken);
+        public Task SendMessageAsync(
+            IBotChatId botChatId,
+            string text,
+            SendType sendType = SendType.Stream,
+            CancellationToken cancellationToken = default
+            )
+            => Task.WhenAll(_SendDiscordAsync(botChatId, text, sendType, cancellationToken), _SendTelegramAsync(botChatId, text, sendType, cancellationToken));
+
+
+        async Task _SendDiscordAsync(
+            IBotChatId botChatId,
+            string text,
+            SendType sendType = SendType.Stream,
+            CancellationToken cancellationToken = default
+            )
         {
-            try
+            foreach (var item in botChatId.DiscordUserIds)
             {
-                _ = _telegramBotChatService.SendMessageAsync(channelId, text, sendType, cancellationToken);
-                _ = _discordBotChatService.SendMessageAsync(channelId, text, sendType, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "SendMessageAsync");
+                await _discordBotChatService.SendMessageAsync(item, text, sendType, cancellationToken);
             }
         }
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="channelIds">telegram user/channel discord</param>
-        /// <param name="text"></param>
-        /// <param name="cancellationToken"></param>
-        /// <returns></returns>
-        public async Task SendMessageAsync(List<string> channelIds, string text, SendType sendType = SendType.Stream, CancellationToken cancellationToken = default)
+        async Task _SendTelegramAsync(
+            IBotChatId botChatId,
+            string text,
+            SendType sendType = SendType.Stream,
+            CancellationToken cancellationToken = default
+            )
         {
-            foreach (var channelId in channelIds)
+            foreach (var item in botChatId.TelegramUserNames)
             {
-                await SendMessageAsync(channelId, text, sendType, cancellationToken);
+                await _telegramBotChatService.SendMessageAsync(new ChatId(item), text, sendType, cancellationToken);
             }
         }
     }

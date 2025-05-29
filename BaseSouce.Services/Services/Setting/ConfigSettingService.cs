@@ -47,7 +47,8 @@ namespace BaseSouce.Services.Services.Setting
                     settingEntity.LinkFBAdmin = model.LinkFBAdmin;
                     settingEntity.BankName = model.BankName;
                     settingEntity.BankAccountName = model.BankAccountName;
-                    settingEntity.Telegrams = model.Telegrams;
+                    settingEntity.TelegramUserIds = model.TelegramUserIds;
+                    settingEntity.DiscordUserIds = model.DiscordUserIds;
                     _repository.Update(settingEntity);
 
                     await _unitOfWork.SaveChangesAsync();

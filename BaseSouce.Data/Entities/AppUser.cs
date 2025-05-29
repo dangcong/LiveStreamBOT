@@ -1,10 +1,12 @@
 ﻿using BaseSource.Data.Entities;
+using BaseSource.Shared.Classes;
+using BaseSource.Shared.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BaseSouce.Data.Entities
 {
-    public class AppUser : IdentityUser<string>
+    public class AppUser : IdentityUser<string>, IBotChatId
     {
         public string LinkFB { get; set; }
         public DateTime CreatedTime { get; set; }
@@ -12,8 +14,8 @@ namespace BaseSouce.Data.Entities
 
 
         // username/userid split by ,
-        public string TelegramUserId { get; set; }
-        public string TelegramUserIdReceiveNotificationsFromStaff { get; set; }
+        public string TelegramUserId { get; set; }//TelegramAPI
+        public string TelegramUserIdReceiveNotificationsFromStaff { get; set; }//TelegramBOT
         public string DiscordUserId { get; set; }
         public string DiscordUserIdReceiveNotificationsFromStaff { get; set; }
 
@@ -45,5 +47,60 @@ namespace BaseSouce.Data.Entities
 
         public ICollection<UserManagerBOT> UserManagerBOTs { get; set; }
         public ICollection<ManagerBOT> ManagerBOTs { get; set; }
+
+
+
+
+
+
+
+
+        IEnumerable<string> IBotChatId.TelegramUserNames
+        {
+            get
+            {
+                return TelegramUserId
+                    .Split(',')
+                    .Select(x => x.Trim());
+            }
+        }
+        IEnumerable<ulong> IBotChatId.DiscordUserIds
+        {
+            get
+            {
+                return DiscordUserId
+                    .Split(',')
+                    .Select(x =>
+                    {
+                        ulong? result = null;
+                        if (ulong.TryParse(x.Trim(), out ulong r))
+                            result = r;
+                        return result;
+                    })
+                    .Where(x => x.HasValue)
+                    .Select(x => x.Value);
+            }
+        }
+        public IBotChatId GetBotChatIdForStaff()
+        {
+            return new BotChatId()
+            {
+                TelegramUserNames = TelegramUserIdReceiveNotificationsFromStaff?
+                    .Split(',')?
+                    .Select(x => x.Trim())?
+                    .ToList() ?? Enumerable.Empty<string>(),
+                DiscordUserIds = DiscordUserIdReceiveNotificationsFromStaff?
+                    .Split(',')?
+                    .Select(x =>
+                    {
+                        ulong? result = null;
+                        if (ulong.TryParse(x.Trim(), out ulong r))
+                            result = r;
+                        return result;
+                    })?
+                    .Where(x => x.HasValue)?
+                    .Select(x => x.Value) ?? Enumerable.Empty<ulong>()
+            };
+        }
     }
 }

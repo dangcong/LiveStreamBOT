@@ -18,13 +18,13 @@
     <div class="section-body">
 
         <div class="row">
-            <div class="col-12 col-sm-12 col-lg-5">
+            <div class="col-12 col-sm-12 col-lg-6">
                 <div class="card author-box card-primary">
                     <div class="card-body">
                         <div class="author-box-left">
                             <img alt="image" src="/admin-themes/assets/img/avatar/avatar-1.png" class="rounded-circle author-box-picture">
                             <div class="clearfix"></div>
-                            <button class="mt-3 btn btn-success " data-toggle="modal" data-target="#updateModal">Cập nhật Telegram</button>
+                            <button class="mt-3 btn btn-success " data-toggle="modal" data-target="#updateModal">Cập nhật Telegram/Discord</button>
                             <a href="/account/changePassword" class="btn btn-danger mt-3 ">Đổi mật khẩu</a>
                         </div>
                         <div class="author-box-details">
@@ -40,7 +40,11 @@
                                 </p>*@
                                 <p>
                                     <strong>Telegram: </strong>
-                                    <span><a href="#">@Model.TelegramAPI</a></span>
+                                    <span><a href="#">@Model.TelegramUserId</a></span>
+                                </p>
+                                <p>
+                                    <strong>Discord: </strong>
+                                    <span><a href="#">@Model.DiscordUserId</a></span>
                                 </p>
                                 @* <h2 class="section-title">Gói LIVE-1080</h2>
                                 <p>
@@ -92,7 +96,7 @@
                 </div>
 
             </div>
-            <div class="col-12 col-sm-12 col-lg-7">
+            <div class="col-12 col-sm-12 col-lg-6">
                 <div class="card">
                     <div class="card-header">
                         <h4>Thông tin Số luồng đang chạy</h4>
@@ -164,12 +168,17 @@
         </div>
 
         <div class="alert alert-primary">
-            <p>* Nhận thông báo telegram</p>
+            <p>* Telegram</p>
             <p>+ Vào link https://t.me/userinfobot nhấn start để nhận ID</p>
             <p>+ Cập nhập telegram: điền ID</p>
             <p>* Nhận thông báo live:</p>
             <p>+ Vào http://t.me/ShineLivestreamBot ấn (nhấn start) thì mới nhận được thông báo.</p>
-
+            <p></p>
+            <p>* Discord</p>
+            <p>+ Vào server https://discord.gg/rDyaqRZhVc</p>
+            <p>+ Kiếm bot ở danh sách thành viên bên phải và chat với bot để khởi đầu cuộc trò chuyện</p>
+            <p>+ Vào cài đặt người dùng > Nâng cao > Bật chế độ nhà phát triển > bấm ESC</p>
+            <p>+ Chuột trái tên tài khoản của mình ở góc dưới trái > Chọn sao chép id người dùng</p>
         </div>
 
     </div>
@@ -178,21 +187,29 @@
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Cập nhật Telegram </h5>
+                <h5 class="modal-title">Cập nhật Telegram/Discord </h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <form id="updateForm" method="post" action="/account/update">
                 <div class="modal-body">
-                    <p>Cập nhật thông tin Telegram API</p>
-                    <input name="TelegramAPI" value="@Model.TelegramAPI" class="form-control" />
+                    <p>User Id Telegram: </p>
+                    <input name="@nameof(Model.TelegramUserId)" value="@Model.TelegramUserId" class="form-control" />
+                </div>
+                <div class="modal-body">
+                    <p>User Id Discord: </p>
+                    <input name="@nameof(Model.DiscordUserId)" value="@Model.DiscordUserId" class="form-control" />
                 </div>
                 @if (User.IsInRole("Manager"))
                 {
                     <div class="modal-body">
-                        <p>Cập nhật thông tin Telegram BOT</p>
-                        <input name="TelegramBOT" value="@Model.TelegramBOT" class="form-control" />
+                        <p>User Id Telegram (nhận thông báo từ nhân viên): </p>
+                        <input name="@nameof(Model.TelegramUserIdReceiveNotificationsFromStaff)" value="@Model.TelegramUserIdReceiveNotificationsFromStaff" class="form-control" />
+                    </div>
+                    <div class="modal-body">
+                        <p>User Id Discord (nhận thông báo từ nhân viên): </p>
+                        <input name="@nameof(Model.DiscordUserIdReceiveNotificationsFromStaff)" value="@Model.DiscordUserIdReceiveNotificationsFromStaff" class="form-control" />
                     </div>
                 }
 

@@ -7,7 +7,7 @@ namespace BaseSouce.Services.BotChatServices
 {
     public interface ITelegramBotChatService
     {
-        Task SendMessageAsync(string userName, string text, SendType sendType = SendType.Stream, CancellationToken cancellationToken = default);
+        Task SendMessageAsync(ChatId chatId, string text, SendType sendType = SendType.Stream, CancellationToken cancellationToken = default);
     }
     public class TelegramBotChatService : ITelegramBotChatService
     {
@@ -40,7 +40,7 @@ namespace BaseSouce.Services.BotChatServices
             this._logger = logger;
         }
 
-        public async Task SendMessageAsync(string userName, string text, SendType sendType = SendType.Stream, CancellationToken cancellationToken = default)
+        public async Task SendMessageAsync(ChatId chatId, string text, SendType sendType = SendType.Stream, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -50,7 +50,7 @@ namespace BaseSouce.Services.BotChatServices
                     SendType.Bot => _telegramContainer.Bot,
                     _ => throw new NotSupportedException(sendType.ToString())
                 };
-                await telegramBotClient.SendTextMessageAsync(new ChatId(userName.Trim()), text);
+                await telegramBotClient.SendTextMessageAsync(chatId, text);
             }
             catch (Exception ex)
             {

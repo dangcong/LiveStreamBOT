@@ -38,13 +38,18 @@ namespace BaseSouce.ViewModels.User
         public string Phone { get; set; }
     }
 
+    /// <summary>
+    /// <see cref="ProfifleInfoDto"/>
+    /// </summary>
     public class UserUpdateDto
     {
         public string Email { get; set; }
         public string Phone { get; set; }
         public string LinkFB { get; set; }
         public string LinkTelegram { get; set; }
-        public string TelegramAPI { get; set; }
-        public string TelegramBOT { get; set; }
+        public string? TelegramUserId { get; set; }
+        public string? TelegramUserIdReceiveNotificationsFromStaff { get; set; }
+        public string? DiscordUserId { get; set; }
+        public string? DiscordUserIdReceiveNotificationsFromStaff { get; set; }
     }
 }

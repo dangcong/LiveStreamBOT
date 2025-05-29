@@ -350,8 +350,10 @@ namespace BaseSouce.Services.Services.User
                     UserName = x.UserName,
                     LinkFB = x.LinkFB,
                     Phone = x.PhoneNumber,
-                    TelegramAPI = x.TelegramAPI,
-                    TelegramBOT = x.TelegramBOT,
+                    TelegramUserId = x.TelegramUserId,
+                    TelegramUserIdReceiveNotificationsFromStaff = x.TelegramUserIdReceiveNotificationsFromStaff,
+                    DiscordUserId = x.DiscordUserId,
+                    DiscordUserIdReceiveNotificationsFromStaff = x.DiscordUserIdReceiveNotificationsFromStaff,
                     PackageLive1080 = new PackageLiveInfoDto
                     {
                         NumberOfThreads = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._1080).Sum(i => i.NumberOfThreads),
@@ -466,8 +468,10 @@ namespace BaseSouce.Services.Services.User
                 //userCurrent.PhoneNumber = model.Phone;
                 //userCurrent.LinkFB = model.LinkFB;
                 //userCurrent.LinkTelegram = model.LinkTelegram;
-                userCurrent.TelegramAPI = model.TelegramAPI;
-                userCurrent.TelegramBOT = model.TelegramBOT;
+                userCurrent.TelegramUserId = model.TelegramUserId;
+                userCurrent.TelegramUserIdReceiveNotificationsFromStaff = model.TelegramUserIdReceiveNotificationsFromStaff;
+                userCurrent.DiscordUserId = model.DiscordUserId;
+                userCurrent.DiscordUserIdReceiveNotificationsFromStaff = model.DiscordUserIdReceiveNotificationsFromStaff;
                 _repository.Update(userCurrent);
                 await _unitOfWork.SaveChangesAsync();
                 return new KeyValuePair<bool, string>(true, string.Empty);

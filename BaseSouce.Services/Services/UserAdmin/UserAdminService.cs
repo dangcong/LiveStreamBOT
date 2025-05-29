@@ -114,7 +114,7 @@ namespace BaseSouce.Services.Services.UserAdmin
                     NormalizedEmail = model.UserName,
                     NormalizedUserName = model.UserName,
                     LinkFB = string.Empty,
-                    TelegramAPI = model.LinkTelegram,
+                    TelegramUserId = model.LinkTelegram,
                     UserManager = !string.IsNullOrWhiteSpace(model.UserManager) ? model.UserManager : null,
                     //NumberOfThreads1080 = model.NumberOfThreads1080,
                     //NumberOfThreads4K = model.NumberOfThreads4K
@@ -328,7 +328,7 @@ namespace BaseSouce.Services.Services.UserAdmin
                     NumberOfThreads4K = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._4K).Sum(i => i.NumberOfThreads),
                     NumberOfThreadsBackup = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._Backup).Sum(i => i.NumberOfThreads),
                     UserName = x.UserName,
-                    TelegramAPI = x.TelegramAPI,
+                    TelegramAPI = x.TelegramUserId,
                     NumberOfThreads4KInRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._4K && i.Status == StreamStatus.Streaming).Count(),
                     NumberOfThreads1080InRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._1080 && i.Status == StreamStatus.Streaming).Count(),
                     NumberOfThreadsBackupInRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._Backup && i.Status == StreamStatus.Streaming).Count(),
@@ -369,7 +369,7 @@ namespace BaseSouce.Services.Services.UserAdmin
                     NumberOfThreads1080 = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._1080).Sum(i => i.NumberOfThreads),
                     NumberOfThreads4K = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._4K).Sum(i => i.NumberOfThreads),
                     UserName = x.UserName,
-                    TelegramAPI = x.TelegramAPI
+                    TelegramAPI = x.TelegramUserId
                 }, include: x => x.Include(i => i.StreamHistorys).Include(i => i.UserManagerBOTs).ThenInclude(o => o.ManagerBOT),
                 orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                 pageIndex: 1, pageSize: 1000);
@@ -395,7 +395,7 @@ namespace BaseSouce.Services.Services.UserAdmin
                     LinkFB = x.LinkFB,
                     LinkTelegram = x.LinkTelegram,
                     UserName = x.UserName,
-                    TelegramAPI = x.TelegramAPI
+                    TelegramAPI = x.TelegramUserId
                 }, include: x => x.Include(i => i.StreamHistorys).Include(i => i.UserManagerBOTs).ThenInclude(o => o.ManagerBOT),
                 orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                 pageIndex: 1, pageSize: 1000);

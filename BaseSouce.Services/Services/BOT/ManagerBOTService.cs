@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.SignalR;
 using BaseSouce.Services.HubServices;
 using Microsoft.Extensions.Configuration;
 using BaseSouce.Services.BotChatServices;
+using BaseSource.Shared.Interfaces;
 
 namespace BaseSouce.Services.Services.BOT
 {
@@ -155,26 +156,14 @@ namespace BaseSouce.Services.Services.BOT
 
                 var setting = await _repositorySetting.GetFirstOrDefaultAsync();
 
-                var idTelesAll = new List<string>();
-                if (!string.IsNullOrWhiteSpace(botCurrent.Manager?.TelegramBOT))
+                List<IBotChatId> botChatIds = new List<IBotChatId>();
+                if (setting is not null)
+                    botChatIds.Add(setting);
+                if (botCurrent.Manager is not null)
                 {
-
-                    var idTeles = botCurrent.Manager.TelegramBOT.Split(',');
-                    if (idTeles.Length > 0)
-                    {
-                        idTelesAll.AddRange(idTeles);
-                    }
+                    botChatIds.Add(botCurrent.Manager.GetBotChatIdForStaff());
                 }
 
-                if (!string.IsNullOrEmpty(setting.Telegrams))
-                {
-                    var idTeles = setting.Telegrams.Split(',');
-                    if (idTeles.Length > 0)
-                    {
-                        idTelesAll.AddRange(idTeles);
-
-                    }
-                }
                 _logger.LogInformation($"{timeDisconnected}");
                 var timeDelay = 0;
                 int.TryParse(_configuration["TimeDelayBot"], out timeDelay);
@@ -187,21 +176,16 @@ namespace BaseSouce.Services.Services.BOT
                     || (statusOld == ManagerBOTStatus.Disconnected && (timeDisconnected < DateTime.Now.AddSeconds(-timeDelay) || timeDisconnected == null))
                     )
                 {
-                    if (idTelesAll.Any())
+                    if (botChatIds.Any())
                     {
-                        idTelesAll = idTelesAll.Distinct().ToList();
-
                         var timer = DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss");
-
-                        _ = _botMessage.SendMessageAsync(
-                            idTelesAll,
-                            $"BotName: {botCurrent.Name}{Environment.NewLine}"
+                        string textSend = $"BotName: {botCurrent.Name}{Environment.NewLine}"
                             + $"Group:{botCurrent.Group}{Environment.NewLine}"
                             + $"Manager:{botCurrent.Manager?.UserName} {Environment.NewLine}"
                             + $"Live: {botCurrent.LiveType}{Environment.NewLine}"
-                            + $"Connected:{timer}", 
-                            BotChatService.SendType.Bot
-                            );
+                            + $"Connected:{timer}";
+
+                        _ = _botMessage.SendMessageAsync(botChatIds, textSend, BotChatService.SendType.Bot);
                     }
 
                 }

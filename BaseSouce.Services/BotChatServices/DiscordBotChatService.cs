@@ -10,7 +10,7 @@ namespace BaseSouce.Services.BotChatServices
 {
     public interface IDiscordBotChatService
     {
-        Task SendMessageAsync(string userId, string text, SendType sendType = SendType.Stream, CancellationToken cancellationToken = default);
+        Task SendMessageAsync(ulong userId, string text, SendType sendType = SendType.Stream, CancellationToken cancellationToken = default);
     }
     public class DiscordBotChatService : IDiscordBotChatService
     {
@@ -53,7 +53,7 @@ namespace BaseSouce.Services.BotChatServices
 
 
 
-        public async Task SendMessageAsync(string userId, string text, SendType sendType = SendType.Stream, CancellationToken cancellationToken = default)
+        public async Task SendMessageAsync(ulong userId, string text, SendType sendType = SendType.Stream, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -63,14 +63,26 @@ namespace BaseSouce.Services.BotChatServices
                     SendType.Bot => _discordContainer.Bot,
                     _ => throw new NotSupportedException(sendType.ToString())
                 };
-                if (ulong.TryParse(userId.Trim(), out ulong uid))
+                IUser user = await discordClient.GetUserAsync(userId);
+                IDMChannel dm = await user.CreateDMChannelAsync();
+                IUserMessage userMessage = await dm.SendMessageAsync(text);
+
+
+                ulong? serverChannel = sendType switch
                 {
-                    IUser user = await discordClient.GetUserAsync(uid);
-                    IDMChannel dm = await user.CreateDMChannelAsync();
-                    IUserMessage userMessage = await dm.SendMessageAsync(text);
+                    SendType.Stream => _discordBotConfigure.ChannelLive,
+                    SendType.Bot => _discordBotConfigure.ChannelBot,
+                    _ => null
+                };
+                if(serverChannel.HasValue)
+                {
+                    var channel = await _discordContainer.Stream.GetChannelAsync(serverChannel.Value) as IMessageChannel;
+                    if (channel is not null)
+                    {
+                        await channel.SendMessageAsync(text);
+                    }
                 }
             }
-
             catch (Exception ex)
             {
                 _logger.LogError(ex, nameof(SendMessageAsync));

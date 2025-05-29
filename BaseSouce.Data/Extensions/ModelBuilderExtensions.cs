@@ -1,4 +1,5 @@
 ﻿using BaseSouce.Data.Entities;
+using BaseSource.Data.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -53,7 +54,13 @@ namespace BaseSouce.Data.Extensions
                 UserId = userAdminId
             });
 
-           
+
+            modelBuilder.Entity<ConfigSystem>().HasData(new ConfigSystem()
+            {
+                Id = 1,
+            });
+
+
             ////add permission admin
             //var roleClaims = new List<AppRoleClaim>();
             //var idIndex = 1;

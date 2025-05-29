@@ -467,7 +467,6 @@ namespace BaseSouce.Services.Services.User
                 }
                 //userCurrent.PhoneNumber = model.Phone;
                 //userCurrent.LinkFB = model.LinkFB;
-                //userCurrent.LinkTelegram = model.LinkTelegram;
                 userCurrent.TelegramUserId = model.TelegramUserId;
                 userCurrent.TelegramUserIdReceiveNotificationsFromStaff = model.TelegramUserIdReceiveNotificationsFromStaff;
                 userCurrent.DiscordUserId = model.DiscordUserId;

@@ -14,9 +14,9 @@ namespace BaseSource.ViewModels.UserAdmin
         public string UserName { get; set; }
         public string Email { get; set; }
         public string LinkFB { get; set; }
-        public string LinkTelegram { get; set; }
         public DateTime CreatedTime { get; set; }
-        public string TelegramAPI { get; set; }
+        public string TelegramUserId { get; set; }
+        public string DiscordUserId { get; set; }
 
         public int TotalBot1080 { get; set; }
         public int TotalBot4k { get; set; }
@@ -100,7 +100,8 @@ namespace BaseSource.ViewModels.UserAdmin
         public string Password { get; set; }
         public int NumberOfThreads1080 { get; set; }
         public int NumberOfThreads4K { get; set; }
-        public string LinkTelegram { get; set; }
+        public string? TelegramUserId { get; set; }
+        public string? DiscordUserId { get; set; }
         public string UserManager { get; set; }
     }
     public class UserManagerBotUpdateDto
@@ -123,7 +124,8 @@ namespace BaseSource.ViewModels.UserAdmin
     public class UpdateTelegramDto
     {
         public string UserId { get; set; }
-        public string Telegram { get; set; }
+        public string? TelegramUserId { get; set; }
+        public string? DiscordUserId { get; set; }
         public string UserManager { get; set; }
     }
 }

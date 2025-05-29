@@ -114,7 +114,8 @@ namespace BaseSouce.Services.Services.UserAdmin
                     NormalizedEmail = model.UserName,
                     NormalizedUserName = model.UserName,
                     LinkFB = string.Empty,
-                    TelegramUserId = model.LinkTelegram,
+                    TelegramUserId = model.TelegramUserId,
+                    DiscordUserId = model.DiscordUserId,
                     UserManager = !string.IsNullOrWhiteSpace(model.UserManager) ? model.UserManager : null,
                     //NumberOfThreads1080 = model.NumberOfThreads1080,
                     //NumberOfThreads4K = model.NumberOfThreads4K
@@ -322,13 +323,13 @@ namespace BaseSouce.Services.Services.UserAdmin
                     Email = x.Email,
                     Id = x.Id,
                     LinkFB = x.LinkFB,
-                    LinkTelegram = x.LinkTelegram,
                     Password = x.Password,
                     NumberOfThreads1080 = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._1080).Sum(i => i.NumberOfThreads),
                     NumberOfThreads4K = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._4K).Sum(i => i.NumberOfThreads),
                     NumberOfThreadsBackup = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._Backup).Sum(i => i.NumberOfThreads),
                     UserName = x.UserName,
-                    TelegramAPI = x.TelegramUserId,
+                    TelegramUserId = x.TelegramUserId,
+                    DiscordUserId = x.DiscordUserId,
                     NumberOfThreads4KInRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._4K && i.Status == StreamStatus.Streaming).Count(),
                     NumberOfThreads1080InRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._1080 && i.Status == StreamStatus.Streaming).Count(),
                     NumberOfThreadsBackupInRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._Backup && i.Status == StreamStatus.Streaming).Count(),
@@ -365,11 +366,11 @@ namespace BaseSouce.Services.Services.UserAdmin
                     Email = x.Email,
                     Id = x.Id,
                     LinkFB = x.LinkFB,
-                    LinkTelegram = x.LinkTelegram,
                     NumberOfThreads1080 = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._1080).Sum(i => i.NumberOfThreads),
                     NumberOfThreads4K = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._4K).Sum(i => i.NumberOfThreads),
                     UserName = x.UserName,
-                    TelegramAPI = x.TelegramUserId
+                    TelegramUserId = x.TelegramUserId,
+                    DiscordUserId = x.DiscordUserId,
                 }, include: x => x.Include(i => i.StreamHistorys).Include(i => i.UserManagerBOTs).ThenInclude(o => o.ManagerBOT),
                 orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                 pageIndex: 1, pageSize: 1000);
@@ -393,9 +394,9 @@ namespace BaseSouce.Services.Services.UserAdmin
                     Email = x.Email,
                     Id = x.Id,
                     LinkFB = x.LinkFB,
-                    LinkTelegram = x.LinkTelegram,
                     UserName = x.UserName,
-                    TelegramAPI = x.TelegramUserId
+                    TelegramUserId = x.TelegramUserId,
+                    DiscordUserId = x.DiscordUserId,
                 }, include: x => x.Include(i => i.StreamHistorys).Include(i => i.UserManagerBOTs).ThenInclude(o => o.ManagerBOT),
                 orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                 pageIndex: 1, pageSize: 1000);
@@ -588,7 +589,8 @@ namespace BaseSouce.Services.Services.UserAdmin
                 {
                     return new KeyValuePair<bool, string>(false, "Tài khoản không tồn tại!");
                 }
-                userCurrent.LinkTelegram = model.Telegram;
+                userCurrent.TelegramUserId = model.TelegramUserId;
+                userCurrent.DiscordUserId = model.DiscordUserId;
 
                 if (isAdmin && !string.IsNullOrWhiteSpace(model.UserManager) && userCurrent.UserManager != model.UserManager)
                 {

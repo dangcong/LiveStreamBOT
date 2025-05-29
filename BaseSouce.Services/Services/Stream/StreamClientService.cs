@@ -1241,10 +1241,6 @@ namespace BaseSouce.Services.Services.Stream
                             {
                                 List<IBotChatId> botChatIds = new List<IBotChatId>();
                                 botChatIds.Add(item.AppUser);
-                                //if (!string.IsNullOrEmpty(item.AppUser.LinkTelegram))
-                                //{
-                                //    idTeles.AddRange(item.AppUser.LinkTelegram.Split(','));
-                                //}
                                 if (botChatIds.Any())
                                 {
                                     var liveType = streamCloneEntity.EndTimeLive != null ? "11h" : "24/7";
@@ -1382,10 +1378,6 @@ namespace BaseSouce.Services.Services.Stream
 
                         List<IBotChatId> botChatIds = new List<IBotChatId>();
                         botChatIds.Add(item.AppUser);
-                        //if (!string.IsNullOrEmpty(item.AppUser.LinkTelegram))
-                        //{
-                        //    idTelesAll.AddRange(item.AppUser.LinkTelegram.Split(','));
-                        //}
                         if (botChatIds.Any())
                         {
                             var liveType = item.EndTimeLive != null ? "11h" : "24/7";

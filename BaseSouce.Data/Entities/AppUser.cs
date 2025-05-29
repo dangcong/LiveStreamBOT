@@ -7,9 +7,8 @@ namespace BaseSouce.Data.Entities
     public class AppUser : IdentityUser<string>
     {
         public string LinkFB { get; set; }
-        public string LinkTelegram { get; set; }
         public DateTime CreatedTime { get; set; }
-        public string TelegramAPI { get; set; }
+        public string LinkTelegram { get; set; }
         public string TelegramBOT { get; set; }
 
         //public int NumberOfThreads1080 { get; set; }

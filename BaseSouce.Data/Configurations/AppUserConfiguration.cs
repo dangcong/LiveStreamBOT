@@ -11,7 +11,10 @@ namespace BaseSouce.Data.Configurations
             builder.ToTable("AppUsers");
             builder.Property(x => x.Id).HasMaxLength(128).ValueGeneratedOnAdd();
             builder.Property(x => x.LinkFB).HasMaxLength(500);
-            builder.Property(x => x.TelegramAPI).HasMaxLength(500);
+            builder.Property(x => x.TelegramUserId).HasMaxLength(500);
+            builder.Property(x => x.DiscordUserId).HasMaxLength(500);
+            builder.Property(x => x.TelegramUserIdReceiveNotificationsFromStaff).HasMaxLength(500);
+            builder.Property(x => x.DiscordUserIdReceiveNotificationsFromStaff).HasMaxLength(500);
             builder.Property(x => x.LinkTelegram).HasMaxLength(500);
 
             // Each User can have many UserClaims

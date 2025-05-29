@@ -9,7 +9,15 @@ namespace BaseSouce.Data.Entities
         public string LinkFB { get; set; }
         public DateTime CreatedTime { get; set; }
         public string LinkTelegram { get; set; }
-        public string TelegramBOT { get; set; }
+
+
+        // username/userid split by ,
+        public string TelegramUserId { get; set; }
+        public string TelegramUserIdReceiveNotificationsFromStaff { get; set; }
+        public string DiscordUserId { get; set; }
+        public string DiscordUserIdReceiveNotificationsFromStaff { get; set; }
+
+
 
         //public int NumberOfThreads1080 { get; set; }
         //public int NumberOfThreads4K { get; set; }

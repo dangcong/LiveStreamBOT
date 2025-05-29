@@ -8,6 +8,12 @@
         public string BankAccountName { get; set; }
         public string LinkFBAdmin { get; set; }
         public string LinkYoutube { get; set; }
-        public string Telegrams { get; set; }
+
+
+        // username/userid split by ,
+        public string TelegramUserIds { get; set; }
+        public string DiscordUserIds { get; set; }
+
+
     }
 }

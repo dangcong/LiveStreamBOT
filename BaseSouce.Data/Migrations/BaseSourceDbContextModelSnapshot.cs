@@ -58,10 +58,18 @@ namespace BaseSource.Data.Migrations
                         new
                         {
                             Id = "c1105ce5-9dbc-49a9-a7d5-c963b6daa62a",
-                            ConcurrencyStamp = "26dbc5d5-9a39-4fe6-a2b7-448a6b13960f",
+                            ConcurrencyStamp = "81ee82fe-56f4-404a-a06c-2c7c6849c9cc",
                             Description = "Administrator role",
                             Name = "Admin",
                             NormalizedName = "Admin"
+                        },
+                        new
+                        {
+                            Id = "d32b2cc9-aabe-43b2-8bc0-66c8dfd77080",
+                            ConcurrencyStamp = "537cf5f8-9b32-414f-b64b-da9ac05139d1",
+                            Description = "Manager role",
+                            Name = "Manager",
+                            NormalizedName = "Manager"
                         });
                 });
 
@@ -109,6 +117,14 @@ namespace BaseSource.Data.Migrations
 
                     b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("DiscordUserId")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("DiscordUserIdReceiveNotificationsFromStaff")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Email")
                         .HasMaxLength(256)
@@ -160,12 +176,13 @@ namespace BaseSource.Data.Migrations
                     b.Property<string>("SecurityStamp")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("TelegramAPI")
+                    b.Property<string>("TelegramUserId")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<string>("TelegramBOT")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("TelegramUserIdReceiveNotificationsFromStaff")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<bool>("TwoFactorEnabled")
                         .HasColumnType("bit");
@@ -202,7 +219,7 @@ namespace BaseSource.Data.Migrations
                         {
                             Id = "ffded6b0-3769-4976-841b-69459049a62d",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "70cbca4b-3188-4730-bb62-a4039639c4ac",
+                            ConcurrencyStamp = "90a70351-e535-43b4-bca2-842ab6d32b83",
                             CreatedTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
@@ -211,7 +228,7 @@ namespace BaseSource.Data.Migrations
                             NormalizedUserName = "superadmin",
                             NumberOfThreads1080Create = 0,
                             NumberOfThreads4KCreate = 0,
-                            PasswordHash = "AQAAAAEAACcQAAAAEDsWiiLw2TCzTLK2vNQSNM5eiEz2m0iYvz2v7Y9PwhJ7tAdcG5i9K/v4YuHAoZbS+g==",
+                            PasswordHash = "AQAAAAEAACcQAAAAEF3HqXkOyhcvpnfVB5zDnwZFZ/yBAGo4x71iqNz3XPNUM/I+dqIMeUiAGMl2jpytWA==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -528,6 +545,10 @@ namespace BaseSource.Data.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<string>("DiscordUserIds")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
                     b.Property<string>("LinkFBAdmin")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
@@ -536,7 +557,7 @@ namespace BaseSource.Data.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<string>("Telegrams")
+                    b.Property<string>("TelegramUserIds")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 

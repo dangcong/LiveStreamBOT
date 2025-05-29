@@ -10,8 +10,6 @@ namespace BaseSouce.Data.Entities
     {
         public string LinkFB { get; set; }
         public DateTime CreatedTime { get; set; }
-        public string LinkTelegram { get; set; }
-
 
         // username/userid split by ,
         public string TelegramUserId { get; set; }//TelegramAPI

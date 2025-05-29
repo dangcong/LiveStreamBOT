@@ -15,7 +15,6 @@ namespace BaseSouce.Data.Configurations
             builder.Property(x => x.DiscordUserId).HasMaxLength(500);
             builder.Property(x => x.TelegramUserIdReceiveNotificationsFromStaff).HasMaxLength(500);
             builder.Property(x => x.DiscordUserIdReceiveNotificationsFromStaff).HasMaxLength(500);
-            builder.Property(x => x.LinkTelegram).HasMaxLength(500);
 
             // Each User can have many UserClaims
             builder.HasMany(e => e.Claims)

@@ -58,7 +58,7 @@ namespace BaseSource.Data.Migrations
                         new
                         {
                             Id = "c1105ce5-9dbc-49a9-a7d5-c963b6daa62a",
-                            ConcurrencyStamp = "42c3c03f-ef08-4c1d-93f3-ba51ad6175cc",
+                            ConcurrencyStamp = "8917027d-3fdd-41b1-abe0-bc55cddfd741",
                             Description = "Administrator role",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -66,7 +66,7 @@ namespace BaseSource.Data.Migrations
                         new
                         {
                             Id = "d32b2cc9-aabe-43b2-8bc0-66c8dfd77080",
-                            ConcurrencyStamp = "cfc30bea-f347-4ab9-9a18-af819a735ace",
+                            ConcurrencyStamp = "fffb431f-85fe-4a2c-94ae-b62d194f76bb",
                             Description = "Manager role",
                             Name = "Manager",
                             NormalizedName = "Manager"
@@ -134,10 +134,6 @@ namespace BaseSource.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("LinkFB")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("LinkTelegram")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -219,7 +215,7 @@ namespace BaseSource.Data.Migrations
                         {
                             Id = "ffded6b0-3769-4976-841b-69459049a62d",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "e80c35cc-6482-4f01-a8a2-1577783c4c85",
+                            ConcurrencyStamp = "e22cc615-9fb7-46fe-8998-4bc14c62a969",
                             CreatedTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
@@ -228,7 +224,7 @@ namespace BaseSource.Data.Migrations
                             NormalizedUserName = "superadmin",
                             NumberOfThreads1080Create = 0,
                             NumberOfThreads4KCreate = 0,
-                            PasswordHash = "AQAAAAEAACcQAAAAEF/GB3Kcf5d0ES7vDF9fVFt66IJL98QMjnVE/52BOYhqPG+xVbJ0u+vRP8EAsofwXw==",
+                            PasswordHash = "AQAAAAEAACcQAAAAELRu9QUSGfsCuBqslHOFKPSr4RyNZ7rnEHEyd4MadvHqKoZcjefJ2lvJ7cbi9NY6lw==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,

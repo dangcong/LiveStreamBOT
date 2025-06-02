@@ -13,11 +13,9 @@ namespace BaseSource.ViewModels.Stream
 {
     public class StreamCreateDto
     {
-        public string UserId { get; set; }
         public int ManagerBOTId { get; set; }
-        public string BotId { get; set; }
         public string StreamKey { get; set; }
-        public string RTMP { get; set; } = "rtmp://x.rtmp.youtube.com/live2";
+        //public string RTMP { get; set; } = "rtmp://x.rtmp.youtube.com/live2";
         public string StreamName { get; set; }
         public LiveType LiveType { get; set; }
         public string Video { get; set; }

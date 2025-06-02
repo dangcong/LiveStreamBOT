@@ -816,7 +816,7 @@ namespace BaseSouce.Services.Services.Stream
                 streamEntity.Audio = model.Audio;
                 streamEntity.IsForever = model.IsForever;
                 streamEntity.IsLiveNow = model.IsLiveNow;
-                streamEntity.RTMP = model.RTMP;
+                streamEntity.RTMP = "rtmp://x.rtmp.youtube.com/live2";//model.RTMP;
                 streamEntity.StartTimeLive = model.StartTimeLive;
                 streamEntity.EndTimeLive = model.EndTimeLive;
                 streamEntity.StreamKey = model.StreamKey;

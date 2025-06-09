@@ -79,7 +79,7 @@ namespace BaseSouce.Services.BotChatServices
                     var channel = await _discordContainer.Stream.GetChannelAsync(serverChannel.Value) as IMessageChannel;
                     if (channel is not null)
                     {
-                        await channel.SendMessageAsync(text);
+                        await channel.SendMessageAsync($"```\r\n{text}\r\n```");
                     }
                 }
             }

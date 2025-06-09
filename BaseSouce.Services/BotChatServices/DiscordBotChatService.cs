@@ -57,6 +57,8 @@ namespace BaseSouce.Services.BotChatServices
         {
             try
             {
+                text = $"```\r\n{text}\r\n```";
+
                 IDiscordClient discordClient = sendType switch
                 {
                     SendType.Stream => _discordContainer.Stream,
@@ -79,7 +81,7 @@ namespace BaseSouce.Services.BotChatServices
                     var channel = await _discordContainer.Stream.GetChannelAsync(serverChannel.Value) as IMessageChannel;
                     if (channel is not null)
                     {
-                        await channel.SendMessageAsync($"```\r\n{text}\r\n```");
+                        await channel.SendMessageAsync(text);
                     }
                 }
             }

@@ -212,7 +212,7 @@
 <div class="modal fade" role="dialog" id="telegramModal">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form method="post" id="formTelegram" action="/admin/User/UpdateTelegram">
+            <form method="post" id="formTelegram" action="/admin/User/UpdateBotChatTarget">
                 <div class="modal-header">
                     <h5 class="modal-title">Cập nhật </h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -223,11 +223,22 @@
                     <input name="UserId" type="hidden" />
 
                     <div class="form-group mb-4">
-                        <label class="">ID telegram(cách nhau ,)</label>
+                        <label class="">ID telegram (cách nhau , )</label>
                         <div class="">
                             <input type="text"
-                                   name="Telegram"
+                                   name="TelegramUserId"
                                    placeholder="Nhập danh sách ID Telegram"
+                                   class="form-control"
+                                   style="height:100px" />
+                            <span class="text-danger"></span>
+                        </div>
+                    </div>
+                    <div class="form-group mb-4">
+                        <label class="">ID discord (cách nhau , )</label>
+                        <div class="">
+                            <input type="text"
+                                   name="DiscordUserId"
+                                   placeholder="Nhập danh sách ID discord"
                                    class="form-control"
                                    style="height:100px" />
                             <span class="text-danger"></span>

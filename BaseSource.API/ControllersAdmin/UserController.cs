@@ -43,10 +43,10 @@ namespace BaseSource.API.ControllersAdmin
         }
 
         [HttpPost]
-        [Route("telegram")]
-        public async Task<IActionResult> UpdateTelegam(UpdateTelegramDto model)
+        [Route("UpdateBotChatTarget")]
+        public async Task<IActionResult> UpdateBotChatTarget(UpdateBotChatTargetDto model)
         {
-            var result = await _userAdminService.UpdateTelegramUserAsync(model, IsAdmin);
+            var result = await _userAdminService.UpdateBotChatTargetUserAsync(model, IsAdmin);
             if (result.Key)
             {
                 return Ok(new ApiSuccessResult<string>(string.Empty));

@@ -297,9 +297,9 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateTelegram(UpdateTelegramDto model)
+        public async Task<IActionResult> UpdateBotChatTarget(UpdateBotChatTargetDto model)
         {
-            var result = await _userAdminApiClient.UpdateTelegram(model);
+            var result = await _userAdminApiClient.UpdateBotChatTarget(model);
             if (result == null || !result.IsSuccessed)
             {
 

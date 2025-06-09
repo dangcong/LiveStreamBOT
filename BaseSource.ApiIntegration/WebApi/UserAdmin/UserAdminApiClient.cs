@@ -102,10 +102,10 @@ namespace BaseSource.ApiIntegration.WebApi.UserAdmin
             return await client.PostAsync<ApiResult<string>>($"/api/admin/user/admin/role?userName={userName}");
         }
 
-        public async Task<ApiResult<string>> UpdateTelegram(UpdateTelegramDto model)
+        public async Task<ApiResult<string>> UpdateBotChatTarget(UpdateBotChatTargetDto model)
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
-            return await client.PostAsync<ApiResult<string>>($"/api/admin/user/telegram", model);
+            return await client.PostAsync<ApiResult<string>>($"/api/admin/user/UpdateBotChatTarget", model);
         }
 
         public async Task<ApiResult<string>> UpdateUserGroup(UserGroupAddDto model)

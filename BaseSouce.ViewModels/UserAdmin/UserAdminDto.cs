@@ -121,11 +121,11 @@ namespace BaseSource.ViewModels.UserAdmin
         public int? Bot4k { get; set; }
         public int? BotBackup { get; set; }
     }
-    public class UpdateTelegramDto
+    public class UpdateBotChatTargetDto
     {
-        public string UserId { get; set; }
+        public string? UserId { get; set; }
         public string? TelegramUserId { get; set; }
         public string? DiscordUserId { get; set; }
-        public string UserManager { get; set; }
+        public string? UserManager { get; set; }
     }
 }

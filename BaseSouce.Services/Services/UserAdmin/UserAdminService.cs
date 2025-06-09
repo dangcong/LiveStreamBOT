@@ -575,7 +575,7 @@ namespace BaseSouce.Services.Services.UserAdmin
             return new KeyValuePair<bool, string>(true, string.Empty);
         }
 
-        public async Task<KeyValuePair<bool, string>> UpdateTelegramUserAsync(UpdateTelegramDto model, bool isAdmin = false)
+        public async Task<KeyValuePair<bool, string>> UpdateBotChatTargetUserAsync(UpdateBotChatTargetDto model, bool isAdmin = false)
         {
             try
             {

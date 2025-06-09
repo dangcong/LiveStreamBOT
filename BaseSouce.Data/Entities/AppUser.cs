@@ -57,26 +57,26 @@ namespace BaseSouce.Data.Entities
         {
             get
             {
-                return TelegramUserId
-                    .Split(',')
-                    .Select(x => x.Trim());
+                return TelegramUserId?
+                    .Split(',')?
+                    .Select(x => x.Trim()) ?? Enumerable.Empty<string>();
             }
         }
         IEnumerable<ulong> IBotChatId.DiscordUserIds
         {
             get
             {
-                return DiscordUserId
-                    .Split(',')
+                return DiscordUserId?
+                    .Split(',')?
                     .Select(x =>
                     {
                         ulong? result = null;
                         if (ulong.TryParse(x.Trim(), out ulong r))
                             result = r;
                         return result;
-                    })
-                    .Where(x => x.HasValue)
-                    .Select(x => x.Value);
+                    })?
+                    .Where(x => x.HasValue)?
+                    .Select(x => x.Value) ?? Enumerable.Empty<ulong>();
             }
         }
         public IBotChatId GetBotChatIdForStaff()

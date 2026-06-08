@@ -6,7 +6,7 @@
     },
     "LivestreamBotLiveApi": {
       "commandName": "Project",
-      "commandLineArgs": "https://liveapi.shinemusicllc.com/"
+      "commandLineArgs": "https://liveapi.lushmedia.co/"
     },
     "WSL Ubuntu-22.04": {
       "commandName": "WSL",

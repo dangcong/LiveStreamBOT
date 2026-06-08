@@ -35,6 +35,7 @@ while (uri is null)
 LogHelper.WriteLog("Starting");
 taskQueue = new WorkQueue<LiveStreamWork>();
 taskQueue.MaxRun = 999;
+AutoUpdateService autoUpdateService = null;
 try
 {
     await using SignalrClient signalrClient = new SignalrClient(uri, Singleton.Setting.Setting.BotId);
@@ -45,6 +46,10 @@ try
     await signalrClient.StartAsync();
 
     Singleton.Setting.Save();
+
+    // Tự động kiểm tra & áp dụng cập nhật (chỉ khi bot rảnh), rồi restart bằng cùng command-line (URL API).
+    autoUpdateService = new AutoUpdateService(new BotUpdateApiClient(uri), taskQueue);
+    autoUpdateService.Start();
     using ISystemInfoReader systemInfoReader = GetSystemInfoReader();
 
     LogHelper.WriteLog($"Started {Singleton.Setting.Setting.BotId}");
@@ -84,6 +89,7 @@ try
 }
 finally
 {
+    autoUpdateService?.Stop();
     taskQueue.ShutDown();
 }
 

@@ -1,0 +1,12 @@
+# should install GitVersion.Tool
+# dotnet tool install --global GitVersion.Tool
+mode: ContinuousDelivery
+next-version: 1.0.0
+assembly-informational-format: '{Major}.{Minor}.{Patch}.{CommitsSinceVersionSource}'
+assembly-versioning-format: '{Major}.{Minor}.{Patch}.{CommitsSinceVersionSource}'
+assembly-file-versioning-format: '{Major}.{Minor}.{Patch}.{CommitsSinceVersionSource}'
+branches:
+  master:
+    regex: ^master$|^main$|^tqk/master$
+    label: ''
+    increment: Patch

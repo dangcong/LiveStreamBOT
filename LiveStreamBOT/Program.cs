@@ -19,23 +19,23 @@ Console.OutputEncoding = Encoding.UTF8;
 
 WorkQueue<LiveStreamWork> taskQueue;
 IServerHub ServerHub;
-Uri uri = null;
+Uri? uri = null;
 bool isDebug = "debug".Equals(args.Skip(1).FirstOrDefault(), StringComparison.OrdinalIgnoreCase);
 
 Uri.TryCreate(args.FirstOrDefault(), UriKind.Absolute, out uri);
 while (uri is null)
 {
-    Console.Write("Nhập Url Api (https://api.shinemusicllc.com/):");
-    string url = Console.ReadLine();
+    Console.Write("Nhập Url Api (https://liveapi.lushmedia.co/):");
+    string? url = Console.ReadLine();
     if (string.IsNullOrWhiteSpace(url))
-        url = "https://api.shinemusicllc.com/";
-    Uri.TryCreate(args.FirstOrDefault(), UriKind.Absolute, out uri);
+        url = "https://liveapi.lushmedia.co/";
+    Uri.TryCreate(url, UriKind.Absolute, out uri);
 }
 
 LogHelper.WriteLog("Starting");
 taskQueue = new WorkQueue<LiveStreamWork>();
 taskQueue.MaxRun = 999;
-AutoUpdateService autoUpdateService = null;
+AutoUpdateService? autoUpdateService = null;
 try
 {
     await using SignalrClient signalrClient = new SignalrClient(uri, Singleton.Setting.Setting.BotId);

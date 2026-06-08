@@ -5,6 +5,8 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+		<!-- GitVersion bật để sinh class GitVersionInformation; auto-update đọc GitVersionInformation.AssemblySemFileVer lúc runtime. -->
+		<IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -13,6 +15,10 @@
 
 	<ItemGroup>
 		<PackageReference Include="FFmpegArgs.Executes" Version="2.2.0" />
+		<PackageReference Include="GitVersion.MsBuild" Version="6.5.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.2" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
 		<PackageReference Include="System.Diagnostics.PerformanceCounter" Version="7.0.0" />

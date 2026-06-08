@@ -29,10 +29,17 @@ namespace BaseSource.Data.Migrations
                 columns: new[] { "ConcurrencyStamp", "PasswordHash" },
                 values: new object[] { "e80c35cc-6482-4f01-a8a2-1577783c4c85", "AQAAAAEAACcQAAAAEF/GB3Kcf5d0ES7vDF9fVFt66IJL98QMjnVE/52BOYhqPG+xVbJ0u+vRP8EAsofwXw==" });
 
-            migrationBuilder.InsertData(
-                table: "ConfigSystems",
-                columns: new[] { "Id", "BankAccountName", "BankName", "BankNumber", "DiscordUserIds", "LinkFBAdmin", "LinkYoutube", "TelegramUserIds" },
-                values: new object[] { 1, null, null, null, null, null, null, null });
+            // Idempotent: chỉ insert ConfigSystems mặc định nếu chưa có row Id=1
+            // (DB có thể đã có sẵn row cấu hình -> tránh trùng khóa chính)
+            migrationBuilder.Sql(@"
+IF NOT EXISTS (SELECT 1 FROM [ConfigSystems] WHERE [Id] = 1)
+BEGIN
+    SET IDENTITY_INSERT [ConfigSystems] ON;
+    INSERT INTO [ConfigSystems] ([Id], [BankAccountName], [BankName], [BankNumber], [DiscordUserIds], [LinkFBAdmin], [LinkYoutube], [TelegramUserIds])
+    VALUES (1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    SET IDENTITY_INSERT [ConfigSystems] OFF;
+END
+");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

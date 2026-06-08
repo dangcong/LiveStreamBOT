@@ -54,10 +54,13 @@ namespace BaseSource.Data.Migrations
                 column: "ConcurrencyStamp",
                 value: "81ee82fe-56f4-404a-a06c-2c7c6849c9cc");
 
-            migrationBuilder.InsertData(
-                table: "AppRoles",
-                columns: new[] { "Id", "ConcurrencyStamp", "Description", "Name", "NormalizedName" },
-                values: new object[] { "d32b2cc9-aabe-43b2-8bc0-66c8dfd77080", "537cf5f8-9b32-414f-b64b-da9ac05139d1", "Manager role", "Manager", "Manager" });
+            // Idempotent: chỉ insert role Manager nếu chưa tồn tại
+            // (DB có thể đã seed sẵn role này với Id khác -> tránh trùng RoleNameIndex)
+            migrationBuilder.Sql(@"
+IF NOT EXISTS (SELECT 1 FROM [AppRoles] WHERE [NormalizedName] = N'Manager')
+    INSERT INTO [AppRoles] ([Id], [ConcurrencyStamp], [Description], [Name], [NormalizedName])
+    VALUES (N'd32b2cc9-aabe-43b2-8bc0-66c8dfd77080', N'537cf5f8-9b32-414f-b64b-da9ac05139d1', N'Manager role', N'Manager', N'Manager');
+");
 
             migrationBuilder.UpdateData(
                 table: "AppUsers",

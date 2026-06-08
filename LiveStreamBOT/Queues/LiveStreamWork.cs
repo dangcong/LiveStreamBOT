@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using TqkLibrary.Queues.TaskQueues;
+using TqkLibrary.Concurrency.TaskQueues;
 using FFmpegArgs.Executes;
 using System.Threading;
 using System.IO;
@@ -14,14 +14,14 @@ using LiveStreamBOT.Helpers;
 using System.Data.Common;
 using BaseSource.Shared.Helpers;
 using BaseSource.Shared.Enums;
-using TqkLibrary.Net.CloudStorage.GoogleDrive;
+using TqkLibrary.Http.Api.CloudStorage.GoogleDrive;
 using FFmpegArgs.Executes.Exceptions;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 
 namespace LiveStreamBOT.Queues
 {
-    internal class WorkQueue : IQueue
+    internal class LiveStreamWork : IWork
     {
         public RenderCommand RenderCommand { get; }
         readonly IServerHub _serverHub;
@@ -29,7 +29,7 @@ namespace LiveStreamBOT.Queues
         readonly CancellationTokenSource _cancellationTokenSource_endTime = new CancellationTokenSource();
         readonly string _workingDir;
         CancellationToken CancellationToken { get { return _cancellationTokenSource_cancel.Token; } }
-        public WorkQueue(RenderCommand renderCommand, IServerHub serverHub)
+        public LiveStreamWork(RenderCommand renderCommand, IServerHub serverHub)
         {
             this.RenderCommand = renderCommand ?? throw new ArgumentNullException(nameof(renderCommand));
             this._serverHub = serverHub ?? throw new ArgumentNullException(nameof(serverHub));
@@ -51,7 +51,7 @@ namespace LiveStreamBOT.Queues
             _cancellationTokenSource_endTime.Dispose();
         }
 
-        public async Task DoWork()
+        public async Task DoWorkAsync()
         {
             try
             {
@@ -263,7 +263,7 @@ namespace LiveStreamBOT.Queues
                     RenderInfo = new RenderInfo()
                     {
                         Bitrate = obj.Bitrate,
-                        Fps = obj.Fps,
+                        Fps = obj.Fps ?? 0,
                         Size = obj.Size,
                         Time = obj.Time
                     }
@@ -351,7 +351,7 @@ namespace LiveStreamBOT.Queues
                     RenderInfo = new RenderInfo()
                     {
                         Bitrate = obj.Bitrate,
-                        Fps = obj.Fps,
+                        Fps = obj.Fps ?? 0,
                         Size = obj.Size,
                         Time = obj.Time
                     }

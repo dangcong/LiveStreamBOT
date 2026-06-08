@@ -13,11 +13,11 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
-using TqkLibrary.Queues.TaskQueues;
+using TqkLibrary.Concurrency.TaskQueues;
 Console.InputEncoding = Encoding.UTF8;
 Console.OutputEncoding = Encoding.UTF8;
 
-TaskQueue<WorkQueue> taskQueue;
+WorkQueue<LiveStreamWork> taskQueue;
 IServerHub ServerHub;
 Uri uri = null;
 bool isDebug = "debug".Equals(args.Skip(1).FirstOrDefault(), StringComparison.OrdinalIgnoreCase);
@@ -33,7 +33,7 @@ while (uri is null)
 }
 
 LogHelper.WriteLog("Starting");
-taskQueue = new TaskQueue<WorkQueue>();
+taskQueue = new WorkQueue<LiveStreamWork>();
 taskQueue.MaxRun = 999;
 try
 {
@@ -120,7 +120,7 @@ void SignalrClient_OnRenderCommand(RenderCommand obj)
                 {
                     if (!taskQueue.Runnings.Any(x => x.RenderCommand.ItemId == obj.ItemId))
                     {
-                        taskQueue.Add(new WorkQueue(obj, ServerHub));
+                        taskQueue.Add(new LiveStreamWork(obj, ServerHub));
                     }
                     break;
                 }

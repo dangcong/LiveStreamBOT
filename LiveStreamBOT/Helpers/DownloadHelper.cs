@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 using BaseSouce.SharedSignalrData.Enums;
 using BaseSouce.SharedSignalrData.Classes;
 using BaseSouce.SharedSignalrData.Interfaces;
-using TqkLibrary.Net.CloudStorage.GoogleDrive;
-using TqkLibrary.Net.CloudStorage.Dropbox;
-using TqkLibrary.Net.CloudStorage.OneDrive;
+using TqkLibrary.Http.Api.CloudStorage.GoogleDrive;
+using TqkLibrary.Http.Api.CloudStorage.Dropbox;
+using TqkLibrary.Http.CloudStorage.OneDrive;
 
 namespace LiveStreamBOT.Helpers
 {

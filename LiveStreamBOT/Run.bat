@@ -1,1 +1,1 @@
-﻿LiveStreamBOT.exe https://api.shinemusicllc.com/
+﻿LiveStreamBOT.exe https://liveapi.lushmedia.co/

@@ -10,10 +10,6 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<Folder Include="Properties\" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<PackageReference Include="FFmpegArgs.Executes" Version="2.2.0" />
 		<PackageReference Include="GitVersion.MsBuild" Version="6.5.1">
 			<PrivateAssets>all</PrivateAssets>
@@ -46,5 +42,32 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</None>
 	</ItemGroup>
+
+	<!--
+		Đóng gói bản publish thành zip rồi upload lên server cập nhật (per-RID) qua endpoint BotUpdate/Publish.
+		Bắt buộc publish kèm -r <rid> và BotUpdateBaseUrl (đặt trong publish profile vd PublishLinux.pubxml, hoặc -p:BotUpdateBaseUrl=...).
+		Vd: dotnet publish -c Release /p:PublishProfile=PublishLinux
+		Theo mẫu UploadYoutubeBotAvalonia/UploadYoutubeBotAvalonia.csproj (ZipAndUpload).
+	-->
+	<Target Name="ZipAndUpload" AfterTargets="Publish" Condition="'$(Configuration)' == 'Release'">
+		<Error Condition="'$(GitVersion_BranchName)' != 'master' AND '$(GitVersion_BranchName)' != 'main' AND '$(GitVersion_BranchName)' != 'tqk/master'" Text="❌ Lỗi: Bạn đang ở nhánh '$(GitVersion_BranchName)'. Chỉ được phép Publish và Upload từ nhánh 'master'/'main'/'tqk/master'!" />
+		<Error Condition="'$(RuntimeIdentifier)' == ''" Text="❌ Lỗi: Phải publish kèm RuntimeIdentifier, vd: dotnet publish -c Release -r win-x64" />
+		<Error Condition="'$(BotUpdateBaseUrl)' == ''" Text="❌ Lỗi: Thiếu BotUpdateBaseUrl (domain server cập nhật). Truyền -p:BotUpdateBaseUrl=https://your-domain" />
+		<PropertyGroup>
+			<SourceDir>$(PublishDir)</SourceDir>
+			<_PkgVersion>$(GitVersion_MajorMinorPatch).$(GitVersion_CommitsSinceVersionSource)</_PkgVersion>
+			<ZipFile>$(OutputPath)$(AssemblyName)_$(_PkgVersion)_$(RuntimeIdentifier).zip</ZipFile>
+			<UploadUrl>$(BotUpdateBaseUrl.TrimEnd('/'))/api/BotUpdate/Publish?version=$(_PkgVersion)&amp;rid=$(RuntimeIdentifier)</UploadUrl>
+		</PropertyGroup>
+
+		<ItemGroup>
+			<OldZipFiles Include="$(OutputPath)$(AssemblyName)_*_$(RuntimeIdentifier).zip" />
+		</ItemGroup>
+		<Delete Files="@(OldZipFiles)" />
+
+		<ZipDirectory SourceDirectory="$(SourceDir)" DestinationFile="$(ZipFile)" Overwrite="true" />
+
+		<Exec Command="powershell -Command &quot;Invoke-RestMethod -Uri '$(UploadUrl)' -Method Post -InFile '$(ZipFile)' -ContentType 'application/zip'&quot;" />
+	</Target>
 
 </Project>

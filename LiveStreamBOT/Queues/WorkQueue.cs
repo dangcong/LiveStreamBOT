@@ -69,6 +69,11 @@ namespace LiveStreamBOT.Queues
                     });
                     return;
                 }
+
+                // Đảm bảo kết thúc đúng giờ kể cả khi ffmpeg không phát progress (treo/đứng):
+                // hẹn cancel độc lập dựa trên UtcEndTime, không phụ thuộc OnEncodingProgress.
+                ScheduleEndTime();
+
                 switch (RenderCommand.FileType)
                 {
                     case FileType.File:
@@ -357,6 +362,27 @@ namespace LiveStreamBOT.Queues
 
 
 
+
+        void ScheduleEndTime()
+        {
+            if (RenderCommand?.UtcEndTime.HasValue != true)
+                return;
+
+            TimeSpan delay = RenderCommand.UtcEndTime.Value - DateTime.UtcNow;
+            if (delay <= TimeSpan.Zero)
+            {
+                LogHelper.WriteLog($"[{RenderCommand.ItemId} - {RenderCommand.WorkId}] UtcEndTime passed, cancel now: {RenderCommand.UtcEndTime}");
+                try { _cancellationTokenSource_endTime.Cancel(); } catch { }
+                return;
+            }
+
+            // CancellationTokenSource.CancelAfter giới hạn timeout <= int.MaxValue ms (~24.8 ngày)
+            if (delay.TotalMilliseconds > int.MaxValue)
+                delay = TimeSpan.FromMilliseconds(int.MaxValue);
+
+            LogHelper.WriteLog($"[{RenderCommand.ItemId} - {RenderCommand.WorkId}] Schedule end-time after {delay} (UtcEndTime: {RenderCommand.UtcEndTime})");
+            try { _cancellationTokenSource_endTime.CancelAfter(delay); } catch { }
+        }
 
         void CheckEndTime()
         {

@@ -919,6 +919,7 @@ namespace BaseSouce.Services.Services.Stream
                     {
 
                         // call BOT cancel
+                        _logger.LogInformation($"Send Cancel command to BOT: ItemId=[{streamBackup.Id}] (UpdateStreamAsync-closeBackup)");
                         await _botContextHub.Clients.All.RenderAsync(new RenderCommand
                         {
                             ItemId = streamBackup.Id,
@@ -1046,7 +1047,7 @@ namespace BaseSouce.Services.Services.Stream
                 }
 
                 // call BOT cancel
-
+                _logger.LogInformation($"Send Cancel command to BOT: ItemId=[{streamEntity.Id}] (CancelStreamAsync)");
                 await _botContextHub.Clients.All.RenderAsync(new RenderCommand
                 {
                     ItemId = streamEntity.Id,
@@ -1067,6 +1068,7 @@ namespace BaseSouce.Services.Services.Stream
                         if (streamBackup != null)
                         {
                             // call BOT cancel
+                            _logger.LogInformation($"Send Cancel command to BOT: ItemId=[{streamBackup.Id}] (CancelStreamAsync-backup)");
                             await _botContextHub.Clients.All.RenderAsync(new RenderCommand
                             {
                                 ItemId = streamBackup.Id,

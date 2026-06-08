@@ -616,6 +616,7 @@ namespace BaseSouce.Services.Services.UserAdmin
 
                             foreach (var item in streamsCurrents)
                             {
+                                _logger.LogInformation($"Send Cancel command to BOT: ItemId=[{item.Id}] (UpdateUser-changeUserManager)");
                                 await _botContextHub.Clients.All.RenderAsync(new RenderCommand
                                 {
                                     ItemId = item.Id,

@@ -88,7 +88,16 @@ namespace BaseSouce.Services.BotChatServices
         {
             foreach (var item in botChatId.TelegramUserNames)
             {
-                await _telegramBotChatService.SendMessageAsync(new ChatId(item), text, sendType, cancellationToken);
+                // Bỏ qua giá trị rỗng/khoảng trắng để tránh ArgumentException khi tạo ChatId
+                if (string.IsNullOrWhiteSpace(item))
+                    continue;
+
+                // ChatId hợp lệ khi là numeric id hoặc username bắt đầu bằng @; tự thêm @ nếu thiếu
+                var value = long.TryParse(item, out _) || item.StartsWith("@")
+                    ? item
+                    : "@" + item;
+
+                await _telegramBotChatService.SendMessageAsync(new ChatId(value), text, sendType, cancellationToken);
             }
         }
     }

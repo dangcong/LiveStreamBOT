@@ -59,7 +59,8 @@ namespace BaseSouce.Data.Entities
             {
                 return TelegramUserId?
                     .Split(',')?
-                    .Select(x => x.Trim()) ?? Enumerable.Empty<string>();
+                    .Select(x => x.Trim())?
+                    .Where(x => !string.IsNullOrWhiteSpace(x)) ?? Enumerable.Empty<string>();
             }
         }
         IEnumerable<ulong> IBotChatId.DiscordUserIds
@@ -86,6 +87,7 @@ namespace BaseSouce.Data.Entities
                 TelegramUserNames = TelegramUserIdReceiveNotificationsFromStaff?
                     .Split(',')?
                     .Select(x => x.Trim())?
+                    .Where(x => !string.IsNullOrWhiteSpace(x))?
                     .ToList() ?? Enumerable.Empty<string>(),
                 DiscordUserIds = DiscordUserIdReceiveNotificationsFromStaff?
                     .Split(',')?

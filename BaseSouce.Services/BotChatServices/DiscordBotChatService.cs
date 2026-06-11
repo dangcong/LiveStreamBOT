@@ -2,6 +2,7 @@
 using Discord.WebSocket;
 using static BaseSouce.Services.BotChatServices.BotChatService;
 using Discord;
+using Discord.Net;
 using Telegram.Bot.Types;
 using Telegram.Bot;
 using Discord.Net.Rest;
@@ -65,11 +66,24 @@ namespace BaseSouce.Services.BotChatServices
                     SendType.Bot => _discordContainer.Bot,
                     _ => throw new NotSupportedException(sendType.ToString())
                 };
+
+                // Gửi DM cho user
+                _logger.LogInformation("Discord sending DM: SendType={SendType}, UserId={UserId}", sendType, userId);
                 IUser user = await discordClient.GetUserAsync(userId);
-                IDMChannel dm = await user.CreateDMChannelAsync();
-                IUserMessage userMessage = await dm.SendMessageAsync(text);
+                if (user is null)
+                {
+                    // Thường gặp khi user chưa từng chung server với bot, hoặc UserId sai
+                    _logger.LogWarning("Discord user not found: SendType={SendType}, UserId={UserId}", sendType, userId);
+                }
+                else
+                {
+                    IDMChannel dm = await user.CreateDMChannelAsync();
+                    IUserMessage userMessage = await dm.SendMessageAsync(text);
+                    _logger.LogInformation("Discord DM sent OK: SendType={SendType}, UserId={UserId}, MessageId={MessageId}", sendType, userId, userMessage.Id);
+                }
 
 
+                // Gửi vào channel server (nếu có cấu hình)
                 ulong? serverChannel = sendType switch
                 {
                     SendType.Stream => _discordBotConfigure.ChannelLive,
@@ -81,13 +95,24 @@ namespace BaseSouce.Services.BotChatServices
                     var channel = await _discordContainer.Stream.GetChannelAsync(serverChannel.Value) as IMessageChannel;
                     if (channel is not null)
                     {
-                        await channel.SendMessageAsync(text);
+                        IUserMessage channelMessage = await channel.SendMessageAsync(text);
+                        _logger.LogInformation("Discord channel sent OK: SendType={SendType}, ChannelId={ChannelId}, MessageId={MessageId}", sendType, serverChannel.Value, channelMessage.Id);
+                    }
+                    else
+                    {
+                        _logger.LogWarning("Discord channel not found or not a message channel: SendType={SendType}, ChannelId={ChannelId}", sendType, serverChannel.Value);
                     }
                 }
             }
+            catch (HttpException ex)
+            {
+                // Lỗi do Discord API trả về (vd 403 Forbidden khi user chặn DM, 404 unknown user/channel...)
+                _logger.LogError(ex, "Discord API error: SendType={SendType}, UserId={UserId}, HttpCode={HttpCode}, DiscordCode={DiscordCode}, Reason={Reason}", sendType, userId, ex.HttpCode, ex.DiscordCode, ex.Reason);
+            }
             catch (Exception ex)
             {
-                _logger.LogError(ex, nameof(SendMessageAsync));
+                // Lỗi khác: mạng tới Discord, token sai, client chưa login...
+                _logger.LogError(ex, "Discord send failed: SendType={SendType}, UserId={UserId}", sendType, userId);
             }
         }
     }

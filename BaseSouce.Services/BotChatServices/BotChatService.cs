@@ -64,7 +64,10 @@ namespace BaseSouce.Services.BotChatServices
             SendType sendType = SendType.Stream,
             CancellationToken cancellationToken = default
             )
-            => Task.WhenAll(_SendDiscordAsync(botChatId, text, sendType, cancellationToken), _SendTelegramAsync(botChatId, text, sendType, cancellationToken));
+        {
+            _logger.LogInformation("Dispatch message: SendType={SendType}", sendType);
+            return Task.WhenAll(_SendDiscordAsync(botChatId, text, sendType, cancellationToken), _SendTelegramAsync(botChatId, text, sendType, cancellationToken));
+        }
 
 
         async Task _SendDiscordAsync(
@@ -74,9 +77,20 @@ namespace BaseSouce.Services.BotChatServices
             CancellationToken cancellationToken = default
             )
         {
-            foreach (var item in botChatId.DiscordUserIds)
+            // Log số người nhận đã resolve để phân biệt "không có người nhận" (lỗi data) vs "gửi fail" (lỗi delivery)
+            var discordUserIds = botChatId.DiscordUserIds?.ToList() ?? new List<ulong>();
+            _logger.LogInformation("Discord recipients resolved: Count={Count}, SendType={SendType}", discordUserIds.Count, sendType);
+
+            foreach (var item in discordUserIds)
             {
-                await _discordBotChatService.SendMessageAsync(item, text, sendType, cancellationToken);
+                try
+                {
+                    await _discordBotChatService.SendMessageAsync(item, text, sendType, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Discord dispatch error: SendType={SendType}, UserId={UserId}", sendType, item);
+                }
             }
         }
         async Task _SendTelegramAsync(
@@ -86,18 +100,29 @@ namespace BaseSouce.Services.BotChatServices
             CancellationToken cancellationToken = default
             )
         {
-            foreach (var item in botChatId.TelegramUserNames)
+            // Log số người nhận đã resolve để phân biệt "không có người nhận" (lỗi data) vs "gửi fail" (lỗi delivery)
+            var telegramUserNames = botChatId.TelegramUserNames?.ToList() ?? new List<string>();
+            _logger.LogInformation("Telegram recipients resolved: Count={Count}, SendType={SendType}", telegramUserNames.Count, sendType);
+
+            foreach (var item in telegramUserNames)
             {
-                // Bỏ qua giá trị rỗng/khoảng trắng để tránh ArgumentException khi tạo ChatId
-                if (string.IsNullOrWhiteSpace(item))
-                    continue;
+                try
+                {
+                    // Bỏ qua giá trị rỗng/khoảng trắng để tránh ArgumentException khi tạo ChatId
+                    if (string.IsNullOrWhiteSpace(item))
+                        continue;
 
-                // ChatId hợp lệ khi là numeric id hoặc username bắt đầu bằng @; tự thêm @ nếu thiếu
-                var value = long.TryParse(item, out _) || item.StartsWith("@")
-                    ? item
-                    : "@" + item;
+                    // ChatId hợp lệ khi là numeric id hoặc username bắt đầu bằng @; tự thêm @ nếu thiếu
+                    var value = long.TryParse(item, out _) || item.StartsWith("@")
+                        ? item
+                        : "@" + item;
 
-                await _telegramBotChatService.SendMessageAsync(new ChatId(value), text, sendType, cancellationToken);
+                    await _telegramBotChatService.SendMessageAsync(new ChatId(value), text, sendType, cancellationToken);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Telegram dispatch error: SendType={SendType}, Item={Item}", sendType, item);
+                }
             }
         }
     }

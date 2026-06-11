@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.SignalR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Primitives;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace BaseSouce.Services.HubServices
 {
@@ -21,35 +22,66 @@ namespace BaseSouce.Services.HubServices
         private readonly IStreamClientService _streamClientService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuration;
+        private readonly ILogger<BotHub> _logger;
 
         public BotHub(IManagerBOTService managerBOTService,
             IStreamClientService streamClientService,
             IUnitOfWork<BaseSourceDbContext> unitOfWork
             , IConfiguration configuration
+            , ILogger<BotHub> logger
             )
         {
             _managerBOTService = managerBOTService;
             _streamClientService = streamClientService;
             _unitOfWork = unitOfWork;
             _configuration = configuration;
+            _logger = logger;
+        }
+
+        /// <summary>
+        /// Lấy "BotId" từ header của HTTP request gắn với connection hiện tại (do client gửi lúc kết nối).
+        /// </summary>
+        private string? GetBotIdFromHeader()
+        {
+            if (this.Context.GetHttpContext()?.Request?.Headers?.TryGetValue("BotId", out StringValues strings) == true)
+                return strings.ToString();
+            return null;
         }
 
         public async Task PingAsync(ClientInfo clientInfo)
         {
-            if (this.Context.GetHttpContext()?.Request?.Headers?.TryGetValue("BotId", out StringValues strings) == true)
+            string? botId = GetBotIdFromHeader();
+            if (string.IsNullOrWhiteSpace(botId))
             {
-                string key = strings.ToString();
-                await _managerBOTService.CreateBOTAsync(new ManagerBotCreateDto
-                {
-                    BotId = key,
-                    ConnectionId = Context.ConnectionId,
-                    Bandwidth = clientInfo.Bandwidth,
-                    CpuUsage = clientInfo.CpuUsage,
-                    RamUsage = clientInfo.RamUsage,
-                    DiskInfo = clientInfo.DiskInfo,
-                });
+                _logger.LogWarning("PingAsync BỎ QUA: thiếu header 'BotId'. ConnectionId=[{ConnectionId}] → bot sẽ không bao giờ lên Connected.", Context.ConnectionId);
+                return;
             }
-            //return Task.CompletedTask;
+
+            _logger.LogInformation(
+                "PingAsync nhận từ BotId=[{BotId}] ConnectionId=[{ConnectionId}] Cpu={Cpu} Ram={Ram} Bandwidth={Bandwidth}KBps DiskInfo=[{DiskInfo}]",
+                botId, Context.ConnectionId, clientInfo?.CpuUsage, clientInfo?.RamUsage, clientInfo?.Bandwidth,
+                clientInfo?.DiskInfo is null ? "null" : $"{clientInfo.DiskInfo.Used}/{clientInfo.DiskInfo.Total}");
+
+            if (clientInfo is null)
+            {
+                _logger.LogWarning("PingAsync: clientInfo null từ BotId=[{BotId}] — bỏ qua CreateBOT.", botId);
+                return;
+            }
+
+            var result = await _managerBOTService.CreateBOTAsync(new ManagerBotCreateDto
+            {
+                BotId = botId,
+                ConnectionId = Context.ConnectionId,
+                Bandwidth = clientInfo.Bandwidth,
+                CpuUsage = clientInfo.CpuUsage,
+                RamUsage = clientInfo.RamUsage,
+                DiskInfo = clientInfo.DiskInfo,
+            });
+
+            if (result.Key)
+                _logger.LogInformation("CreateBOTAsync OK cho BotId=[{BotId}] → Status=Connected.", botId);
+            else
+                _logger.LogWarning("CreateBOTAsync THẤT BẠI cho BotId=[{BotId}]: {Message}", botId, result.Value);
         }
 
         public async Task RenderUpdateAsync(RenderMessage renderMessage)
@@ -58,6 +90,12 @@ namespace BaseSouce.Services.HubServices
         }
         public override Task OnConnectedAsync()
         {
+            string? botId = GetBotIdFromHeader();
+            if (string.IsNullOrWhiteSpace(botId))
+                _logger.LogWarning("BOT kết nối nhưng THIẾU header 'BotId'. ConnectionId=[{ConnectionId}]", Context.ConnectionId);
+            else
+                _logger.LogInformation("BOT kết nối: BotId=[{BotId}] ConnectionId=[{ConnectionId}]", botId, Context.ConnectionId);
+
             _ = base.Clients.Caller.SetSettingAsync(new SettingInfo()
             {
                 PingInterval = 5000,
@@ -68,6 +106,10 @@ namespace BaseSouce.Services.HubServices
         }
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
+            if (exception is null)
+                _logger.LogInformation("BOT disconnected (bình thường): ConnectionId=[{ConnectionId}]", Context.ConnectionId);
+            else
+                _logger.LogWarning(exception, "BOT disconnected (kèm lỗi): ConnectionId=[{ConnectionId}]", Context.ConnectionId);
             try
             {
                 var _repositoryBot = _unitOfWork.GetRepository<ManagerBOT>();
@@ -163,8 +205,7 @@ namespace BaseSouce.Services.HubServices
             }
             catch (Exception ex)
             {
-                //_logger.LogError($"Disconnect BOT failed by error:[{ex}]");
-
+                _logger.LogError(ex, "OnDisconnectedAsync xử lý thất bại cho ConnectionId=[{ConnectionId}]", Context.ConnectionId);
             }
             // _ = _managerBOTService.DisconnectBotAsync(Context.ConnectionId);
             //await base.OnDisconnectedAsync(exception);

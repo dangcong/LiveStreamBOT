@@ -340,6 +340,14 @@ namespace BaseSouce.Services.Services.BOT
                 orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                 pageIndex: model.Page, pageSize: model.PageSize);
 
+            // Ngưỡng số ngày không hoạt động để hiển thị (mặc định 10), cấu hình qua appsettings "InactiveBotDays".
+            int inactiveThreshold = 0;
+            int.TryParse(_configuration["InactiveBotDays"], out inactiveThreshold);
+            if (inactiveThreshold <= 0)
+            {
+                inactiveThreshold = 10;
+            }
+
             if (data.Items.Any())
             {
                 foreach (var item in data.Items)
@@ -359,6 +367,15 @@ namespace BaseSouce.Services.Services.BOT
                             && x.Status == StreamStatus.Streaming
                             && x.ManagerBOTBackupId == item.Id).CountAsync();
                     }
+
+                    // Lần cuối user gửi lệnh live tới BOT (kể cả vai trò backup). Nếu chưa từng có lệnh, tính từ ngày tạo BOT.
+                    var lastCommandTime = await _repositoryStream.Queryable()
+                        .AsNoTracking()
+                        .Where(x => x.ManagerBOTId == item.Id || x.ManagerBOTBackupId == item.Id)
+                        .MaxAsync(x => (DateTime?)x.CreatedTime);
+                    var lastActive = lastCommandTime ?? item.CreatedTime;
+                    var inactiveDays = (int)(DateTime.Now.Date - lastActive.Date).TotalDays;
+                    item.InactiveDays = inactiveDays >= inactiveThreshold ? inactiveDays : 0;
                     //switch (item.LiveType)
                     //{
                     //    case LiveType._1080:

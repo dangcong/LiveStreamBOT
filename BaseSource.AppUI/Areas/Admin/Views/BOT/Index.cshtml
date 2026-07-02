@@ -122,6 +122,7 @@
                                         <th>Name</th>
                                         <th>Group</th>
                                         <th>Status</th>
+                                        <th>Không hoạt động</th>
                                         <th>Ngày tạo</th>
                                         <th>Số luồng</th>
                                         <th>Số User</th>
@@ -204,6 +205,12 @@
                                                         break;
                                                 }
 
+                                            </td>
+                                            <td>
+                                                @if (item.InactiveDays > 0)
+                                                {
+                                                    <span class="badge badge-danger">@item.InactiveDays ngày</span>
+                                                }
                                             </td>
                                             <td>@item.CreatedTime.ToString("dd/MM/yyyy HH:mm:ss")</td>
                                             @if (item.LiveType!=LiveType._Backup)

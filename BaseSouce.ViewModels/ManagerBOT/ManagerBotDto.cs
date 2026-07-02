@@ -54,6 +54,8 @@ namespace BaseSource.ViewModels.ManagerBOT
         public int TotalUser { get; set; }
         public long DiskUsed { get; set; }
         public long DiskTotal { get; set; }
+        // Số ngày BOT không nhận lệnh live nào từ user; chỉ set khi >= ngưỡng cấu hình (InactiveBotDays), ngược lại = 0.
+        public int InactiveDays { get; set; }
     }
     public class ManagerBOTRequestDto : PageQuery
     {

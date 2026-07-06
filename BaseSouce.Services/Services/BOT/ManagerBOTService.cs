@@ -368,14 +368,30 @@ namespace BaseSouce.Services.Services.BOT
                             && x.ManagerBOTBackupId == item.Id).CountAsync();
                     }
 
-                    // Lần cuối user gửi lệnh live tới BOT (kể cả vai trò backup). Nếu chưa từng có lệnh, tính từ ngày tạo BOT.
-                    var lastCommandTime = await _repositoryStream.Queryable()
+                    // BOT đang treo luồng 24/7 (EndTimeLive == null) và luồng đó đang chạy thì luôn coi là đang hoạt động,
+                    // không gắn cờ dù lệnh live cuối cách đây lâu (luồng 24/7 chỉ tạo 1 lệnh lúc khởi động rồi treo liên tục).
+                    var hasActiveStream = await _repositoryStream.Queryable()
                         .AsNoTracking()
-                        .Where(x => x.ManagerBOTId == item.Id || x.ManagerBOTBackupId == item.Id)
-                        .MaxAsync(x => (DateTime?)x.CreatedTime);
-                    var lastActive = lastCommandTime ?? item.CreatedTime;
-                    var inactiveDays = (int)(DateTime.Now.Date - lastActive.Date).TotalDays;
-                    item.InactiveDays = inactiveDays >= inactiveThreshold ? inactiveDays : 0;
+                        .AnyAsync(x => (x.ManagerBOTId == item.Id || x.ManagerBOTBackupId == item.Id)
+                            && x.Status == StreamStatus.Streaming
+                            && x.EndTimeLive == null);
+                    if (hasActiveStream)
+                    {
+                        item.InactiveDays = 0;
+                    }
+                    else
+                    {
+                        // Lần cuối BOT còn hoạt động (kể cả vai trò backup): lấy mốc cập nhật gần nhất của luồng (Updatedtime -
+                        // được refresh theo heartbeat khi đang live và khi luồng tự kết thúc), fallback về ngày tạo lệnh nếu chưa có.
+                        // Nhờ vậy khi luồng 24/7 vừa đóng, số ngày đếm từ lúc đóng chứ không nhảy về ngày khởi động lệnh.
+                        var lastActiveTime = await _repositoryStream.Queryable()
+                            .AsNoTracking()
+                            .Where(x => x.ManagerBOTId == item.Id || x.ManagerBOTBackupId == item.Id)
+                            .MaxAsync(x => (DateTime?)(x.Updatedtime ?? x.CreatedTime));
+                        var lastActive = lastActiveTime ?? item.CreatedTime;
+                        var inactiveDays = (int)(DateTime.Now.Date - lastActive.Date).TotalDays;
+                        item.InactiveDays = inactiveDays >= inactiveThreshold ? inactiveDays : 0;
+                    }
                     //switch (item.LiveType)
                     //{
                     //    case LiveType._1080:

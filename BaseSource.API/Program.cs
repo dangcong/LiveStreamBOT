@@ -67,7 +67,6 @@ builder.Services.SwaggerConfiguration(builder.Configuration);
 builder.Services.AddSignalR().AddJsonProtocol(configure => configure.PayloadSerializerOptions.SignalR_JsonSerializerOptions());
 
 builder.AddTelegram();
-await builder.AddDiscordAsync();
 builder.Services.AddTransient<IBotChatService, BotChatService>();
 
 var app = builder.Build();

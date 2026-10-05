@@ -66,13 +66,6 @@
                                             <span asp-validation-for="TelegramUserId" class="text-danger"></span>
                                         </div>
                                     </div>
-                                    <div class="form-group mb-4">
-                                        <label class="">Discord UserId</label>
-                                        <div class="">
-                                            <input asp-for="DiscordUserId" class="form-control" />
-                                            <span asp-validation-for="DiscordUserId" class="text-danger"></span>
-                                        </div>
-                                    </div>
                                     @if (User.IsInRole("Admin"))
                                     {
                                         <div class="form-group mb-4">

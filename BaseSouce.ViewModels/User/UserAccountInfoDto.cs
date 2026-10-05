@@ -48,7 +48,5 @@ namespace BaseSouce.ViewModels.User
         public string LinkFB { get; set; }
         public string? TelegramUserId { get; set; }
         public string? TelegramUserIdReceiveNotificationsFromStaff { get; set; }
-        public string? DiscordUserId { get; set; }
-        public string? DiscordUserIdReceiveNotificationsFromStaff { get; set; }
     }
 }

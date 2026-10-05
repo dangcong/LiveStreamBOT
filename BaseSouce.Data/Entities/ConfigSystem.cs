@@ -14,7 +14,6 @@ namespace BaseSource.Data.Entities
 
         // username/userid split by ,
         public string TelegramUserIds { get; set; }
-        public string DiscordUserIds { get; set; }
 
 
 
@@ -25,23 +24,6 @@ namespace BaseSource.Data.Entities
                 return TelegramUserIds?
                     .Split(',')?
                     .Select(x => x.Trim()) ?? Enumerable.Empty<string>();
-            }
-        }
-        IEnumerable<ulong> IBotChatId.DiscordUserIds
-        {
-            get
-            {
-                return DiscordUserIds?
-                    .Split(',')?
-                    .Select(x =>
-                    {
-                        ulong? result = null;
-                        if (ulong.TryParse(x.Trim(), out ulong r))
-                            result = r;
-                        return result;
-                    })?
-                    .Where(x => x.HasValue)?
-                    .Select(x => x.Value) ?? Enumerable.Empty<ulong>();
             }
         }
     }

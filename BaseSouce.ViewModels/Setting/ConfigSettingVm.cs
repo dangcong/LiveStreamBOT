@@ -9,6 +9,5 @@
         public string LinkFBAdmin { get; set; }
         public string LinkYoutube { get; set; }
         public string TelegramUserIds { get; set; }
-        public string DiscordUserIds { get; set; }
     }
 }

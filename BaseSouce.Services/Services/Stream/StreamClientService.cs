@@ -748,7 +748,7 @@ namespace BaseSouce.Services.Services.Stream
                             {
                                 IBotChatId botChatId = userCurrent;
                                 //send message telegram
-                                if (botChatId.TelegramUserNames.Any() || botChatId.DiscordUserIds.Any())
+                                if (botChatId.TelegramUserNames.Any())
                                 {
                                     var liveType = streamCloneEntity.EndTimeLive != null ? "11h" : "24/7";
                                     var timer = streamCloneEntity.StartTimeLive != null ?

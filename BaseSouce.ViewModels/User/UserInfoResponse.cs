@@ -28,9 +28,7 @@ namespace BaseSouce.ViewModels.User
         public string Phone { get; set; }
         public string LinkFB { get; set; }
         public string? TelegramUserId { get; set; }
-        public string? DiscordUserId { get; set; }
         public string? TelegramUserIdReceiveNotificationsFromStaff { get; set; }
-        public string? DiscordUserIdReceiveNotificationsFromStaff { get; set; }
         public PackageLiveInfoDto? PackageLive1080 { get; set; } = new PackageLiveInfoDto();
         public PackageLiveInfoDto? PackageLive4k { get; set; } = new PackageLiveInfoDto();
     }

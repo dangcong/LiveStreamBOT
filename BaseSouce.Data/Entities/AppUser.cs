@@ -14,8 +14,6 @@ namespace BaseSouce.Data.Entities
         // username/userid split by ,
         public string TelegramUserId { get; set; }//TelegramAPI
         public string TelegramUserIdReceiveNotificationsFromStaff { get; set; }//TelegramBOT
-        public string DiscordUserId { get; set; }
-        public string DiscordUserIdReceiveNotificationsFromStaff { get; set; }
 
 
 
@@ -63,23 +61,6 @@ namespace BaseSouce.Data.Entities
                     .Where(x => !string.IsNullOrWhiteSpace(x)) ?? Enumerable.Empty<string>();
             }
         }
-        IEnumerable<ulong> IBotChatId.DiscordUserIds
-        {
-            get
-            {
-                return DiscordUserId?
-                    .Split(',')?
-                    .Select(x =>
-                    {
-                        ulong? result = null;
-                        if (ulong.TryParse(x.Trim(), out ulong r))
-                            result = r;
-                        return result;
-                    })?
-                    .Where(x => x.HasValue)?
-                    .Select(x => x.Value) ?? Enumerable.Empty<ulong>();
-            }
-        }
         public IBotChatId GetBotChatIdForStaff()
         {
             return new BotChatId()
@@ -88,18 +69,7 @@ namespace BaseSouce.Data.Entities
                     .Split(',')?
                     .Select(x => x.Trim())?
                     .Where(x => !string.IsNullOrWhiteSpace(x))?
-                    .ToList() ?? Enumerable.Empty<string>(),
-                DiscordUserIds = DiscordUserIdReceiveNotificationsFromStaff?
-                    .Split(',')?
-                    .Select(x =>
-                    {
-                        ulong? result = null;
-                        if (ulong.TryParse(x.Trim(), out ulong r))
-                            result = r;
-                        return result;
-                    })?
-                    .Where(x => x.HasValue)?
-                    .Select(x => x.Value) ?? Enumerable.Empty<ulong>()
+                    .ToList() ?? Enumerable.Empty<string>()
             };
         }
     }

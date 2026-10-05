@@ -115,7 +115,6 @@ namespace BaseSouce.Services.Services.UserAdmin
                     NormalizedUserName = model.UserName,
                     LinkFB = string.Empty,
                     TelegramUserId = model.TelegramUserId,
-                    DiscordUserId = model.DiscordUserId,
                     UserManager = !string.IsNullOrWhiteSpace(model.UserManager) ? model.UserManager : null,
                     //NumberOfThreads1080 = model.NumberOfThreads1080,
                     //NumberOfThreads4K = model.NumberOfThreads4K
@@ -329,7 +328,6 @@ namespace BaseSouce.Services.Services.UserAdmin
                     NumberOfThreadsBackup = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._Backup).Sum(i => i.NumberOfThreads),
                     UserName = x.UserName,
                     TelegramUserId = x.TelegramUserId,
-                    DiscordUserId = x.DiscordUserId,
                     NumberOfThreads4KInRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._4K && i.Status == StreamStatus.Streaming).Count(),
                     NumberOfThreads1080InRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._1080 && i.Status == StreamStatus.Streaming).Count(),
                     NumberOfThreadsBackupInRun = x.StreamHistorys.Where(i => i.LiveType == LiveType._Backup && i.Status == StreamStatus.Streaming).Count(),
@@ -370,7 +368,6 @@ namespace BaseSouce.Services.Services.UserAdmin
                     NumberOfThreads4K = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._4K).Sum(i => i.NumberOfThreads),
                     UserName = x.UserName,
                     TelegramUserId = x.TelegramUserId,
-                    DiscordUserId = x.DiscordUserId,
                 }, include: x => x.Include(i => i.StreamHistorys).Include(i => i.UserManagerBOTs).ThenInclude(o => o.ManagerBOT),
                 orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                 pageIndex: 1, pageSize: 1000);
@@ -396,7 +393,6 @@ namespace BaseSouce.Services.Services.UserAdmin
                     LinkFB = x.LinkFB,
                     UserName = x.UserName,
                     TelegramUserId = x.TelegramUserId,
-                    DiscordUserId = x.DiscordUserId,
                 }, include: x => x.Include(i => i.StreamHistorys).Include(i => i.UserManagerBOTs).ThenInclude(o => o.ManagerBOT),
                 orderBy: x => x.OrderByDescending(i => i.CreatedTime),
                 pageIndex: 1, pageSize: 1000);
@@ -590,7 +586,6 @@ namespace BaseSouce.Services.Services.UserAdmin
                     return new KeyValuePair<bool, string>(false, "Tài khoản không tồn tại!");
                 }
                 userCurrent.TelegramUserId = model.TelegramUserId;
-                userCurrent.DiscordUserId = model.DiscordUserId;
 
                 if (isAdmin && !string.IsNullOrWhiteSpace(model.UserManager) && userCurrent.UserManager != model.UserManager)
                 {

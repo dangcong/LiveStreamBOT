@@ -10,6 +10,5 @@ namespace BaseSource.Shared.Interfaces
     public interface IBotChatId
     {
         IEnumerable<string> TelegramUserNames { get; }
-        IEnumerable<ulong> DiscordUserIds { get; }
     }
 }

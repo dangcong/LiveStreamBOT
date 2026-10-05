@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Telegram.Bot;
-using Discord;
 using Telegram.Bot.Types;
 using static BaseSouce.Services.BotChatServices.BotChatService;
 using BaseSource.Shared.Interfaces;
@@ -23,16 +22,13 @@ namespace BaseSouce.Services.BotChatServices
             Bot
         }
 
-        readonly IDiscordBotChatService _discordBotChatService;
         readonly ITelegramBotChatService _telegramBotChatService;
         readonly ILogger<BotChatService> _logger;
         public BotChatService(
-            IDiscordBotChatService discordBotChatService,
             ITelegramBotChatService telegramBotChatService,
             ILogger<BotChatService> logger
             )
         {
-            this._discordBotChatService = discordBotChatService;
             this._telegramBotChatService = telegramBotChatService;
             this._logger = logger;
         }
@@ -66,33 +62,9 @@ namespace BaseSouce.Services.BotChatServices
             )
         {
             _logger.LogInformation("Dispatch message: SendType={SendType}", sendType);
-            return Task.WhenAll(_SendDiscordAsync(botChatId, text, sendType, cancellationToken), _SendTelegramAsync(botChatId, text, sendType, cancellationToken));
+            return _SendTelegramAsync(botChatId, text, sendType, cancellationToken);
         }
 
-
-        async Task _SendDiscordAsync(
-            IBotChatId botChatId,
-            string text,
-            SendType sendType = SendType.Stream,
-            CancellationToken cancellationToken = default
-            )
-        {
-            // Log số người nhận đã resolve để phân biệt "không có người nhận" (lỗi data) vs "gửi fail" (lỗi delivery)
-            var discordUserIds = botChatId.DiscordUserIds?.ToList() ?? new List<ulong>();
-            _logger.LogInformation("Discord recipients resolved: Count={Count}, SendType={SendType}", discordUserIds.Count, sendType);
-
-            foreach (var item in discordUserIds)
-            {
-                try
-                {
-                    await _discordBotChatService.SendMessageAsync(item, text, sendType, cancellationToken);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Discord dispatch error: SendType={SendType}, UserId={UserId}", sendType, item);
-                }
-            }
-        }
         async Task _SendTelegramAsync(
             IBotChatId botChatId,
             string text,

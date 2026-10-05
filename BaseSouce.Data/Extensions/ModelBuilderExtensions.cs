@@ -22,6 +22,7 @@ namespace BaseSouce.Data.Extensions
                 new AppRole
                 {
                     Id = roleAdminId,
+                    ConcurrencyStamp = "8917027d-3fdd-41b1-abe0-bc55cddfd741",
                     Name = "Admin",
                     NormalizedName = "Admin",
                     Description = "Administrator role"
@@ -29,13 +30,13 @@ namespace BaseSouce.Data.Extensions
                 new AppRole
                 {
                     Id = roleManagerId,
+                    ConcurrencyStamp = "fffb431f-85fe-4a2c-94ae-b62d194f76bb",
                     Name = "Manager",
                     NormalizedName = "Manager",
                     Description = "Manager role"
                 });
 
             var userAdminId = (new Guid("ffded6b0-3769-4976-841b-69459049a62d")).ToString();
-            var hasher = new PasswordHasher<AppUser>();
             modelBuilder.Entity<AppUser>().HasData(new AppUser
             {
                 Id = userAdminId,
@@ -44,7 +45,8 @@ namespace BaseSouce.Data.Extensions
                 Email = "admin@gmail.com",
                 NormalizedEmail = "admin@gmail.com",
                 EmailConfirmed = true,
-                PasswordHash = hasher.HashPassword(null, "12345678"),
+                ConcurrencyStamp = "e22cc615-9fb7-46fe-8998-4bc14c62a969",
+                PasswordHash = "AQAAAAEAACcQAAAAELRu9QUSGfsCuBqslHOFKPSr4RyNZ7rnEHEyd4MadvHqKoZcjefJ2lvJ7cbi9NY6lw==",
                 SecurityStamp = string.Empty
             });
 

@@ -4133,3 +4133,94 @@ body:not(.sidebar-mini) .sidebar-style-2 .sidebar-menu li.active ul.dropdown-men
         opacity: 0.0;
     }
 }
+
+/* Keyboard visibility, touch-sized table actions, and accessible mobile scrolling. */
+.btn:focus-visible,
+.table-responsive:focus-visible {
+    outline: 3px solid #1b6ec2 !important;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 3px rgba(27, 110, 194, .2) !important;
+    z-index: 2;
+}
+
+.table .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 40px;
+    margin: 2px;
+    white-space: nowrap;
+}
+
+.btn {
+    min-height: 40px;
+}
+
+.btn.btn-icon {
+    min-width: 40px;
+}
+
+.table-responsive {
+    max-width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+}
+
+.table-responsive:focus-visible {
+    border-radius: 3px;
+}
+
+.user-actions-cell {
+    width: 140px;
+    min-width: 140px;
+}
+
+.user-row-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+    width: 132px;
+    max-width: 132px;
+    position: relative;
+    z-index: 1;
+}
+
+.user-row-actions > .btn {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    margin: 0;
+    padding: 6px 5px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    touch-action: manipulation;
+    pointer-events: auto;
+}
+
+@media (max-width: 575.98px) {
+    .table-responsive {
+        padding-bottom: 6px;
+    }
+
+    .table-responsive .table {
+        min-width: 800px;
+    }
+
+    .table .btn {
+        min-height: 44px;
+    }
+
+    .btn {
+        min-height: 44px;
+    }
+
+    .btn.btn-icon {
+        min-width: 44px;
+    }
+
+    .user-row-actions > .btn {
+        min-height: 44px;
+    }
+}

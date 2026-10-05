@@ -1,8 +1,8 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
     <title>Admin</title>
 
     <!-- General CSS Files -->
@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="~/admin-themes/assets/modules/select2/dist/css/select2.min.css">
     <link rel="stylesheet" href="~/admin-themes/assets/modules/jquery-selectric/selectric.css">
     <!-- Template CSS -->
-    <link href="~/admin-themes/assets/css/style.css" rel="stylesheet" />
+    <link href="~/admin-themes/assets/css/style.css" rel="stylesheet" asp-append-version="true" />
     <link href="~/admin-themes/assets/css/components.css" rel="stylesheet" />
     <link rel="icon" type="image/x-icon" href="~/live-logo.png" asp-append-version="true" />
     @*<link rel="stylesheet" href="/css/styleauto.css">
@@ -128,6 +128,12 @@
     <!-- Page Specific JS File -->
     <script src="~/admin-themes/assets/js/page/modules-datatables.js"></script>
     <script>
+        document.querySelectorAll('.table-responsive').forEach((tableRegion, index) => {
+            tableRegion.tabIndex = 0;
+            tableRegion.setAttribute('role', 'region');
+            tableRegion.setAttribute('aria-label', `Bảng dữ liệu ${index + 1}; cuộn ngang để xem thêm cột`);
+        });
+
         $('body').on('change', '#managerChoose', function () {
             let val = $(this).val();
             $.ajax({

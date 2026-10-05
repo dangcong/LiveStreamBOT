@@ -127,8 +127,7 @@ namespace BaseSouce.Services.Services.User
                 var result = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
                 if (result.Succeeded)
                 {
-                    user.Password = model.NewPassword;
-                    await _userManager.UpdateAsync(user);
+                    await _unitOfWork.SaveChangesAsync();
                     await _signInManager.SignInAsync(user, isPersistent: false);
                     await _unitOfWork.SaveChangesAsync();
                     return new KeyValuePair<bool, string>(true, string.Empty);
@@ -199,14 +198,14 @@ namespace BaseSouce.Services.Services.User
                 //}
                 var hasher = new PasswordHasher<AppUser>();
 
+                var passwordHash = hasher.HashPassword(null, model.Password);
                 var user = new AppUser
                 {
                     Email = model.UserName,
                     UserName = model.UserName,
                     SecurityStamp = Guid.NewGuid().ToString(),
                     PhoneNumber = model.PhoneNumber,
-                    PasswordHash = hasher.HashPassword(null, model.Password),
-                    Password = model.Password,
+                    PasswordHash = passwordHash,
                     CreatedTime = DateTime.Now,
                     NormalizedEmail = model.UserName,
                     NormalizedUserName = model.UserName,
@@ -443,7 +442,6 @@ namespace BaseSouce.Services.Services.User
             var result = await _userManager.ResetPasswordAsync(user, codeDecoded, model.Password);
             if (result.Succeeded)
             {
-                user.Password = model.Password;
                 await _unitOfWork.SaveChangesAsync();
                 return new KeyValuePair<bool, string>(true, string.Empty);
             }

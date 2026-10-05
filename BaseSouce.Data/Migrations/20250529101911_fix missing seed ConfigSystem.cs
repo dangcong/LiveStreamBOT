@@ -8,6 +8,12 @@ namespace BaseSource.Data.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql(@"
+IF COL_LENGTH(N'dbo.ConfigSystems', N'Telegrams') IS NOT NULL
+   AND COL_LENGTH(N'dbo.ConfigSystems', N'TelegramUserIds') IS NULL
+    EXEC sp_rename N'dbo.ConfigSystems.Telegrams', N'TelegramUserIds', N'COLUMN';
+");
+
             migrationBuilder.UpdateData(
                 table: "AppRoles",
                 keyColumn: "Id",
@@ -35,8 +41,8 @@ namespace BaseSource.Data.Migrations
 IF NOT EXISTS (SELECT 1 FROM [ConfigSystems] WHERE [Id] = 1)
 BEGIN
     SET IDENTITY_INSERT [ConfigSystems] ON;
-    INSERT INTO [ConfigSystems] ([Id], [BankAccountName], [BankName], [BankNumber], [DiscordUserIds], [LinkFBAdmin], [LinkYoutube], [TelegramUserIds])
-    VALUES (1, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
+    INSERT INTO [ConfigSystems] ([Id], [BankAccountName], [BankName], [BankNumber], [LinkFBAdmin], [LinkYoutube], [TelegramUserIds])
+    VALUES (1, NULL, NULL, NULL, NULL, NULL, NULL);
     SET IDENTITY_INSERT [ConfigSystems] OFF;
 END
 ");
@@ -48,6 +54,12 @@ END
                 table: "ConfigSystems",
                 keyColumn: "Id",
                 keyValue: 1);
+
+            migrationBuilder.Sql(@"
+IF COL_LENGTH(N'dbo.ConfigSystems', N'TelegramUserIds') IS NOT NULL
+   AND COL_LENGTH(N'dbo.ConfigSystems', N'Telegrams') IS NULL
+    EXEC sp_rename N'dbo.ConfigSystems.TelegramUserIds', N'Telegrams', N'COLUMN';
+");
 
             migrationBuilder.UpdateData(
                 table: "AppRoles",

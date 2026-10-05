@@ -27,7 +27,6 @@ namespace BaseSource.ViewModels.UserAdmin
         public int NumberOfThreads4KInRun { get; set; }
         public int NumberOfThreadsBackupInRun { get; set; }
         public int NumberOfThreadsBackupPending { get; set; }
-        public string Password { get; set; }
         public int TotalBOT { get; set; }
         public DateTime? UpdatedTime { get; set; }
         public string UserUpdate { get; set; }
@@ -122,7 +121,10 @@ namespace BaseSource.ViewModels.UserAdmin
     public class UpdateBotChatTargetDto
     {
         public string? UserId { get; set; }
+        public string? UserName { get; set; }
+        public string? Password { get; set; }
         public string? TelegramUserId { get; set; }
         public string? UserManager { get; set; }
+        public string? UserUpdate { get; set; }
     }
 }

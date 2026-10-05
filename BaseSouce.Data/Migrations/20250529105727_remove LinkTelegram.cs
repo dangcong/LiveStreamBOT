@@ -8,6 +8,15 @@ namespace BaseSource.Data.Migrations
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.Sql(@"
+IF COL_LENGTH(N'dbo.AppUsers', N'TelegramAPI') IS NOT NULL
+   AND COL_LENGTH(N'dbo.AppUsers', N'TelegramUserId') IS NULL
+    EXEC sp_rename N'dbo.AppUsers.TelegramAPI', N'TelegramUserId', N'COLUMN';
+IF COL_LENGTH(N'dbo.AppUsers', N'TelegramBOT') IS NOT NULL
+   AND COL_LENGTH(N'dbo.AppUsers', N'TelegramUserIdReceiveNotificationsFromStaff') IS NULL
+    EXEC sp_rename N'dbo.AppUsers.TelegramBOT', N'TelegramUserIdReceiveNotificationsFromStaff', N'COLUMN';
+");
+
             migrationBuilder.DropColumn(
                 name: "LinkTelegram",
                 table: "AppUsers");
@@ -42,6 +51,15 @@ namespace BaseSource.Data.Migrations
                 type: "nvarchar(500)",
                 maxLength: 500,
                 nullable: true);
+
+            migrationBuilder.Sql(@"
+IF COL_LENGTH(N'dbo.AppUsers', N'TelegramUserId') IS NOT NULL
+   AND COL_LENGTH(N'dbo.AppUsers', N'TelegramAPI') IS NULL
+    EXEC sp_rename N'dbo.AppUsers.TelegramUserId', N'TelegramAPI', N'COLUMN';
+IF COL_LENGTH(N'dbo.AppUsers', N'TelegramUserIdReceiveNotificationsFromStaff') IS NOT NULL
+   AND COL_LENGTH(N'dbo.AppUsers', N'TelegramBOT') IS NULL
+    EXEC sp_rename N'dbo.AppUsers.TelegramUserIdReceiveNotificationsFromStaff', N'TelegramBOT', N'COLUMN';
+");
 
             migrationBuilder.UpdateData(
                 table: "AppRoles",

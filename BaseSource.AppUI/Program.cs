@@ -6,9 +6,6 @@ using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-builder.Services.AddControllersWithViews();
-
 //config session
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>

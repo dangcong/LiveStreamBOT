@@ -6,11 +6,14 @@
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
 		<PackageReference Include="Mailjet.Api" Version="3.0.0" />
 		<PackageReference Include="Telegram.Bot" Version="19.0.0"/>
-		<PackageReference Include="UnitOfWork.EntityFrameworkCore" Version="6.0.3" />
-		<PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
+		<PackageReference Include="UnitOfWork.EntityFrameworkCore" Version="8.0.6" />
 		<PackageReference Include="TqkLibrary.Http.Api.CloudStorage.Dropbox" Version="1.1.21" />
 		<PackageReference Include="TqkLibrary.Http.Api.CloudStorage.GoogleDrive" Version="1.1.21" />
 		<PackageReference Include="TqkLibrary.Http.Api.CloudStorage.OneDrive" Version="1.1.21" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 
 	<ItemGroup>

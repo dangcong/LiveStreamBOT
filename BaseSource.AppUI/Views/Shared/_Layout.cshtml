@@ -1,9 +1,9 @@
 ﻿<!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
 
     <meta charset="UTF-8">
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, shrink-to-fit=no" name="viewport">
+    <meta content="width=device-width, initial-scale=1, shrink-to-fit=no" name="viewport">
     <title>Admin</title>
 
     <!-- General CSS Files -->
@@ -130,7 +130,11 @@
     <script src="~/admin-themes/assets/modules/select2/dist/js/select2.full.min.js"></script>
     <script src="~/admin-themes/assets/modules/jquery-selectric/jquery.selectric.min.js"></script>
     <script>
-
+        document.querySelectorAll('.table-responsive').forEach((tableRegion, index) => {
+            tableRegion.tabIndex = 0;
+            tableRegion.setAttribute('role', 'region');
+            tableRegion.setAttribute('aria-label', `Bảng dữ liệu ${index + 1}; cuộn ngang để xem thêm cột`);
+        });
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 

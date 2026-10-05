@@ -3,7 +3,7 @@
 	<Import Project="..\ProjectBuildProperties.targets" />
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
 	</ItemGroup>
 
 	<ItemGroup>

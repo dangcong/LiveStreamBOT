@@ -10,4 +10,4 @@ Lịch sử Git được rewrite để loại `BaseSource.API/appsettings.json` 
 
 ## D003 — Chỉ sử dụng Telegram cho thông báo
 
-Hệ thống chỉ gửi thông báo qua Telegram. Discord integration, cấu hình runtime, package dependency và các trường nhập Discord trong UI đã được loại bỏ. Migration/schema lịch sử vẫn được giữ để tương thích với database hiện tại.
+Hệ thống chỉ gửi thông báo qua Telegram. Cấu hình, package dependency và trường nhập cho các kênh thông báo khác không thuộc runtime hiện tại.

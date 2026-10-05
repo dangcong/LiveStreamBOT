@@ -46,6 +46,15 @@
 
     <div class="section-body">
 
+        @if (TempData["Error"] is string errorMessage)
+        {
+            <div class="alert alert-danger" role="alert">@errorMessage</div>
+        }
+        @if (TempData["Success"] is string successMessage)
+        {
+            <div class="alert alert-success" role="status">@successMessage</div>
+        }
+
         <div class=" row">
             <div class="col-lg-12 col-md-12 col-sm-12">
                 <div class="card card-statistic-2">
@@ -134,22 +143,23 @@
                                     {
                                         <tr>
                                             <td>@(index++)</td>
-                                            <td>
-                                                <button class="btn btn-sm btn-primary btnTelegram"
+                                            <td class="user-actions-cell">
+                                                <div class="user-row-actions" role="group" aria-label="Thao tác người dùng @item.UserName">
+                                                <button type="button" class="btn btn-sm btn-primary btnEditUser"
+                                                        data-toggle="modal"
+                                                        data-target="#editUserModal"
                                                         data-id="@item.Id"
+                                                        data-username="@item.UserName"
+                                                        data-telegram="@item.TelegramUserId"
                                                         data-manager="@item.UserManager">
                                                     Edit
                                                 </button>
-                                                <a class="btn btn-sm btn-success" href="/admin/stream/user?userId=@(item.Id)&username=@(item.UserName)">DS Stream</a>
-                                                <a class="btn btn-sm btn-success" href="/admin/user/managerBot?userId=@(item.Id)&username=@(item.UserName)">DS BOT</a>
-                                                <button class="btn btn-sm btn-danger btnDelete" data-id="@item.Id">
+                                                <a class="btn btn-sm btn-success" href="/admin/stream/user?userId=@(item.Id)&username=@(item.UserName)">Stream</a>
+                                                <a class="btn btn-sm btn-success" href="/admin/user/managerBot?userId=@(item.Id)&username=@(item.UserName)">BOT</a>
+                                                <button type="button" class="btn btn-sm btn-danger btnDelete" data-id="@item.Id">
                                                     Xóa
                                                 </button>
-                                                <button class="btn btn-sm btn-warning btnResetPassword"
-                                                        data-id="@item.Id"
-                                                        data-user="@item.UserName">
-                                                    Reset Pass
-                                                </button>
+                                                </div>
                                             </td>
                                             <td>
                                                 @if (item.Roles.Any(x => x == "Admin"))
@@ -207,12 +217,12 @@
 </section>
 
 
-<div class="modal fade" role="dialog" id="telegramModal">
+<div class="modal fade" role="dialog" id="editUserModal" aria-labelledby="editUserModalTitle" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
-            <form method="post" id="formTelegram" action="/admin/User/UpdateBotChatTarget">
+            <form method="post" id="formEditUser" action="/admin/User/UpdateBotChatTarget">
                 <div class="modal-header">
-                    <h5 class="modal-title">Cập nhật </h5>
+                    <h5 class="modal-title" id="editUserModalTitle">Chỉnh sửa tài khoản</h5>
                     <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                         <span aria-hidden="true">&times;</span>
                     </button>
@@ -220,25 +230,35 @@
                 <div class="modal-body">
                     <input name="UserId" type="hidden" />
 
+                    <div class="form-group">
+                        <label for="editUserName">Tên người dùng</label>
+                        <input id="editUserName" type="text" name="UserName" required maxlength="256" autocomplete="username" class="form-control" />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="editUserPassword">Mật khẩu mới</label>
+                        <input id="editUserPassword" type="password" name="Password" minlength="6" autocomplete="new-password" placeholder="Để trống nếu không đổi mật khẩu" class="form-control" />
+                        <small class="form-text text-muted">Mật khẩu mới cần ít nhất 6 ký tự. Để trống nếu không muốn đổi.</small>
+                    </div>
+
                     <div class="form-group mb-4">
-                        <label class="">ID telegram (cách nhau , )</label>
+                        <label for="editTelegramUserId">ID Telegram (nhiều ID cách nhau bằng dấu phẩy)</label>
                         <div class="">
-                            <input type="text"
+                            <input id="editTelegramUserId" type="text"
                                    name="TelegramUserId"
-                                   placeholder="Nhập danh sách ID Telegram"
-                                   class="form-control"
-                                   style="height:100px" />
+                                   placeholder="Nhập ID Telegram"
+                                   class="form-control" />
                             <span class="text-danger"></span>
                         </div>
                     </div>
                     @if (User.IsInRole("Admin"))
                     {
                         <div class="form-group mb-4">
-                            <label class="">Manager <span class="text-danger">(Nếu người dùng là Manager, không chọn dòng này)</span></label>
+                            <label for="editUserManager">Manager</label>
                             <div class="">
                                 <div class="">
-                                    <select name="UserManager" required class="form-control select2">
-                                        <option>-- Chọn ---</option>
+                                    <select id="editUserManager" name="UserManager" class="form-control select2">
+                                        <option value="">Không đổi Manager</option>
                                         @foreach (var item in managers)
                                         {
                                             <option value="@item.Id">@item.UserName</option>
@@ -251,7 +271,7 @@
                     }
                 </div>
                 <div class="modal-footer bg-whitesmoke br">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Đóng</button>
                     <button type="submit" class="btn btn-primary">Cập nhật</button>
                 </div>
             </form>
@@ -283,79 +303,31 @@
     </div>
 </div>
 
-<div class="modal fade" tabindex="-1" role="dialog" id="resetPasswordModal">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <form method="post" id="formResetPassword" action="/admin/User/ResetPassword">
-                <div class="modal-header">
-                    <h5 class="modal-title">Reset mật khẩu người dùng :<span class="text-danger text-userName"></span></h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group mb-4">
-                        <label class="">Nhập mật khẩu mới</label>
-                        <div class="">
-                            <input name="Password" required placeholder="Nhập mật khẩu mới" class="form-control" />
-                            <span class="text-danger"></span>
-                        </div>
-                    </div>
-                    <input class="form-control" name="userId" type="hidden" />
-                </div>
-                <div class="modal-footer bg-whitesmoke br">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary">Xác nhận</button>
-
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $("#tableAllUser").DataTable({});
-
-            $('body').on('click', '.btnReset', function () {
-                let id = $(this).attr('data-id');
-                $('#formResetPassword input[name="userId"]').val(id);
-            });
             $('body').on('click', '.btnDelete', function () {
                 $('#deleteUserModal').modal('show');
                 let id = $(this).attr('data-id');
                 $('#formDeleteUser input[name="userId"]').val(id);
             });
-            $('body').on('click', '.btnTelegram', function () {
-                $('#telegramModal').modal('show');
-
+            $('body').on('click', '.btnEditUser', function () {
                 let id = $(this).attr('data-id');
-                let telegrams = $(this).attr('data-tele');
+                let userName = $(this).attr('data-username');
+                let telegrams = $(this).attr('data-telegram');
                 let manager = $(this).attr('data-manager');
 
-                $('#formTelegram input[name="UserId"]').val(id);
-                $('#formTelegram input[name="Telegram"]').val(telegrams);
-                $('#formTelegram select[name="UserManager"]').val(manager);
-            });
-
-            $('body').on('click', '.btnResetPassword', function () {
-                let id = $(this).attr('data-id');
-                let user = $(this).attr('data-user');
-                $('.text-userName').html(user);
-                $('#formResetPassword input[name="userId"]').val(id);
-                $('#resetPasswordModal').modal('show');
-                //$('#telegramModal').modal('show');
-
-
-                //let telegrams = $(this).attr('data-tele');
-                //$('#formTelegram input[name="UserId"]').val(id);
-                //$('#formTelegram input[name="Telegram"]').val(telegrams);
+                $('#formEditUser input[name="UserId"]').val(id);
+                $('#formEditUser input[name="UserName"]').val(userName);
+                $('#formEditUser input[name="Password"]').val('');
+                $('#formEditUser input[name="TelegramUserId"]').val(telegrams);
+                $('#formEditUser select[name="UserManager"]').val(manager || '').trigger('change');
             });
 
 
 
 
+            $("#tableAllUser").DataTable({});
         });
 
 

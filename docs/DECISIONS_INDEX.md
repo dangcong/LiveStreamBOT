@@ -2,4 +2,6 @@
 
 - D001 — Giữ branch chính là `master` để tương thích với repository nguồn.
 - D002 — Không đưa secret lịch sử vào repository mới; config trong source tree chỉ dùng placeholder.
-- D003 — Chỉ giữ Telegram làm kênh thông báo; loại bỏ Discord integration khỏi runtime và UI.
+- D003 — Kênh thông báo duy nhất là Telegram.
+- D004 — Chuẩn hóa tất cả project trong repository về `net8.0`; UI giữ bảng rộng trong vùng cuộn ngang trên mobile thay vì ép cột khó đọc.
+- D005 — Chỉ lưu mật khẩu trong `PasswordHash`; bỏ cột legacy `AppUsers.Password` và không đổi dữ liệu seed tài khoản mặc định khi migrate.

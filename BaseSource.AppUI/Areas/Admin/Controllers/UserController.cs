@@ -299,13 +299,14 @@ namespace BaseSource.AppUI.Areas.Admin.Controllers
         [HttpPost]
         public async Task<IActionResult> UpdateBotChatTarget(UpdateBotChatTargetDto model)
         {
+            model.UserUpdate = User.Identity?.Name;
             var result = await _userAdminApiClient.UpdateBotChatTarget(model);
             if (result == null || !result.IsSuccessed)
             {
-
-                // ModelState.AddModelError("", result?.ResultObj ?? "Tạo mới tài khoản không thành công");
+                TempData["Error"] = result?.Message ?? "Cập nhật tài khoản không thành công.";
                 return RedirectToAction("Index");
             }
+            TempData["Success"] = "Đã cập nhật tài khoản.";
             return RedirectToAction("Index");
         }
 

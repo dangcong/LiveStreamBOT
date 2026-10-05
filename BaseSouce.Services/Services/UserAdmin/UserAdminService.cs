@@ -22,16 +22,18 @@ namespace BaseSouce.Services.Services.UserAdmin
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly RoleManager<AppRole> _roleManager;
+        private readonly UserManager<AppUser> _userManager;
         private readonly ILogger<UserAdminService> _logger;
         private readonly IStreamClientService _streamClientService;
         private readonly IHubContext<BotHub, IBotClientHub> _botContextHub;
         public UserAdminService(IUnitOfWork<BaseSourceDbContext> unitOfWork,
-             RoleManager<AppRole> roleManager, ILogger<UserAdminService> logger
+             RoleManager<AppRole> roleManager, UserManager<AppUser> userManager, ILogger<UserAdminService> logger
             , IStreamClientService streamClientService
             , IHubContext<BotHub, IBotClientHub> botContextHub)
         {
             _unitOfWork = unitOfWork;
             _roleManager = roleManager;
+            _userManager = userManager;
             _logger = logger;
             _streamClientService = streamClientService;
             _botContextHub = botContextHub;
@@ -101,6 +103,7 @@ namespace BaseSouce.Services.Services.UserAdmin
                 var userIdParent = string.Empty;
 
                 var hasher = new PasswordHasher<AppUser>();
+                var passwordHash = hasher.HashPassword(null, model.Password);
 
                 var user = new AppUser
                 {
@@ -108,8 +111,7 @@ namespace BaseSouce.Services.Services.UserAdmin
                     UserName = model.UserName,
                     SecurityStamp = Guid.NewGuid().ToString(),
                     PhoneNumber = "123456789",
-                    PasswordHash = hasher.HashPassword(null, model.Password),
-                    Password = model.Password,
+                    PasswordHash = passwordHash,
                     CreatedTime = DateTime.Now,
                     NormalizedEmail = model.UserName,
                     NormalizedUserName = model.UserName,
@@ -322,7 +324,6 @@ namespace BaseSouce.Services.Services.UserAdmin
                     Email = x.Email,
                     Id = x.Id,
                     LinkFB = x.LinkFB,
-                    Password = x.Password,
                     NumberOfThreads1080 = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._1080).Sum(i => i.NumberOfThreads),
                     NumberOfThreads4K = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._4K).Sum(i => i.NumberOfThreads),
                     NumberOfThreadsBackup = x.UserManagerBOTs.Where(i => i.ManagerBOT.LiveType == LiveType._Backup).Sum(i => i.NumberOfThreads),
@@ -485,7 +486,6 @@ namespace BaseSouce.Services.Services.UserAdmin
 
                 var passwordHash = hasher.HashPassword(null, model.Password);
 
-                userCurrent.Password = model.Password;
                 userCurrent.PasswordHash = passwordHash;
                 userCurrent.UpdatedTime = DateTime.Now;
                 userCurrent.UserUpdate = model.UserUpdate;
@@ -585,6 +585,39 @@ namespace BaseSouce.Services.Services.UserAdmin
                 {
                     return new KeyValuePair<bool, string>(false, "Tài khoản không tồn tại!");
                 }
+
+                if (!string.IsNullOrWhiteSpace(model.UserName))
+                {
+                    var newUserName = model.UserName.Trim();
+                    if (!string.Equals(userCurrent.UserName, newUserName, StringComparison.Ordinal))
+                    {
+                        var normalizedUserName = _userManager.NormalizeName(newUserName);
+                        var usernameExists = await _repository.Queryable()
+                            .AnyAsync(x => x.Id != userCurrent.Id && x.NormalizedUserName == normalizedUserName);
+                        if (usernameExists)
+                        {
+                            return new KeyValuePair<bool, string>(false, "Tên người dùng đã được sử dụng!");
+                        }
+
+                        userCurrent.UserName = newUserName;
+                        userCurrent.NormalizedUserName = normalizedUserName;
+                        userCurrent.Email = newUserName;
+                        userCurrent.NormalizedEmail = _userManager.NormalizeEmail(newUserName);
+                    }
+                }
+
+                if (!string.IsNullOrWhiteSpace(model.Password))
+                {
+                    if (model.Password.Length < 6)
+                    {
+                        return new KeyValuePair<bool, string>(false, "Mật khẩu phải có ít nhất 6 ký tự!");
+                    }
+
+                    var passwordHash = _userManager.PasswordHasher.HashPassword(userCurrent, model.Password);
+                    userCurrent.PasswordHash = passwordHash;
+                    userCurrent.SecurityStamp = Guid.NewGuid().ToString();
+                }
+
                 userCurrent.TelegramUserId = model.TelegramUserId;
 
                 if (isAdmin && !string.IsNullOrWhiteSpace(model.UserManager) && userCurrent.UserManager != model.UserManager)
@@ -623,6 +656,8 @@ namespace BaseSouce.Services.Services.UserAdmin
                     }
                     userCurrent.UserManager = model.UserManager;
                 }
+                userCurrent.UpdatedTime = DateTime.Now;
+                userCurrent.UserUpdate = model.UserUpdate;
                 _repository.Update(userCurrent);
                 await _unitOfWork.SaveChangesAsync();
                 return new KeyValuePair<bool, string>(true, string.Empty);

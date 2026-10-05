@@ -120,14 +120,6 @@ namespace BaseSource.Data.Migrations
                     b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DiscordUserId")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("DiscordUserIdReceiveNotificationsFromStaff")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -546,10 +538,6 @@ namespace BaseSource.Data.Migrations
                     b.Property<string>("BankNumber")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("DiscordUserIds")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("LinkFBAdmin")
                         .HasMaxLength(500)

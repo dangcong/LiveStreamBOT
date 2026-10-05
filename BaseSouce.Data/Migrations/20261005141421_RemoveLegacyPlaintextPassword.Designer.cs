@@ -12,17 +12,18 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BaseSource.Data.Migrations
 {
     [DbContext(typeof(BaseSourceDbContext))]
-    [Migration("20250529091643_rename some telegram, add discord")]
-    partial class renamesometelegramadddiscord
+    [Migration("20261005141421_RemoveLegacyPlaintextPassword")]
+    partial class RemoveLegacyPlaintextPassword
     {
+        /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.2")
+                .HasAnnotation("ProductVersion", "8.0.31")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("BaseSouce.Data.Entities.AppRole", b =>
                 {
@@ -60,7 +61,7 @@ namespace BaseSource.Data.Migrations
                         new
                         {
                             Id = "c1105ce5-9dbc-49a9-a7d5-c963b6daa62a",
-                            ConcurrencyStamp = "81ee82fe-56f4-404a-a06c-2c7c6849c9cc",
+                            ConcurrencyStamp = "8917027d-3fdd-41b1-abe0-bc55cddfd741",
                             Description = "Administrator role",
                             Name = "Admin",
                             NormalizedName = "Admin"
@@ -68,7 +69,7 @@ namespace BaseSource.Data.Migrations
                         new
                         {
                             Id = "d32b2cc9-aabe-43b2-8bc0-66c8dfd77080",
-                            ConcurrencyStamp = "537cf5f8-9b32-414f-b64b-da9ac05139d1",
+                            ConcurrencyStamp = "fffb431f-85fe-4a2c-94ae-b62d194f76bb",
                             Description = "Manager role",
                             Name = "Manager",
                             NormalizedName = "Manager"
@@ -81,7 +82,7 @@ namespace BaseSource.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("nvarchar(max)");
@@ -120,14 +121,6 @@ namespace BaseSource.Data.Migrations
                     b.Property<DateTime?>("DeletedTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DiscordUserId")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("DiscordUserIdReceiveNotificationsFromStaff")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("nvarchar(256)");
@@ -136,10 +129,6 @@ namespace BaseSource.Data.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("LinkFB")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("LinkTelegram")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -162,9 +151,6 @@ namespace BaseSource.Data.Migrations
 
                     b.Property<int>("NumberOfThreads4KCreate")
                         .HasColumnType("int");
-
-                    b.Property<string>("Password")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PasswordHash")
                         .HasColumnType("nvarchar(max)");
@@ -221,7 +207,7 @@ namespace BaseSource.Data.Migrations
                         {
                             Id = "ffded6b0-3769-4976-841b-69459049a62d",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "90a70351-e535-43b4-bca2-842ab6d32b83",
+                            ConcurrencyStamp = "e22cc615-9fb7-46fe-8998-4bc14c62a969",
                             CreatedTime = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
@@ -230,7 +216,7 @@ namespace BaseSource.Data.Migrations
                             NormalizedUserName = "superadmin",
                             NumberOfThreads1080Create = 0,
                             NumberOfThreads4KCreate = 0,
-                            PasswordHash = "AQAAAAEAACcQAAAAEF3HqXkOyhcvpnfVB5zDnwZFZ/yBAGo4x71iqNz3XPNUM/I+dqIMeUiAGMl2jpytWA==",
+                            PasswordHash = "AQAAAAEAACcQAAAAELRu9QUSGfsCuBqslHOFKPSr4RyNZ7rnEHEyd4MadvHqKoZcjefJ2lvJ7cbi9NY6lw==",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
@@ -244,7 +230,7 @@ namespace BaseSource.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("ClaimType")
                         .HasColumnType("nvarchar(max)");
@@ -332,7 +318,7 @@ namespace BaseSource.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<double>("Bandwidth")
                         .HasColumnType("float");
@@ -413,7 +399,7 @@ namespace BaseSource.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
@@ -460,7 +446,7 @@ namespace BaseSource.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
@@ -503,7 +489,7 @@ namespace BaseSource.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<double>("Discount")
                         .HasColumnType("float");
@@ -533,7 +519,7 @@ namespace BaseSource.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("BankAccountName")
                         .HasMaxLength(50)
@@ -546,10 +532,6 @@ namespace BaseSource.Data.Migrations
                     b.Property<string>("BankNumber")
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("DiscordUserIds")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("LinkFBAdmin")
                         .HasMaxLength(500)
@@ -566,6 +548,12 @@ namespace BaseSource.Data.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ConfigSystems", (string)null);
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1
+                        });
                 });
 
             modelBuilder.Entity("BaseSource.Data.Entities.ManagerGroup", b =>
@@ -574,7 +562,7 @@ namespace BaseSource.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Note")
                         .HasMaxLength(100)
@@ -601,7 +589,7 @@ namespace BaseSource.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Audio")
                         .HasMaxLength(200)
@@ -710,7 +698,7 @@ namespace BaseSource.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedTime")
                         .HasColumnType("datetime2");
@@ -742,7 +730,7 @@ namespace BaseSource.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<string>("Changed")
                         .HasColumnType("nvarchar(max)");

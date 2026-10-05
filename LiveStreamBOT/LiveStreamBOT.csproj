@@ -15,10 +15,10 @@
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 		</PackageReference>
-		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="7.0.2" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="8.0.31" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.17.0" />
-		<PackageReference Include="System.Diagnostics.PerformanceCounter" Version="7.0.0" />
-		<PackageReference Include="System.Management" Version="7.0.2" />
+		<PackageReference Include="System.Diagnostics.PerformanceCounter" Version="8.0.0" />
+		<PackageReference Include="System.Management" Version="8.0.0" />
 		<PackageReference Include="TqkLibrary.Http.Api.CloudStorage.Dropbox" Version="1.1.21" />
 		<PackageReference Include="TqkLibrary.Http.Api.CloudStorage.GoogleDrive" Version="1.1.21" />
 		<PackageReference Include="TqkLibrary.Http.Api.CloudStorage.OneDrive" Version="1.1.21" />

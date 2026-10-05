@@ -46,6 +46,7 @@ namespace BaseSource.API.ControllersAdmin
         [Route("UpdateBotChatTarget")]
         public async Task<IActionResult> UpdateBotChatTarget(UpdateBotChatTargetDto model)
         {
+            model.UserUpdate = User.Identity?.Name;
             var result = await _userAdminService.UpdateBotChatTargetUserAsync(model, IsAdmin);
             if (result.Key)
             {

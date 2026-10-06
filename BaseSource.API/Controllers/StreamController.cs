@@ -105,6 +105,14 @@ namespace BaseSource.API.Controllers
         }
 
         [HttpGet]
+        [Route("{id:int:min(1)}/thumbnail")]
+        public async Task<IActionResult> GetThumbnail(int id)
+        {
+            var thumbnail = await _streamClientService.GetThumbnailAsync(UserId, id);
+            return thumbnail == null ? NotFound() : File(thumbnail, "image/jpeg");
+        }
+
+        [HttpGet]
         [Route("report")]
         public async Task<IActionResult> GetReportByUser()
         {

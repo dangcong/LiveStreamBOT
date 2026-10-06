@@ -18,6 +18,8 @@ using TqkLibrary.Http.Api.CloudStorage.GoogleDrive;
 using FFmpegArgs.Executes.Exceptions;
 using System.Net.Http;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
+using System.Globalization;
 
 namespace LiveStreamBOT.Queues
 {
@@ -79,6 +81,7 @@ namespace LiveStreamBOT.Queues
                     case FileType.File:
                         {
                             await DownloadFileAsync();
+                            await CreateAndUploadThumbnailAsync();
                             await PreRenderAsync();
                             DeleteDownloaded();
                             await WaitTimeAsync();
@@ -224,6 +227,106 @@ namespace LiveStreamBOT.Queues
                 if (File.Exists(path))
                     File.Delete(path);
             }
+        }
+
+        async Task CreateAndUploadThumbnailAsync()
+        {
+            string? videoPath = RenderCommand.FileDatas
+                .Where(x => string.Equals(x.Name, "video", StringComparison.OrdinalIgnoreCase))
+                .Select(x => Path.Combine(_workingDir, x.Name))
+                .FirstOrDefault(File.Exists);
+            if (videoPath == null)
+                return;
+
+            string thumbnailPath = Path.Combine(_workingDir, "thumbnail.jpg");
+            try
+            {
+                string durationText = await RunProcessAsync("ffprobe", new[]
+                {
+                    "-v", "error", "-show_entries", "format=duration",
+                    "-of", "default=noprint_wrappers=1:nokey=1", videoPath
+                });
+                if (!double.TryParse(durationText.Trim(), NumberStyles.Float, CultureInfo.InvariantCulture, out var duration)
+                    || duration <= 0 || double.IsInfinity(duration))
+                {
+                    LogHelper.WriteLog($"[{RenderCommand.ItemId} - {RenderCommand.WorkId}] Thumbnail skipped: video duration is unavailable.");
+                    return;
+                }
+
+                var midpoint = (duration / 2d).ToString("0.###", CultureInfo.InvariantCulture);
+                await RunProcessAsync("ffmpeg", new[]
+                {
+                    "-hide_banner", "-loglevel", "error", "-ss", midpoint,
+                    "-i", videoPath, "-frames:v", "1", "-vf", "scale=320:-2",
+                    "-q:v", "9", "-y", thumbnailPath
+                });
+
+                if (!File.Exists(thumbnailPath))
+                    return;
+
+                byte[] thumbnail = await File.ReadAllBytesAsync(thumbnailPath, CancellationToken);
+                if (thumbnail.Length > 512 * 1024)
+                {
+                    LogHelper.WriteLog($"[{RenderCommand.ItemId} - {RenderCommand.WorkId}] Thumbnail skipped: image exceeds upload limit ({thumbnail.Length} bytes).");
+                    return;
+                }
+
+                await _serverHub.UploadThumbnailAsync(RenderCommand.ItemId, thumbnail);
+            }
+            catch (Exception ex)
+            {
+                // Thumbnail extraction must never prevent a valid stream from starting.
+                LogHelper.WriteLog($"[{RenderCommand.ItemId} - {RenderCommand.WorkId}] Thumbnail extraction failed: {ex.Message}");
+            }
+            finally
+            {
+                try
+                {
+                    if (File.Exists(thumbnailPath)) File.Delete(thumbnailPath);
+                }
+                catch (Exception ex)
+                {
+                    LogHelper.WriteLog($"[{RenderCommand.ItemId} - {RenderCommand.WorkId}] Temporary thumbnail cleanup failed: {ex.Message}");
+                }
+            }
+        }
+
+        static async Task<string> RunProcessAsync(string fileName, IEnumerable<string> arguments)
+        {
+            using Process process = new Process
+            {
+                StartInfo = new ProcessStartInfo
+                {
+                    FileName = fileName,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                }
+            };
+            foreach (var argument in arguments)
+                process.StartInfo.ArgumentList.Add(argument);
+
+            if (!process.Start())
+                throw new InvalidOperationException($"Could not start {fileName}.");
+
+            Task<string> outputTask = process.StandardOutput.ReadToEndAsync();
+            Task<string> errorTask = process.StandardError.ReadToEndAsync();
+            using CancellationTokenSource timeout = new CancellationTokenSource(TimeSpan.FromSeconds(20));
+            try
+            {
+                await process.WaitForExitAsync(timeout.Token);
+            }
+            catch
+            {
+                try { process.Kill(entireProcessTree: true); } catch { }
+                throw;
+            }
+            string output = await outputTask;
+            string error = await errorTask;
+            if (process.ExitCode != 0)
+                throw new InvalidOperationException($"{fileName} exited with code {process.ExitCode}: {error}");
+            return output;
         }
 
         Task<Stream> GetLivestreamAsync()

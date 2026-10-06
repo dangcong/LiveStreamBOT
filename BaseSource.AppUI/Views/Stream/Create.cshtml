@@ -10,7 +10,26 @@
 
 }
 <style>
+    .stream-job-thumbnail-cell {
+        min-width: 116px;
+        text-align: center;
+        vertical-align: middle !important;
+    }
+
+    .stream-job-thumbnail {
+        width: 100px;
+        height: 56px;
+        object-fit: cover;
+        border-radius: 6px;
+        background: #eef1f5;
+    }
+
     @@media (max-width: 767px) {
+        .stream-job-thumbnail {
+            width: 84px;
+            height: 48px;
+        }
+
         .card .card-stats .card-stats-items {
             display: flow;
         }
@@ -433,6 +452,7 @@
                                             BotName
                                         </th>
                                         <th>Group</th>
+                                        <th>Job</th>
                                         <th>Live</th>
                                         <th>Tên luồng</th>
                                         <th>Khóa luồng</th>
@@ -516,6 +536,13 @@
                                                 </td>
                                                 <td>
                                                     <span class="text-primary">@item.Group</span>
+                                                </td>
+                                                <td class="stream-job-thumbnail-cell">
+                                                    <img src="/stream/thumbnail?id=@item.Id"
+                                                         alt="Ảnh xem trước: @item.StreamName"
+                                                         title="@item.StreamName"
+                                                         loading="lazy"
+                                                         class="stream-job-thumbnail" />
                                                 </td>
                                                 <td>
                                                     @switch (item.LiveType)

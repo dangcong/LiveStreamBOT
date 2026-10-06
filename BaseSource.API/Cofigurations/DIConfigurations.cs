@@ -37,6 +37,7 @@ namespace BaseSource.API.Cofigurations
             services.AddTransient<IOrderService, OrderService>();
             services.AddTransient<IOrderAdminService, OrderAdminService>();
             services.AddTransient<IStreamClientService, StreamClientService>();
+            services.AddSingleton<IStreamThumbnailStorage, FileStreamThumbnailStorage>();
             services.AddTransient<IValidateLinkService, ValidateLinkService>();
 
             services.AddTransient<IManagerBOTService, ManagerBOTService>();

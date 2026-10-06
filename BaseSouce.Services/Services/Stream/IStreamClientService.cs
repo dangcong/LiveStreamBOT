@@ -14,6 +14,8 @@ namespace BaseSouce.Services.Services.Stream
         Task<KeyValuePair<bool, string>> StartStreamAsync(string userId, int id);
         Task<IPagedList<StreamClientInfoDto>> GetByFilterAsync(string userId, StreamClientRequestDto model);
         Task<KeyValuePair<bool, string>> UpdateStreamAsync(RenderMessage model);
+        Task<byte[]?> GetThumbnailAsync(string userId, int streamId);
+        Task SaveThumbnailAsync(int streamId, string botId, string connectionId, byte[] thumbnail);
         Task<KeyValuePair<bool, string>> CancelStreamAsync(string userId, int id);
         Task<StreamClientInfoDto> GetStreamByIdAsync(string userId, int id);
         Task<StreamReportDto> GetStreamReportAsync(string userId);

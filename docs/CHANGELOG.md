@@ -2,6 +2,10 @@
 
 ## 2026-10-06
 
+- Thêm cột `Job` giữa `Group` và `Live`, hiển thị frame thumbnail trích ở giữa video sau khi BOT tải xong; lỗi thiếu `ffprobe`/`ffmpeg` không làm gián đoạn livestream.
+- API lưu thumbnail ra thư mục dữ liệu bền vững (cấu hình bằng `StreamThumbnailStoragePath`), chỉ chủ sở hữu xem được qua AppUI; xóa thumbnail cùng khi xóa stream hoặc đổi video nguồn, không cần migration database.
+- BOT tải thumbnail qua SignalR riêng, giới hạn 512 KiB và chỉ chấp nhận JPEG từ BOT có `BotId`/`ConnectionId` đang khớp với stream.
+
 - Đổi timezone VPS production sang `Asia/Ho_Chi_Minh` (UTC+7), giữ NTP đồng bộ; restart API/AppUI để nạp timezone mới, không chạy migration.
 - Đổi nhãn nút nhóm BOT từ “DS User” thành “User”.
 - Sửa profile phát hành Linux BOT để upload ZIP cập nhật lên API production `liveapi.lushmedia.net` thay vì domain `.co` cũ.

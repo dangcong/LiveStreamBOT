@@ -97,6 +97,23 @@ namespace LiveStreamBOT.Services
                     }
                 }
             }
+
+            public async Task UploadThumbnailAsync(long itemId, byte[] thumbnail)
+            {
+                try
+                {
+                    await _baseServerHub.UploadThumbnailAsync(itemId, thumbnail);
+                }
+                catch (ObjectDisposedException)
+                {
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    if (ex is AggregateException ae) ex = ae.InnerException;
+                    LogHelper.WriteLog($"Thumbnail upload failed: {ex.GetType().FullName}: {ex.Message}");
+                }
+            }
         }
 
 

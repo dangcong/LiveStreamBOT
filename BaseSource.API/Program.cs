@@ -65,7 +65,8 @@ builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.SwaggerConfiguration(builder.Configuration);
 
 
-builder.Services.AddSignalR().AddJsonProtocol(configure => configure.PayloadSerializerOptions.SignalR_JsonSerializerOptions());
+builder.Services.AddSignalR(options => options.MaximumReceiveMessageSize = 1024 * 1024)
+    .AddJsonProtocol(configure => configure.PayloadSerializerOptions.SignalR_JsonSerializerOptions());
 
 builder.AddTelegram();
 builder.Services.AddTransient<IBotChatService, BotChatService>();

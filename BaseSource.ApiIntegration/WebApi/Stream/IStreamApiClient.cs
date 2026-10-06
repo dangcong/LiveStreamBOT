@@ -12,6 +12,7 @@ namespace BaseSource.ApiIntegration.WebApi.Stream
         Task<ApiResult<string>> StopStreamAsync(int id);
         Task<ApiResult<PagedResult<StreamClientInfoDto>>> GetByFilterAsync(StreamClientRequestDto model);
         Task<ApiResult<StreamClientInfoDto>> GetById(int id);
+        Task<byte[]?> GetThumbnailAsync(int id);
         Task<ApiResult<StreamReportDto>> GetReport();
         Task<ApiResult<string>> ValidateLink(StreamLinkDto model);
         Task<ApiResult<List<UserBotDto>>> GetBotOfUserAsync();

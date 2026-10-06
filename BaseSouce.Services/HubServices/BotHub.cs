@@ -88,6 +88,13 @@ namespace BaseSouce.Services.HubServices
         {
             await _streamClientService.UpdateStreamAsync(renderMessage);
         }
+
+        public async Task UploadThumbnailAsync(long itemId, byte[] thumbnail)
+        {
+            var botId = GetBotIdFromHeader();
+            if (!string.IsNullOrWhiteSpace(botId) && itemId > 0 && itemId <= int.MaxValue)
+                await _streamClientService.SaveThumbnailAsync((int)itemId, botId, Context.ConnectionId, thumbnail);
+        }
         public override Task OnConnectedAsync()
         {
             string? botId = GetBotIdFromHeader();

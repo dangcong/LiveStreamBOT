@@ -33,6 +33,7 @@ namespace BaseSouce.Services.Services.Stream
         private readonly IBotChatService _botMessage;
         private readonly IValidateLinkService _validateLinkService;
         private readonly IConfiguration _configuration;
+        private readonly IStreamThumbnailStorage _thumbnailStorage;
         public StreamClientService(
             IUnitOfWork<BaseSourceDbContext> unitOfWork,
             ILogger<StreamClientService> logger,
@@ -41,7 +42,8 @@ namespace BaseSouce.Services.Services.Stream
             IUserService userService,
             IBotChatService botMessage,
             IValidateLinkService validateLinkService,
-            IConfiguration configuration
+            IConfiguration configuration,
+            IStreamThumbnailStorage thumbnailStorage
             )
         {
             _unitOfWork = unitOfWork;
@@ -52,6 +54,7 @@ namespace BaseSouce.Services.Services.Stream
             _botMessage = botMessage;
             _validateLinkService = validateLinkService;
             _configuration = configuration;
+            _thumbnailStorage = thumbnailStorage;
         }
 
 
@@ -502,6 +505,7 @@ namespace BaseSouce.Services.Services.Stream
                 _repositoryStream.Delete(streamEntity);
 
                 await _unitOfWork.SaveChangesAsync();
+                await DeleteThumbnailAsync(streamEntity.Id);
 
                 return new KeyValuePair<bool, string>(true, string.Empty);
             }
@@ -812,6 +816,7 @@ namespace BaseSouce.Services.Services.Stream
                 }
                 //update data
                 streamEntity.StreamName = model.StreamName;
+                var videoChanged = !string.Equals(streamEntity.Video, model.Video, StringComparison.Ordinal);
                 streamEntity.Video = model.Video;
                 streamEntity.Audio = model.Audio;
                 streamEntity.IsForever = model.IsForever;
@@ -828,6 +833,8 @@ namespace BaseSouce.Services.Services.Stream
 
 
                 await _unitOfWork.SaveChangesAsync();
+                if (videoChanged)
+                    await DeleteThumbnailAsync(streamEntity.Id);
 
                 return new KeyValuePair<bool, string>(true, string.Empty);
             }
@@ -942,6 +949,7 @@ namespace BaseSouce.Services.Services.Stream
 
                         _repositoryStream.Delete(streamBackup);
                         await _unitOfWork.SaveChangesAsync();
+                        await DeleteThumbnailAsync(streamBackup.Id);
                         //_logger.LogInformation($"End close Backup:[{streamEntity.StreamBackupId}]");
                         //streamEntity.StreamBackupId = null;
                         streamEntity.IsLiveBackup = false;
@@ -1013,6 +1021,7 @@ namespace BaseSouce.Services.Services.Stream
                     {
                         _repositoryStream.Delete(streamEntity);
                         await _unitOfWork.SaveChangesAsync();
+                        await DeleteThumbnailAsync(streamEntity.Id);
                         return new KeyValuePair<bool, string>(true, string.Empty);
                     }
                 }
@@ -1054,9 +1063,11 @@ namespace BaseSouce.Services.Services.Stream
                     Command = Command.Cancel
                 });
 
+                var deletedThumbnailIds = new List<int>();
                 if (streamEntity.LiveType == LiveType._Backup)
                 {
                     _repositoryStream.Delete(streamEntity);
+                    deletedThumbnailIds.Add(streamEntity.Id);
                 }
                 else
                 {
@@ -1075,6 +1086,7 @@ namespace BaseSouce.Services.Services.Stream
                                 Command = Command.Cancel
                             });
                             _repositoryStream.Delete(streamBackup);
+                            deletedThumbnailIds.Add(streamBackup.Id);
                         }
 
                     }
@@ -1087,6 +1099,8 @@ namespace BaseSouce.Services.Services.Stream
                 //
 
                 await _unitOfWork.SaveChangesAsync();
+                foreach (var deletedId in deletedThumbnailIds)
+                    await DeleteThumbnailAsync(deletedId);
 
                 return new KeyValuePair<bool, string>(true, string.Empty);
             }
@@ -1105,6 +1119,61 @@ namespace BaseSouce.Services.Services.Stream
                 selector: x => _mapper.Map<StreamClientInfoDto>(x),
                 include: x => x.Include(i => i.AppUser).Include(i => i.ManagerBOT),
                 disableTracking: false);
+        }
+
+        public async Task<byte[]?> GetThumbnailAsync(string userId, int streamId)
+        {
+            var stream = await _unitOfWork.GetRepository<StreamHistory>().GetFirstOrDefaultAsync(
+                predicate: x => x.Id == streamId && x.UserId == userId);
+            return stream == null ? null : await _thumbnailStorage.GetAsync(streamId);
+        }
+
+        public async Task SaveThumbnailAsync(int streamId, string botId, string connectionId, byte[] thumbnail)
+        {
+            const int maxThumbnailBytes = 512 * 1024;
+            if (thumbnail == null || thumbnail.Length == 0 || thumbnail.Length > maxThumbnailBytes)
+            {
+                _logger.LogWarning("Ignoring invalid thumbnail for stream {StreamId}; bytes={ByteCount}", streamId, thumbnail?.Length ?? 0);
+                return;
+            }
+            if (thumbnail.Length < 3 || thumbnail[0] != 0xFF || thumbnail[1] != 0xD8 || thumbnail[2] != 0xFF)
+            {
+                _logger.LogWarning("Ignoring non-JPEG thumbnail for stream {StreamId}", streamId);
+                return;
+            }
+
+            var repository = _unitOfWork.GetRepository<StreamHistory>();
+            var stream = await repository.GetFirstOrDefaultAsync(
+                predicate: x => x.Id == streamId,
+                disableTracking: true);
+            if (stream == null)
+            {
+                _logger.LogWarning("Ignoring thumbnail for missing stream {StreamId}", streamId);
+                return;
+            }
+
+            var managerBot = await _unitOfWork.GetRepository<ManagerBOT>().GetFirstOrDefaultAsync(
+                predicate: x => x.BotId == botId && x.ConnectionId == connectionId,
+                disableTracking: true);
+            if (managerBot == null || (stream.ManagerBOTId != managerBot.Id && stream.ManagerBOTBackupId != managerBot.Id))
+            {
+                _logger.LogWarning("Ignoring unauthorized thumbnail upload for stream {StreamId} from bot {BotId}", streamId, botId);
+                return;
+            }
+
+            await _thumbnailStorage.SaveAsync(streamId, thumbnail);
+        }
+
+        private async Task DeleteThumbnailAsync(int streamId)
+        {
+            try
+            {
+                await _thumbnailStorage.DeleteAsync(streamId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to remove thumbnail for deleted or updated stream {StreamId}", streamId);
+            }
         }
 
         public async Task<StreamReportDto> GetStreamReportAsync(string userId)

@@ -50,6 +50,16 @@ namespace BaseSource.ApiIntegration.WebApi.Stream
             return await client.GetAsync<ApiResult<StreamClientInfoDto>>($"/api/stream/{id}");
         }
 
+        public async Task<byte[]?> GetThumbnailAsync(int id)
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            using var response = await client.GetAsync($"/api/stream/{id}/thumbnail");
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                return null;
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsByteArrayAsync();
+        }
+
         public async Task<ApiResult<StreamReportDto>> GetReport()
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);

@@ -4177,6 +4177,27 @@ body:not(.sidebar-mini) .sidebar-style-2 .sidebar-menu li.active ul.dropdown-men
     min-width: 140px;
 }
 
+.user-list-header {
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.user-list-header > h4 {
+    margin: 0;
+    padding-right: 0;
+    line-height: 1.2;
+}
+
+.user-list-header .user-list-create-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    flex: 0 0 auto;
+    margin: 0;
+    line-height: 1.2;
+}
+
 .user-row-actions {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -4200,6 +4221,22 @@ body:not(.sidebar-mini) .sidebar-style-2 .sidebar-menu li.active ul.dropdown-men
 }
 
 @media (max-width: 575.98px) {
+    .user-list-header {
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .user-list-header > h4 {
+        width: 100%;
+        text-align: center;
+    }
+
+    .user-list-header .user-list-create-btn {
+        align-self: center;
+        margin: 0;
+    }
+
     .table-responsive {
         padding-bottom: 6px;
     }

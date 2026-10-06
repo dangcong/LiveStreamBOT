@@ -6,6 +6,7 @@
 - Chuyển lịch kiểm tra cảnh báo BOT sang một lần mỗi ngày lúc 08:00 giờ Việt Nam; worker chờ đến mốc tiếp theo thay vì kiểm tra ngay khi API khởi động.
 - Chỉ gửi cảnh báo khi số ngày không hoạt động lớn hơn `InactiveBotDays` (mặc định 10); đúng 10 ngày chưa gửi.
 - Thu gọn nhóm 4 nút Edit/Stream/BOT/Xóa trong bảng user khoảng 30% theo chiều ngang; giữ vùng chạm tối thiểu 44px trên mobile.
+- Căn giữa tiêu đề và nút “Tạo mới” của header danh sách người dùng trên mobile; căn giữa nội dung bên trong nút ở mọi kích thước.
 
 ## 2026-10-05
 

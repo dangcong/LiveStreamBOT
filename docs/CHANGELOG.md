@@ -2,6 +2,7 @@
 
 ## 2026-10-06
 
+- Đổi nhãn nút nhóm BOT từ “DS User” thành “User”.
 - Sửa profile phát hành Linux BOT để upload ZIP cập nhật lên API production `liveapi.lushmedia.net` thay vì domain `.co` cũ.
 - Thêm worker cảnh báo Telegram BOT không hoạt động theo `InactiveBotDays`, gửi cho staff và manager; lưu trạng thái chống gửi lặp trong file bền vững để không yêu cầu đổi schema database.
 - Chuyển lịch kiểm tra cảnh báo BOT sang một lần mỗi ngày lúc 08:00 giờ Việt Nam; worker chờ đến mốc tiếp theo thay vì kiểm tra ngay khi API khởi động.

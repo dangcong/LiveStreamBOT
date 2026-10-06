@@ -2,6 +2,7 @@
 
 ## 2026-10-06
 
+- Đổi timezone VPS production sang `Asia/Ho_Chi_Minh` (UTC+7), giữ NTP đồng bộ; restart API/AppUI để nạp timezone mới, không chạy migration.
 - Đổi nhãn nút nhóm BOT từ “DS User” thành “User”.
 - Sửa profile phát hành Linux BOT để upload ZIP cập nhật lên API production `liveapi.lushmedia.net` thay vì domain `.co` cũ.
 - Thêm worker cảnh báo Telegram BOT không hoạt động theo `InactiveBotDays`, gửi cho staff và manager; lưu trạng thái chống gửi lặp trong file bền vững để không yêu cầu đổi schema database.

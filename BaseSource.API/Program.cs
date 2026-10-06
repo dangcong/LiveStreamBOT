@@ -83,6 +83,7 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 app.UseForwardedHeaders();
+app.UseHttpsRedirection();
 //if (app.Environment.IsDevelopment())
 //{
 //    app.UseSwagger();
@@ -90,7 +91,6 @@ app.UseForwardedHeaders();
 //}
 app.UseSwagger();
 app.UseSwaggerUI();
-app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseAuthentication();

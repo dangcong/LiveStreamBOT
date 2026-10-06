@@ -11,23 +11,26 @@
 }
 <style>
     .stream-job-thumbnail-cell {
-        min-width: 116px;
+        min-width: 136px;
         text-align: center;
-        vertical-align: middle !important;
+        vertical-align: top !important;
+        padding-top: .75rem !important;
     }
 
     .stream-job-thumbnail {
-        width: 100px;
-        height: 56px;
+        display: block;
+        width: 120px;
+        height: 67px;
         object-fit: cover;
         border-radius: 6px;
         background: #eef1f5;
+        margin: 0 auto;
     }
 
     @@media (max-width: 767px) {
         .stream-job-thumbnail {
-            width: 84px;
-            height: 48px;
+            width: 101px;
+            height: 58px;
         }
 
         .card .card-stats .card-stats-items {
@@ -448,13 +451,13 @@
                                     <tr>
                                         <th>STT</th>
                                         <th>Action</th>
+                                        <th>Tên luồng</th>
+                                        <th>Job</th>
                                         <th class="text-center">
                                             BotName
                                         </th>
                                         <th>Group</th>
-                                        <th>Job</th>
                                         <th>Live</th>
-                                        <th>Tên luồng</th>
                                         <th>Khóa luồng</th>
                                         <th>Bot Backup</th>
                                         <th>Kiểu live</th>
@@ -531,18 +534,19 @@
 
 
                                                 </td>
-                                                <td>
-                                                    <span class="text-danger">@item.BotName</span>
-                                                </td>
-                                                <td>
-                                                    <span class="text-primary">@item.Group</span>
-                                                </td>
+                                                <td>@item.StreamName</td>
                                                 <td class="stream-job-thumbnail-cell">
                                                     <img src="/stream/thumbnail?id=@item.Id"
                                                          alt="Ảnh xem trước: @item.StreamName"
                                                          title="@item.StreamName"
                                                          loading="lazy"
                                                          class="stream-job-thumbnail" />
+                                                </td>
+                                                <td>
+                                                    <span class="text-danger">@item.BotName</span>
+                                                </td>
+                                                <td>
+                                                    <span class="text-primary">@item.Group</span>
                                                 </td>
                                                 <td>
                                                     @switch (item.LiveType)
@@ -559,7 +563,6 @@
                                                     }
 
                                                 </td>
-                                                <td>@item.StreamName</td>
                                                 <th>@item.StreamKey</th>
                                                 <td>
                                                     @if (!string.IsNullOrWhiteSpace(item.BotBackupName))

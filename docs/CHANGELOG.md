@@ -2,6 +2,7 @@
 
 ## 2026-10-06
 
+- Đổi thứ tự bảng cấu hình thành Action, Tên luồng, Job, BotName, Group, Live; tăng thumbnail thêm 20% và căn lên đầu ô.
 - Thêm cột `Job` giữa `Group` và `Live`, hiển thị frame thumbnail trích ở giữa video sau khi BOT tải xong; lỗi thiếu `ffprobe`/`ffmpeg` không làm gián đoạn livestream.
 - API lưu thumbnail ra thư mục dữ liệu bền vững (cấu hình bằng `StreamThumbnailStoragePath`), chỉ chủ sở hữu xem được qua AppUI; xóa thumbnail cùng khi xóa stream hoặc đổi video nguồn, không cần migration database.
 - BOT tải thumbnail qua SignalR riêng, giới hạn 512 KiB và chỉ chấp nhận JPEG từ BOT có `BotId`/`ConnectionId` đang khớp với stream.

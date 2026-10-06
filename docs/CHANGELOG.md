@@ -38,4 +38,4 @@
 - Tinh gọn action người dùng thành “Edit”, “Stream”, “BOT”; gộp tên đăng nhập, đổi mật khẩu, Telegram và Manager vào form Edit; loại bỏ modal/nút Reset Pass riêng.
 - Thu gọn nhóm nút thao tác user khoảng 30% trên mobile nhưng giữ vùng chạm 44px; thêm Bootstrap trigger dự phòng và đăng ký handler Edit trước khi khởi tạo DataTables.
 - Các luồng tạo/đổi/reset mật khẩu không còn ghi mật khẩu rõ vào cột legacy; bỏ hiển thị trường mật khẩu khỏi trang Admin/Manager.
-- AppUI nhận `X-Forwarded-Proto` từ Cloudflare Tunnel trước HTTPS redirection để redirect và URL sinh ra giữ đúng HTTPS.
+- AppUI/API nhận `X-Forwarded-Proto` từ Cloudflare Tunnel trước HTTPS redirection và cố định cổng đích 443; redirect và URL sinh ra giữ đúng HTTPS.

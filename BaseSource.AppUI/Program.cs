@@ -13,6 +13,7 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.XForwardedProto;
 });
+builder.Services.AddHttpsRedirection(options => options.HttpsPort = 443);
 
 //config session
 builder.Services.AddDistributedMemoryCache();

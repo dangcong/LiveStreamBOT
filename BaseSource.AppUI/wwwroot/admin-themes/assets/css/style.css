@@ -4180,20 +4180,20 @@ body:not(.sidebar-mini) .sidebar-style-2 .sidebar-menu li.active ul.dropdown-men
 .user-row-actions {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 5px;
-    width: 132px;
-    max-width: 132px;
+    gap: 4px;
+    width: 96px;
+    max-width: 96px;
     position: relative;
     z-index: 1;
 }
 
 .user-row-actions > .btn {
     width: 100%;
-    min-width: 0;
+    min-width: 44px;
     min-height: 44px;
     margin: 0;
-    padding: 6px 5px;
-    font-size: 0.85rem;
+    padding: 4px 1px;
+    font-size: 0.75rem;
     white-space: nowrap;
     touch-action: manipulation;
     pointer-events: auto;

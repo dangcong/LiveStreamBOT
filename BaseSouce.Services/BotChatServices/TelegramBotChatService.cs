@@ -8,7 +8,7 @@ namespace BaseSouce.Services.BotChatServices
 {
     public interface ITelegramBotChatService
     {
-        Task SendMessageAsync(ChatId chatId, string text, SendType sendType = SendType.Stream, CancellationToken cancellationToken = default);
+        Task<bool> SendMessageAsync(ChatId chatId, string text, SendType sendType = SendType.Stream, CancellationToken cancellationToken = default);
     }
     public class TelegramBotChatService : ITelegramBotChatService
     {
@@ -41,7 +41,7 @@ namespace BaseSouce.Services.BotChatServices
             this._logger = logger;
         }
 
-        public async Task SendMessageAsync(ChatId chatId, string text, SendType sendType = SendType.Stream, CancellationToken cancellationToken = default)
+        public async Task<bool> SendMessageAsync(ChatId chatId, string text, SendType sendType = SendType.Stream, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -55,17 +55,24 @@ namespace BaseSouce.Services.BotChatServices
                 _logger.LogInformation("Telegram sending: SendType={SendType}, ChatId={ChatId}", sendType, chatId);
                 Message sent = await telegramBotClient.SendTextMessageAsync(chatId, text, cancellationToken: cancellationToken);
                 _logger.LogInformation("Telegram sent OK: SendType={SendType}, ChatId={ChatId}, MessageId={MessageId}", sendType, chatId, sent.MessageId);
+                return true;
+            }
+            catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+            {
+                throw;
             }
             catch (ApiRequestException ex)
             {
                 // Lỗi do Telegram API trả về (vd 403 Forbidden: bot can't initiate conversation,
                 // 400 Bad Request: chat not found...). Đây là nguyên nhân hay gặp nhất khi không nhận được tin.
                 _logger.LogError(ex, "Telegram API error: SendType={SendType}, ChatId={ChatId}, ErrorCode={ErrorCode}, Message={ApiMessage}", sendType, chatId, ex.ErrorCode, ex.Message);
+                return false;
             }
             catch (Exception ex)
             {
                 // Lỗi khác: mạng tới api.telegram.org, token sai, TLS...
                 _logger.LogError(ex, "Telegram send failed: SendType={SendType}, ChatId={ChatId}", sendType, chatId);
+                return false;
             }
         }
     }

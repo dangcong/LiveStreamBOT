@@ -2,9 +2,17 @@ using BaseSource.Shared.Constants;
 using BaseSource.AppUI.Configuration;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.HttpOverrides;
 using System.Net.Http.Headers;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Cloudflare Tunnel terminates HTTPS at the edge and forwards requests to Kestrel over HTTP.
+// Honor the forwarded scheme from the local tunnel proxy so generated redirects stay HTTPS.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedProto;
+});
 
 //config session
 builder.Services.AddDistributedMemoryCache();
@@ -65,6 +73,7 @@ builder.Services.DIConfiguration();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseForwardedHeaders();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");

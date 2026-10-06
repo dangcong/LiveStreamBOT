@@ -39,3 +39,7 @@
 - Thu gọn nhóm nút thao tác user khoảng 30% trên mobile nhưng giữ vùng chạm 44px; thêm Bootstrap trigger dự phòng và đăng ký handler Edit trước khi khởi tạo DataTables.
 - Các luồng tạo/đổi/reset mật khẩu không còn ghi mật khẩu rõ vào cột legacy; bỏ hiển thị trường mật khẩu khỏi trang Admin/Manager.
 - AppUI/API nhận `X-Forwarded-Proto` từ Cloudflare Tunnel trước HTTPS redirection, cố định cổng đích 443; middleware redirect chạy trước Swagger/static để cả API docs cũng bắt buộc HTTPS.
+
+## 2026-10-07
+
+- Đồng bộ bảng stream Admin/Manager theo thứ tự STT, Manager, Người dùng, Tên Luồng, Job, BotName, Group; thêm thumbnail Job qua API admin có kiểm tra quyền.

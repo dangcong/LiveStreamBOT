@@ -116,11 +116,10 @@
                                         <th>STT</th>
                                         <th>Manager</th>
                                         <th>Người dùng</th>
-
-                                        <th>BOTName</th>
-
+                                        <th>Tên Luồng</th>
+                                        <th>Job</th>
+                                        <th>BotName</th>
                                         <th>Group</th>
-                                        <th>Tên</th>
                                         <th>Key</th>
                                         <th>Bot Backup</th>
                                         <th>Kiểu live</th>
@@ -142,10 +141,16 @@
                                             <td>
                                                 @item.UserName
                                             </td>
-
+                                            <td>@item.StreamName</td>
+                                            <td class="stream-job-thumbnail-cell">
+                                                <img src="/admin/stream/thumbnail?id=@item.Id"
+                                                     alt="Ảnh xem trước: @item.StreamName"
+                                                     title="@item.StreamName"
+                                                     loading="lazy"
+                                                     class="stream-job-thumbnail" />
+                                            </td>
                                             <td>@item.BotName</td>
                                             <td>@item.BotGroup</td>
-                                            <td>@item.StreamName</td>
                                             <th>@item.StreamKey</th>
                                             <td>@(item.BotBackupName) - @(item.BotBackupGroup)</td>
                                             <td>

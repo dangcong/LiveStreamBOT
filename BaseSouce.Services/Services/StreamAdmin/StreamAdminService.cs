@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BaseSouce.Data.EF;
 using BaseSouce.Data.Entities;
+using BaseSouce.Services.Services.Stream;
 using BaseSouce.Shared.Enums;
 using BaseSource.Data.Entities;
 using BaseSource.ViewModels.Stream;
@@ -16,15 +17,28 @@ namespace BaseSouce.Services.Services.StreamAdmin
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<StreamAdminService> _logger;
         private readonly IMapper _mapper;
+        private readonly IStreamThumbnailStorage _thumbnailStorage;
         public StreamAdminService(
             IUnitOfWork<BaseSourceDbContext> unitOfWork,
             ILogger<StreamAdminService> logger,
-            IMapper mapper)
+            IMapper mapper,
+            IStreamThumbnailStorage thumbnailStorage)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
             _mapper = mapper;
+            _thumbnailStorage = thumbnailStorage;
 
+        }
+
+        public async Task<byte[]?> GetThumbnailAsync(string userId, int streamId, bool isAdmin)
+        {
+            var canAccess = await _unitOfWork.GetRepository<StreamHistory>().Queryable()
+                .AsNoTracking()
+                .AnyAsync(stream => stream.Id == streamId &&
+                    (isAdmin || stream.UserId == userId || stream.AppUser.UserManager == userId));
+
+            return canAccess ? await _thumbnailStorage.GetAsync(streamId) : null;
         }
 
         public async Task<List<StreamAdminInfoDto>> GetAllByUserIdAsync(string userId, bool isAdmin = false)

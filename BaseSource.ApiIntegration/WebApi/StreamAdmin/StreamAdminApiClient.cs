@@ -38,6 +38,16 @@ namespace BaseSource.ApiIntegration.WebApi.StreamAdmin
             return await client.GetAsync<ApiResult<StreamClientInfoDto>>($"/api/admin/stream/{id}");
         }
 
+        public async Task<byte[]?> GetThumbnailAsync(int id)
+        {
+            var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);
+            using var response = await client.GetAsync($"/api/admin/stream/{id}/thumbnail");
+            if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                return null;
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadAsByteArrayAsync();
+        }
+
         public async Task<ApiResult<StreamReportAdminDto>> GetReportStream(string managers)
         {
             var client = _httpClientFactory.CreateClient(SystemConstants.BackendApiClient);

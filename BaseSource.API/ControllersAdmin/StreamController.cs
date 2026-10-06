@@ -30,6 +30,14 @@ namespace BaseSource.API.ControllersAdmin
         }
 
         [HttpGet]
+        [Route("{id:int:min(1)}/thumbnail")]
+        public async Task<IActionResult> GetThumbnail(int id)
+        {
+            var thumbnail = await _streamAdminService.GetThumbnailAsync(UserId, id, IsAdmin);
+            return thumbnail == null ? NotFound() : File(thumbnail, "image/jpeg");
+        }
+
+        [HttpGet]
         [Route("bot/{id:int:min(1)}")]
         public async Task<IActionResult> GetAllByBotId(int id)
         {

@@ -10,6 +10,7 @@ namespace BaseSource.ApiIntegration.WebApi.StreamAdmin
         Task<ApiResult<List<StreamAdminInfoDto>>> GetAllByUserIdAsync(string userId);
         Task<ApiResult<StreamReportAdminDto>> GetReportStream(string managers);
         Task<ApiResult<StreamClientInfoDto>> GetById(int id);
+        Task<byte[]?> GetThumbnailAsync(int id);
         
     }
 }

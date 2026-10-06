@@ -1,0 +1,23 @@
+.stream-job-thumbnail-cell {
+    min-width: 136px;
+    text-align: center;
+    vertical-align: top !important;
+    padding-top: .75rem !important;
+}
+
+.stream-job-thumbnail {
+    display: block;
+    width: 120px;
+    height: 67px;
+    object-fit: cover;
+    border-radius: 6px;
+    background: #eef1f5;
+    margin: 0 auto;
+}
+
+@media (max-width: 767px) {
+    .stream-job-thumbnail {
+        width: 101px;
+        height: 58px;
+    }
+}

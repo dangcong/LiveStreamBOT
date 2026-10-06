@@ -11,5 +11,6 @@ namespace BaseSouce.Services.Services.StreamAdmin
         Task<List<StreamAdminInfoDto>> GetAllByUserIdAsync(string userId, bool isAdmin = false);
         Task<StreamReportAdminDto> GetReportStreamAsync(string userId, bool isAdmin,string managers);
         Task<StreamClientInfoDto> GetStreamByIdAsync(int id);
+        Task<byte[]?> GetThumbnailAsync(string userId, int streamId, bool isAdmin);
     }
 }

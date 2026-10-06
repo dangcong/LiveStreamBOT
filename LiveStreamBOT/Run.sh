@@ -1,2 +1,2 @@
 ﻿#!/bin/sh
-dotnet LiveStreamBOT.dll https://liveapi.lushmedia.co/
+dotnet LiveStreamBOT.dll https://liveapi.lushmedia.net/

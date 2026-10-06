@@ -25,10 +25,10 @@ bool isDebug = "debug".Equals(args.Skip(1).FirstOrDefault(), StringComparison.Or
 Uri.TryCreate(args.FirstOrDefault(), UriKind.Absolute, out uri);
 while (uri is null)
 {
-    Console.Write("Nhập Url Api (https://liveapi.lushmedia.co/):");
+    Console.Write("Nhập Url Api (https://liveapi.lushmedia.net/):");
     string? url = Console.ReadLine();
     if (string.IsNullOrWhiteSpace(url))
-        url = "https://liveapi.lushmedia.co/";
+        url = "https://liveapi.lushmedia.net/";
     Uri.TryCreate(url, UriKind.Absolute, out uri);
 }
 

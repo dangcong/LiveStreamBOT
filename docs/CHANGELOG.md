@@ -7,6 +7,7 @@
 - Chỉ gửi cảnh báo khi số ngày không hoạt động lớn hơn `InactiveBotDays` (mặc định 10); đúng 10 ngày chưa gửi.
 - Thu gọn nhóm 4 nút Edit/Stream/BOT/Xóa trong bảng user khoảng 30% theo chiều ngang; giữ vùng chạm tối thiểu 44px trên mobile.
 - Căn giữa tiêu đề và nút “Tạo mới” của header danh sách người dùng trên mobile; căn giữa nội dung bên trong nút ở mọi kích thước.
+- Chuẩn hóa URL mặc định kết nối BOT trong console, Run scripts và launch profile về `https://liveapi.lushmedia.net/` để khớp domain production.
 
 ## 2026-10-05
 

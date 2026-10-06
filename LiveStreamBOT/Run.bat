@@ -1,1 +1,1 @@
-﻿LiveStreamBOT.exe https://liveapi.lushmedia.co/
+﻿LiveStreamBOT.exe https://liveapi.lushmedia.net/

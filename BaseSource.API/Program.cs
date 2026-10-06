@@ -14,8 +14,16 @@ using BaseSouce.Services.HubServices;
 using BaseSouce.Services.BackgroundServices;
 using BaseSouce.SharedSignalrData;
 using BaseSouce.Services.BotChatServices;
+using Microsoft.AspNetCore.HttpOverrides;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Cloudflare Tunnel terminates HTTPS at the edge and forwards to Kestrel over HTTP.
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedProto;
+});
+builder.Services.AddHttpsRedirection(options => options.HttpsPort = 443);
 
 //add logging
 builder.Host.ConfigureLogging(logging =>
@@ -74,6 +82,7 @@ builder.Services.AddTransient<IBotChatService, BotChatService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
+app.UseForwardedHeaders();
 //if (app.Environment.IsDevelopment())
 //{
 //    app.UseSwagger();

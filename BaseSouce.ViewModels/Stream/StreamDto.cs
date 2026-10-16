@@ -19,7 +19,7 @@ namespace BaseSource.ViewModels.Stream
         public string StreamName { get; set; }
         public LiveType LiveType { get; set; }
         public string Video { get; set; }
-        public string Audio { get; set; }
+        public string? Audio { get; set; }
         public LiveOrder LiveOrder { get; set; }
         public bool IsForever { get; set; }
         public bool IsLiveNow { get; set; }

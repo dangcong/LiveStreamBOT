@@ -54,6 +54,11 @@
         </div>
     </div>
     <div class="section-body">
+        @if (TempData["Success"] is string successMessage)
+        {
+            <div class="alert alert-success" role="status">@successMessage</div>
+        }
+
         <div class=" row">
             <div class="col-lg-12 col-md-12 col-sm-12">
                 <div class="card card-statistic-2">
@@ -255,7 +260,10 @@
 
                 <div class="card">
                     <form asp-action="Create" class="needs-validation" novalidate="">
-                        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                        @if (!ViewData.ModelState.IsValid)
+                        {
+                            <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2" role="alert"></div>
+                        }
                         <div class="card-header">
                             <h4>Cấu hình</h4>
                         </div>
@@ -271,6 +279,7 @@
                                 <input type="radio" id="live4k" value="2" name="LiveType" class="custom-control-input">
                                 <label class="custom-control-label" for="live4k">Live 4k</label>
                             </div>
+                            <span asp-validation-for="LiveType" class="text-danger d-block"></span>
 
 
                             <div class="form-group">
@@ -372,10 +381,12 @@
                             <div class="form-group">
                                 <label>Thời gian bắt đầu <span class="text-danger">* Bắt buộc</span></label>
                                 <input type="datetime-local" required asp-for="StartTimeLive" class="form-control col-6" placeholder="Thời gian bắt đầu">
+                                <span asp-validation-for="StartTimeLive" class="text-danger"></span>
                             </div>
                             <div class="form-group">
                                 <label>Thời gian kết thúc</label>
                                 <input type="datetime-local" asp-for="EndTimeLive" class="form-control col-6" placeholder="Thời gian kết thúc">
+                                <span asp-validation-for="EndTimeLive" class="text-danger"></span>
                             </div>
                             <button class="btn btn-warning" type="button" onclick="myFunction()">Reset thời gian</button>
                         </div>

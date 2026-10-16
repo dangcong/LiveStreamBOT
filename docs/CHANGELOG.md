@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-16
+
+- Cho phép Audio để trống đúng thiết kế khi tạo/sửa stream; bỏ validation bắt buộc ngầm do nullable reference types và chuẩn hóa Audio rỗng trước khi lưu, không đổi schema database.
+- Sửa phản hồi tạo luồng: tải lại danh sách khi form/API báo lỗi, hiển thị validation rõ hơn cho loại live và thời gian, và chỉ báo thành công sau khi API xác nhận lưu.
+- Xác minh bằng MVC validator: Audio trống được chấp nhận khi tạo/sửa, Video bắt buộc vẫn bị từ chối khi thiếu; build toàn solution bằng SDK 8.0.426 đạt 0 lỗi.
+
 ## 2026-10-06
 
 - Đổi thứ tự bảng cấu hình thành Action, Tên luồng, Job, BotName, Group, Live; tăng thumbnail thêm 20% và căn lên đầu ô.

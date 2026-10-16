@@ -312,7 +312,7 @@ namespace BaseSouce.Services.Services.Stream
         }
 
 
-        private async Task<BoolStringKeyValuePair> ValidateLink(string video, string audio)
+        private async Task<BoolStringKeyValuePair> ValidateLink(string video, string? audio)
         {
             var result = await _validateLinkService.ValidateLinkAsync(video, "video");
             if (!result.Key)
@@ -454,7 +454,7 @@ namespace BaseSouce.Services.Services.Stream
 
                 var streamEntityNew = new StreamHistory
                 {
-                    Audio = model.Audio,
+                    Audio = model.Audio ?? string.Empty,
                     Video = model.Video,
                     StreamName = model.StreamName,
                     //BotId = botConnectCurrent,
@@ -818,7 +818,7 @@ namespace BaseSouce.Services.Services.Stream
                 streamEntity.StreamName = model.StreamName;
                 var videoChanged = !string.Equals(streamEntity.Video, model.Video, StringComparison.Ordinal);
                 streamEntity.Video = model.Video;
-                streamEntity.Audio = model.Audio;
+                streamEntity.Audio = model.Audio ?? string.Empty;
                 streamEntity.IsForever = model.IsForever;
                 streamEntity.IsLiveNow = model.IsLiveNow;
                 streamEntity.RTMP = "rtmp://x.rtmp.youtube.com/live2";//model.RTMP;

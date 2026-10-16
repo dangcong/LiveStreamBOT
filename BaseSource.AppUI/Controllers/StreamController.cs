@@ -15,32 +15,42 @@ namespace BaseSource.AppUI.Controllers
             _streamApiClient = streamApiClient;
             _userApiClient = userApiClient;
         }
-        [HttpGet]
-        public async Task<IActionResult> Create()
+
+        private async Task<bool> LoadCreateViewDataAsync()
         {
-            var result = await _userApiClient.GetPackageInfo();
-            if (result == null || !result.IsSuccessed)
+            var packageInfo = await _userApiClient.GetPackageInfo();
+            if (packageInfo == null || !packageInfo.IsSuccessed)
             {
-                return NotFound();
+                return false;
             }
-            ViewBag.PackageInfo = result.ResultObj;
+            ViewBag.PackageInfo = packageInfo.ResultObj;
 
             var streamData = await _streamApiClient.GetByFilterAsync(new StreamClientRequestDto
             {
                 Page = 1,
                 PageSize = 500
             });
-            ViewBag.StreamData = streamData.ResultObj.Items.ToList();
+            ViewBag.StreamData = streamData?.ResultObj?.Items?.ToList() ?? new List<StreamClientInfoDto>();
 
             var report = await _streamApiClient.GetReport();
-            ViewBag.Report = report.ResultObj;
+            ViewBag.Report = report?.ResultObj;
 
             var bots = await _streamApiClient.GetBotOfUserAsync();
             if (bots == null || !bots.IsSuccessed)
             {
-                return NotFound();
+                return false;
             }
             ViewBag.Bots = bots.ResultObj;
+            return true;
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Create()
+        {
+            if (!await LoadCreateViewDataAsync())
+            {
+                return NotFound();
+            }
             return View();
         }
 
@@ -50,27 +60,15 @@ namespace BaseSource.AppUI.Controllers
 
             if (!ModelState.IsValid)
             {
-                var errorList = ModelState
-                .Where(x => x.Value.Errors.Count > 0)
-                .ToDictionary(
-                    kvp => kvp.Key,
-                    kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).ToArray()
-                );
-                var report = await _streamApiClient.GetReport();
-                ViewBag.Report = report.ResultObj;
+                if (!ModelState.TryGetValue(string.Empty, out var modelErrors) || modelErrors.Errors.Count == 0)
+                {
+                    ModelState.AddModelError(string.Empty, "Thông tin chưa hợp lệ. Vui lòng kiểm tra các thông báo dưới trường nhập rồi thử lại.");
+                }
 
-                var packageInfo = await _userApiClient.GetPackageInfo();
-                if (packageInfo == null || !packageInfo.IsSuccessed)
+                if (!await LoadCreateViewDataAsync())
                 {
                     return NotFound();
                 }
-                ViewBag.PackageInfo = packageInfo.ResultObj;
-                var bots = await _streamApiClient.GetBotOfUserAsync();
-                if (bots == null || !bots.IsSuccessed)
-                {
-                    return NotFound();
-                }
-                ViewBag.Bots = bots.ResultObj;
                 return View(model);
 
             }
@@ -79,24 +77,15 @@ namespace BaseSource.AppUI.Controllers
             var result = await _streamApiClient.Create(model);
             if (result == null || !result.IsSuccessed)
             {
-                var report = await _streamApiClient.GetReport();
-                ViewBag.Report = report.ResultObj;
-
-                var packageInfo = await _userApiClient.GetPackageInfo();
-                if (packageInfo == null || !packageInfo.IsSuccessed)
+                if (!await LoadCreateViewDataAsync())
                 {
                     return NotFound();
                 }
-                ViewBag.PackageInfo = packageInfo.ResultObj;
-                var bots = await _streamApiClient.GetBotOfUserAsync();
-                if (bots == null || !bots.IsSuccessed)
-                {
-                    return NotFound();
-                }
-                ViewBag.Bots = bots.ResultObj;
                 ModelState.AddModelError("", result?.Message ?? "Không thể tạo luồng stream!");
                 return View(model);
             }
+
+            TempData["Success"] = "Tạo luồng thành công.";
             return RedirectToAction("Create");
         }
 

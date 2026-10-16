@@ -3,6 +3,7 @@ using BaseSouce.SharedSignalrData.Enums;
 using BaseSouce.SharedSignalrData.Classes;
 using BaseSouce.SharedSignalrData.Interfaces;
 using BaseSouce.ViewModels.Common;
+using System.ComponentModel.DataAnnotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,8 +19,10 @@ namespace BaseSource.ViewModels.Stream
         //public string RTMP { get; set; } = "rtmp://x.rtmp.youtube.com/live2";
         public string StreamName { get; set; }
         public LiveType LiveType { get; set; }
-        public string Video { get; set; }
-        public string? Audio { get; set; }
+        [Required(ErrorMessage = "Vui lòng nhập link Video.")]
+        public string Video { get; set; } = string.Empty;
+        [Required(ErrorMessage = "Vui lòng nhập link Audio.")]
+        public string Audio { get; set; } = string.Empty;
         public LiveOrder LiveOrder { get; set; }
         public bool IsForever { get; set; }
         public bool IsLiveNow { get; set; }

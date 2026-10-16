@@ -1,5 +1,7 @@
 # Decisions Index
 
+- D008 — Stream phải có cả link Video và Audio khi tạo/sửa; chặn yêu cầu chạy nếu thiếu một trong hai link. Validation trả thông báo rõ ràng, không thay đổi schema database.
+
 - D001 — Giữ branch chính là `master` để tương thích với repository nguồn.
 - D002 — Không đưa secret lịch sử vào repository mới; config trong source tree chỉ dùng placeholder.
 - D003 — Kênh thông báo duy nhất là Telegram.

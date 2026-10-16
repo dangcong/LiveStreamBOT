@@ -312,18 +312,28 @@ namespace BaseSouce.Services.Services.Stream
         }
 
 
-        private async Task<BoolStringKeyValuePair> ValidateLink(string video, string? audio)
+        private static string? GetMissingMediaLinkError(string? video, string? audio)
         {
+            if (string.IsNullOrWhiteSpace(video))
+                return "Vui lòng nhập link Video.";
+            if (string.IsNullOrWhiteSpace(audio))
+                return "Vui lòng nhập link Audio.";
+            return null;
+        }
+
+        private async Task<BoolStringKeyValuePair> ValidateLink(string video, string audio)
+        {
+            var missingLinkError = GetMissingMediaLinkError(video, audio);
+            if (missingLinkError != null)
+                return missingLinkError;
+
             var result = await _validateLinkService.ValidateLinkAsync(video, "video");
             if (!result.Key)
                 return result.Value;
 
-            if (!string.IsNullOrWhiteSpace(audio))
-            {
-                result = await _validateLinkService.ValidateLinkAsync(audio, "audio");
-                if (!result.Key)
-                    return result.Value;
-            }
+            result = await _validateLinkService.ValidateLinkAsync(audio, "audio");
+            if (!result.Key)
+                return result.Value;
             return true;
         }
 
@@ -454,7 +464,7 @@ namespace BaseSouce.Services.Services.Stream
 
                 var streamEntityNew = new StreamHistory
                 {
-                    Audio = model.Audio ?? string.Empty,
+                    Audio = model.Audio,
                     Video = model.Video,
                     StreamName = model.StreamName,
                     //BotId = botConnectCurrent,
@@ -557,6 +567,12 @@ namespace BaseSouce.Services.Services.Stream
                 if (streamEntity == null)
                 {
                     return new KeyValuePair<bool, string>(false, "Luồng không tồn tại, vui lòng thử lại!");
+                }
+
+                var missingLinkError = GetMissingMediaLinkError(streamEntity.Video, streamEntity.Audio);
+                if (missingLinkError != null)
+                {
+                    return new KeyValuePair<bool, string>(false, missingLinkError);
                 }
 
                 //if (streamEntity.StreamBackupId.GetValueOrDefault() > 0)
@@ -795,6 +811,12 @@ namespace BaseSouce.Services.Services.Stream
         {
             try
             {
+                var missingLinkError = GetMissingMediaLinkError(model.Video, model.Audio);
+                if (missingLinkError != null)
+                {
+                    return new KeyValuePair<bool, string>(false, missingLinkError);
+                }
+
                 var _repositoryStream = _unitOfWork.GetRepository<StreamHistory>();
 
                 var streamEntity = await _repositoryStream.GetFirstOrDefaultAsync(
@@ -818,7 +840,7 @@ namespace BaseSouce.Services.Services.Stream
                 streamEntity.StreamName = model.StreamName;
                 var videoChanged = !string.Equals(streamEntity.Video, model.Video, StringComparison.Ordinal);
                 streamEntity.Video = model.Video;
-                streamEntity.Audio = model.Audio ?? string.Empty;
+                streamEntity.Audio = model.Audio;
                 streamEntity.IsForever = model.IsForever;
                 streamEntity.IsLiveNow = model.IsLiveNow;
                 streamEntity.RTMP = "rtmp://x.rtmp.youtube.com/live2";//model.RTMP;

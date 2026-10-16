@@ -2,6 +2,7 @@
 
 ## 2026-10-16
 
+- Điều chỉnh theo yêu cầu tiếp theo: bắt buộc cả link Video và Audio khi tạo/sửa, chặn chạy stream thiếu link, thay cho quy tắc cho phép Audio trống của bản trước; sửa model trả lại form Edit khi có lỗi. Kiểm tra 16 trường hợp MVC validation và build solution đạt 0 lỗi, không chạy migration.
 - Cho phép Audio để trống đúng thiết kế khi tạo/sửa stream; bỏ validation bắt buộc ngầm do nullable reference types và chuẩn hóa Audio rỗng trước khi lưu, không đổi schema database.
 - Sửa phản hồi tạo luồng: tải lại danh sách khi form/API báo lỗi, hiển thị validation rõ hơn cho loại live và thời gian, và chỉ báo thành công sau khi API xác nhận lưu.
 - Xác minh bằng MVC validator: Audio trống được chấp nhận khi tạo/sửa, Video bắt buộc vẫn bị từ chối khi thiếu; build toàn solution bằng SDK 8.0.426 đạt 0 lỗi.

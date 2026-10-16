@@ -216,6 +216,18 @@ namespace BaseSource.AppUI.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(int id, StreamUpdateDto model)
         {
+            if (!ModelState.IsValid)
+            {
+                var bots = await _streamApiClient.GetBotOfUserAsync();
+                if (bots == null || !bots.IsSuccessed)
+                {
+                    return NotFound();
+                }
+                ViewBag.Bots = bots.ResultObj;
+                ModelState.AddModelError(string.Empty, "Thông tin chưa hợp lệ. Vui lòng kiểm tra các thông báo dưới trường nhập rồi thử lại.");
+                return View(BuildEditViewModel(id, model));
+            }
+
             var result = await _streamApiClient.UpdateAsync(id, model);
             if (result == null || !result.IsSuccessed)
             {
@@ -226,9 +238,31 @@ namespace BaseSource.AppUI.Controllers
                 }
                 ViewBag.Bots = bots.ResultObj;
                 ModelState.AddModelError("", result?.Message ?? "Không thể sửa luồng stream!");
-                return View(model);
+                return View(BuildEditViewModel(id, model));
             }
             return RedirectToAction("Create");
+        }
+
+        private static StreamClientInfoDto BuildEditViewModel(int id, StreamUpdateDto model)
+        {
+            return new StreamClientInfoDto
+            {
+                Id = id,
+                StreamName = model.StreamName,
+                StreamKey = model.StreamKey,
+                Video = model.Video,
+                Audio = model.Audio,
+                LiveType = model.LiveType,
+                PlatformType = model.PlatformType,
+                ManagerBOTId = model.ManagerBOTId,
+                ManagerBotBackupId = model.ManagerBotBackupId,
+                TimeBackup = model.TimeBackup,
+                StartTimeLive = model.StartTimeLive,
+                EndTimeLive = model.EndTimeLive,
+                IsForever = model.IsForever,
+                IsLiveNow = model.IsLiveNow,
+                RTMP = "rtmp://x.rtmp.youtube.com/live2"
+            };
         }
 
 

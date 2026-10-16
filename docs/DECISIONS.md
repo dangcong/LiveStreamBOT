@@ -1,5 +1,9 @@
 # Decisions
 
+## D008 — Bắt buộc link Video và Audio
+
+Theo yêu cầu ngày 2026-10-16, cả Video và Audio đều bắt buộc khi tạo/sửa stream; chuỗi trống hoặc chỉ có khoảng trắng không được chấp nhận. Yêu cầu chạy stream cũ thiếu một trong hai link bị từ chối. Quy tắc được áp dụng ở DTO/API, form AppUI và service; giữ phần hiển thị lỗi rõ ràng và không cần migration database.
+
 ## D001 — Giữ branch chính là `master`
 
 Repository mới giữ branch `master` để không làm thay đổi workflow từ repository nguồn.
